@@ -81,7 +81,7 @@ function HeroSection() {
   }, [])
 
   return (
-    <section className="w-full h-screen bg-black flex overflow-hidden">
+    <section className="w-full h-[52vh] md:h-[65vh] lg:h-screen bg-black flex overflow-hidden">
 
       {/* ── LEFT SIDEBAR — columna sólida negra ── */}
       <div
