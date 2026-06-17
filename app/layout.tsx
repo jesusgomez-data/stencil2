@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Playfair_Display, Source_Code_Pro, Bebas_Neue } from 'next/font/google'
 import './globals.css'
+import { CartProvider } from '@/context/CartContext'
 
 const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
@@ -53,7 +54,9 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${playfairDisplay.variable} ${sourceCodePro.variable} ${bebasNeue.variable}`}>
       <body className="bg-black text-white antialiased">
-        {children}
+        <CartProvider>
+          {children}
+        </CartProvider>
       </body>
     </html>
   )

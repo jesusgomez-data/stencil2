@@ -12,7 +12,7 @@ import {
   SportSVG,
 } from './SunglassesIllustration'
 
-export type GlassesModel = 'wayfarer' | 'round' | 'shield' | 'aviator' | 'cat-eye' | 'sport'
+import { GlassesModel } from '@/types'
 
 const ILLUSTRATIONS: Record<GlassesModel, React.ComponentType<React.SVGProps<SVGSVGElement> & { color?: string }>> = {
   wayfarer: WayfarerSVG,

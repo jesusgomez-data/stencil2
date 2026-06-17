@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useCart } from '@/context/CartContext'
 
 const NAV_LINKS = [
   { label: 'INICIO',        href: '/' },
@@ -51,13 +52,12 @@ const XIcon = () => (
   </svg>
 )
 
-interface NavbarProps {
-  cartCount?: number
-}
-
-export default function Navbar({ cartCount = 2 }: NavbarProps) {
+export default function Navbar() {
+  const { cartItems } = useCart()
   const [menuOpen, setMenuOpen] = useState(false)
   const pathname = usePathname()
+
+  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0)
 
   // Prevent scroll when mobile menu is open
   useEffect(() => {
@@ -77,21 +77,13 @@ export default function Navbar({ cartCount = 2 }: NavbarProps) {
         <div className="relative flex items-center justify-between h-20">
 
           {/* Logo — LEFT */}
-          <Link href="/" aria-label="STENCIL2 — Inicio" className="flex items-center gap-3 flex-shrink-0 z-50">
+          <Link href="/" aria-label="STENCIL2 — Inicio" className="flex items-center flex-shrink-0 z-50">
             <Image
               src="/images/logo-grenade-white.png"
-              alt=""
-              width={32}
-              height={52}
-              className="h-11 w-auto object-contain"
-              priority
-            />
-            <Image
-              src="/images/logo-script-white.png?v=4"
               alt="STENCIL2"
-              width={160}
-              height={50}
-              className="h-[30px] w-auto object-contain mt-0.5"
+              width={48}
+              height={78}
+              className="h-16 w-auto object-contain hover:scale-105 transition-transform duration-300"
               priority
             />
           </Link>
@@ -135,13 +127,13 @@ export default function Navbar({ cartCount = 2 }: NavbarProps) {
 
             <Link
               href="/carrito"
-              aria-label={`Carrito (${cartCount} artículos)`}
+              aria-label={`Carrito (${totalItems} artículos)`}
               className="relative text-white/40 hover:text-white hover:scale-105 transition-all p-1.5 group"
             >
               <ShoppingBagIcon />
-              {cartCount > 0 && (
+              {totalItems > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 bg-white text-black text-[7px] font-code w-3.5 h-3.5 rounded-full flex items-center justify-center leading-none scale-90 font-bold">
-                  {cartCount}
+                  {totalItems}
                 </span>
               )}
             </Link>
@@ -200,9 +192,8 @@ export default function Navbar({ cartCount = 2 }: NavbarProps) {
               transition={{ delay: 0.35 }}
               className="border-t border-white/[0.08] pt-8 flex flex-col gap-4"
             >
-              <div className="flex items-center gap-2.5">
-                <Image src="/images/logo-grenade-white.png" alt="" width={20} height={32} className="h-6.5 w-auto object-contain" />
-                <Image src="/images/logo-script-white.png?v=4" alt="STENCIL2" width={100} height={30} className="h-[18px] w-auto object-contain mt-0.5" />
+              <div className="flex items-center">
+                <Image src="/images/logo-grenade-white.png" alt="STENCIL2" width={28} height={44} className="h-10 w-auto object-contain" />
               </div>
               <p className="font-code text-[9px] tracking-[0.2em] text-white/30 uppercase">
                 © STENCIL2 — JOINING CULTURE

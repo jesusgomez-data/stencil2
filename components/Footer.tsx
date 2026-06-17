@@ -29,9 +29,8 @@ export default function Footer() {
 
           {/* Brand */}
           <div className="space-y-4">
-            <Link href="/" className="flex items-center gap-2.5">
-              <Image src="/images/logo-grenade-white.png" alt="" width={24} height={38} className="h-8 w-auto object-contain" />
-              <Image src="/images/logo-script-white.png?v=4" alt="STENCIL2" width={130} height={40} className="h-[22px] w-auto object-contain mt-0.5" />
+            <Link href="/" className="flex items-center">
+              <Image src="/images/logo-grenade-white.png" alt="STENCIL2" width={36} height={58} className="h-12 w-auto object-contain hover:scale-105 transition-transform duration-300" />
             </Link>
             <p className="font-code text-[10px] tracking-[0.2em] text-white/30 uppercase">
               JOINING CULTURE

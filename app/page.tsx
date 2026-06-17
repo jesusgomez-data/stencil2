@@ -12,6 +12,7 @@ import {
 
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import Viewer3D from '@/components/Viewer3D'
 
 /* ─── Data ────────────────────────────────────────────────────────── */
 
@@ -251,8 +252,6 @@ function TrustBadgesBar() {
 /* ─── COLLECTIONS ─────────────────────────────────────────────────── */
 
 function CollectionsSection() {
-  const [selected, setSelected] = useState('classic-blue')
-
   return (
     <section className="bg-black pt-10 pb-14">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
@@ -322,39 +321,35 @@ function CollectionsSection() {
 
           {/* Product cards (sits automatically in columns 2 to 5, Row 2) */}
           {COLLECTION_PRODUCTS.map((p) => {
-            const isActive = selected === p.id
             return (
-              <button
+              <Link
                 key={p.id}
-                onClick={() => setSelected(p.id)}
-                className="relative flex flex-col text-left overflow-hidden rounded-xl transition-all duration-300 lg:h-[390px] aspect-[3/4] lg:aspect-auto group"
-                style={{
-                  background: '#131313',
-                  border:     '1px solid rgba(255,255,255,0.052)',
-                }}
+                href={`/producto/${p.id}`}
+                className="relative flex flex-col text-left overflow-hidden rounded-xl transition-all duration-300 lg:h-[390px] aspect-[3/4] lg:aspect-auto group bg-[#0f0f0f] border border-white/[0.06] hover:border-white/20 hover:shadow-2xl"
               >
                 {p.isNew && (
                   <span
                     className="absolute top-3 left-3 font-code text-[8px] tracking-[0.12em] uppercase px-2 py-1 z-10 font-bold"
-                    style={{ background: '#C4822A', color: '#000', borderRadius: '2px' }}
+                    style={{ background: '#CC0000', color: '#fff', borderRadius: '2px' }}
                   >
                     NUEVO
                   </span>
                 )}
 
-                <div className="relative flex-1 flex items-center justify-center p-4 min-h-[230px]">
+                {/* Real fotorrealistic sunglasses image from AI */}
+                <div className="relative flex-1 flex items-center justify-center p-4 min-h-[230px] overflow-hidden">
+                  {/* Radial colored glow matching the frame color */}
                   <div
-                    className="absolute inset-0"
+                    className="absolute inset-0 opacity-40 group-hover:opacity-60 transition-opacity duration-500"
                     style={{
-                      background: `radial-gradient(ellipse at 50% 50%, ${p.frameColor}30 0%, transparent 72%)`,
+                      background: `radial-gradient(circle at center, ${p.frameColor}33 0%, transparent 70%)`,
                     }}
                   />
                   <div
-                    className="relative w-full h-[168px] max-w-[260px] transition-all duration-500 group-hover:scale-105"
-                    style={{ mixBlendMode: 'multiply' }}
+                    className="relative w-full h-[152px] max-w-[242px] transition-all duration-500 group-hover:scale-105 z-10"
                   >
                     <Image
-                      src={p.image}
+                      src={`${p.image}?v=7`}
                       alt={p.name}
                       fill
                       className="object-contain"
@@ -363,12 +358,13 @@ function CollectionsSection() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between px-5 pb-5 w-full">
+                {/* Details Footer */}
+                <div className="flex items-center justify-between px-5 pb-5 w-full bg-[#0f0f0f] pt-3 border-t border-white/[0.04] z-10">
                   <div>
-                    <p className="font-code text-[9px] tracking-[0.18em] text-white/76 uppercase leading-none">
+                    <p className="font-code text-[9px] tracking-[0.18em] text-white/50 group-hover:text-white/80 transition-colors uppercase leading-none">
                       {p.name}
                     </p>
-                    <p className="font-display text-[13px] font-semibold text-white/36 group-hover:text-white/70 transition-colors mt-1">
+                    <p className="font-display text-[13px] font-bold text-white mt-1">
                       {p.price}
                     </p>
                   </div>
@@ -376,7 +372,7 @@ function CollectionsSection() {
                     <Plus size={11} strokeWidth={2.2} />
                   </div>
                 </div>
-              </button>
+              </Link>
             )
           })}
 
