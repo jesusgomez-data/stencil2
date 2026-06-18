@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node find-overflow.js)",
+      "Bash(node test-lightbox.js)",
+      "Bash(node test-lightbox2.js)",
+      "Skill(browse)",
+      "Skill(browse:*)"
+    ]
+  }
+}

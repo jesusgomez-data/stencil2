@@ -21,6 +21,8 @@ const config: Config = {
         display: ['var(--font-display)', '"Playfair Display"', 'serif'],
         code: ['var(--font-code)', '"Source Code Pro"', 'monospace'],
         bebas: ['var(--font-bebas)', '"Bebas Neue"', 'sans-serif'],
+        gabinet: ['var(--font-gabinet)', '"Space Grotesk"', 'sans-serif'],
+        signature: ['var(--font-signature)', '"Caveat"', 'cursive'],
       },
       borderRadius: {
         cta: '3px',

@@ -1,5 +1,5 @@
-import type { Metadata } from 'next'
-import { Playfair_Display, Source_Code_Pro, Bebas_Neue } from 'next/font/google'
+import type { Metadata, Viewport } from 'next'
+import { Playfair_Display, Source_Code_Pro, Bebas_Neue, Space_Grotesk, Caveat } from 'next/font/google'
 import './globals.css'
 import { CartProvider } from '@/context/CartContext'
 
@@ -21,6 +21,20 @@ const bebasNeue = Bebas_Neue({
   subsets: ['latin'],
   weight: ['400'],
   variable: '--font-bebas',
+  display: 'swap',
+})
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  weight: ['500', '700'],
+  variable: '--font-gabinet',
+  display: 'swap',
+})
+
+const caveat = Caveat({
+  subsets: ['latin'],
+  weight: ['600', '700'],
+  variable: '--font-signature',
   display: 'swap',
 })
 
@@ -46,13 +60,19 @@ export const metadata: Metadata = {
   },
 }
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+}
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="es" className={`${playfairDisplay.variable} ${sourceCodePro.variable} ${bebasNeue.variable}`}>
+    <html lang="es" className={`${playfairDisplay.variable} ${sourceCodePro.variable} ${bebasNeue.variable} ${spaceGrotesk.variable} ${caveat.variable}`}>
       <body className="bg-black text-white antialiased">
         <CartProvider>
           {children}

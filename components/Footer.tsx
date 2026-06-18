@@ -28,11 +28,11 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[280px_1fr_160px_200px] gap-10 lg:gap-8">
 
           {/* Brand */}
-          <div className="space-y-4">
+          <div className="flex flex-col items-center text-center space-y-6">
             <Link href="/" className="flex items-center">
               <Image src="/images/logo-grenade-white.png" alt="STENCIL2" width={36} height={58} className="h-12 w-auto object-contain hover:scale-105 transition-transform duration-300" />
             </Link>
-            <p className="font-code text-[10px] tracking-[0.2em] text-white/30 uppercase">
+            <p className="font-code text-[10px] tracking-[0.2em] text-slate-400/70 uppercase">
               JOINING CULTURE
             </p>
             <div className="flex items-center gap-4">

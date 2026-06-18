@@ -2,28 +2,30 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useRef, useEffect } from 'react'
 import {
   ArrowRight, Truck, Shield, Award, Headphones,
   ChevronLeft, ChevronRight, Plus, ChevronUp, ChevronDown,
   Home, Search, Compass, LayoutGrid, Play, AlignJustify, Grid3x3,
+  Volume2, VolumeX, Pause, X, Maximize2
 } from 'lucide-react'
 
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
-import Viewer3D from '@/components/Viewer3D'
+import Viewer3D, { FRAME_COLORS } from '@/components/Viewer3D'
+import { PRODUCTS } from '@/lib/products'
 
 /* ─── Data ────────────────────────────────────────────────────────── */
 
 const LEFT_NAV = [
-  { Icon: Home,        label: 'Inicio',       href: '/'       },
-  { Icon: Search,      label: 'Buscar',        href: '#'       },
-  { Icon: Compass,     label: 'Explorar',      href: '#'       },
-  { Icon: LayoutGrid,  label: 'Colecciones',   href: '/tienda', active: true },
-  { Icon: Play,        label: 'Video',         href: '#'       },
-  { Icon: AlignJustify,label: 'Lista',         href: '#'       },
-  { Icon: Grid3x3,     label: 'Grid',          href: '#'       },
+  { id: 'inicio',      Icon: Home,        label: 'Inicio'      },
+  { id: 'buscar',      Icon: Search,      label: 'Buscar'      },
+  { id: 'explorar',    Icon: Compass,     label: 'Explorar'    },
+  { id: 'colecciones', Icon: LayoutGrid,  label: 'Colecciones' },
+  { id: 'video',       Icon: Play,        label: 'Video'       },
+  { id: 'lista',       Icon: AlignJustify,label: 'Lista'       },
+  { id: 'grid',        Icon: Grid3x3,     label: 'Grid'        },
 ]
 
 const TRUST_BADGES = [
@@ -38,8 +40,9 @@ const COLLECTION_PRODUCTS = [
     id:              'classic-blue',
     name:            'CLASSIC BLUE',
     price:           '$ 29.00',
-    image:           '/images/classic-blue-ref.png',
+    image:           '/images/classic-blue-dark.png',
     frameColor:      '#C4822A',
+    bgColor:         '#040404',
     isNew:           false,
     whiteBg:         false,
   },
@@ -47,8 +50,9 @@ const COLLECTION_PRODUCTS = [
     id:              'onyx-black',
     name:            'ONYX BLACK',
     price:           '$ 29.00',
-    image:           '/images/onyx-black-ref.png',
+    image:           '/images/onyx-black-dark.png',
     frameColor:      '#111111',
+    bgColor:         '#030303',
     isNew:           false,
     whiteBg:         false,
   },
@@ -56,8 +60,9 @@ const COLLECTION_PRODUCTS = [
     id:              'olive-crystal',
     name:            'OLIVE CRYSTAL',
     price:           '$ 29.00',
-    image:           '/images/olive-crystal-ref.png',
+    image:           '/images/olive-crystal-dark.png',
     frameColor:      '#3A5A28',
+    bgColor:         '#050505',
     isNew:           false,
     whiteBg:         false,
   },
@@ -65,8 +70,9 @@ const COLLECTION_PRODUCTS = [
     id:              'smoke-grey',
     name:            'SMOKE GREY',
     price:           '$ 29.00',
-    image:           '/images/smoke-grey-ref.png',
+    image:           '/images/smoke-grey-dark.png',
     frameColor:      '#555555',
+    bgColor:         '#080808',
     isNew:           false,
     whiteBg:         false,
   },
@@ -77,12 +83,84 @@ const COLLECTION_PRODUCTS = [
 function HeroSection() {
   const videoRef = useRef<HTMLVideoElement>(null)
 
+  const [activeTab, setActiveTab] = useState<string>('inicio')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isVideoPlaying, setIsVideoPlaying] = useState(true)
+  const [isMuted, setIsMuted] = useState(true)
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [active3dColor, setActive3dColor] = useState('#0D2147') // Classic Blue hex as initial color
+  const [active3dView, setActive3dView] = useState('Frontal')
+
+  const VIEW_PRESETS_KEYS = ['Frontal', 'Lateral', 'Superior', 'Atrás']
+
   useEffect(() => {
-    if (videoRef.current) videoRef.current.playbackRate = 0.5
+    if (videoRef.current) {
+      videoRef.current.playbackRate = 0.5
+    }
   }, [])
 
+  useEffect(() => {
+    if (videoRef.current) {
+      if (isVideoPlaying) {
+        videoRef.current.play().catch((err) => console.log('Autoplay blocked or interrupted:', err))
+      } else {
+        videoRef.current.pause()
+      }
+    }
+  }, [isVideoPlaying])
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = isMuted
+    }
+  }, [isMuted])
+
+  const handleTabClick = (id: string) => {
+    if (id === 'inicio') {
+      setActiveTab('inicio')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } else if (id === 'buscar') {
+      setActiveTab('buscar')
+    } else if (id === 'explorar') {
+      setActiveTab('explorar')
+    } else if (id === 'colecciones') {
+      document.getElementById('collections-section')?.scrollIntoView({ behavior: 'smooth' })
+    } else if (id === 'video') {
+      if (activeTab !== 'video') {
+        setActiveTab('video')
+        setIsMuted(false)
+        setIsVideoPlaying(true)
+      } else {
+        setIsVideoPlaying(!isVideoPlaying)
+      }
+    } else if (id === 'lista') {
+      setDrawerOpen(true)
+    } else if (id === 'grid') {
+      document.getElementById('featured-grid')?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
+  const handleRightSidebarChevron = (direction: 'up' | 'down') => {
+    if (activeTab === 'explorar') {
+      const currentIndex = VIEW_PRESETS_KEYS.indexOf(active3dView)
+      let nextIndex = currentIndex
+      if (direction === 'up') {
+        nextIndex = currentIndex === 0 ? VIEW_PRESETS_KEYS.length - 1 : currentIndex - 1
+      } else {
+        nextIndex = currentIndex === VIEW_PRESETS_KEYS.length - 1 ? 0 : currentIndex + 1
+      }
+      setActive3dView(VIEW_PRESETS_KEYS[nextIndex])
+    } else {
+      if (direction === 'down') {
+        document.getElementById('collections-section')?.scrollIntoView({ behavior: 'smooth' })
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }
+    }
+  }
+
   return (
-    <section className="w-full h-[52vh] md:h-[65vh] lg:h-screen bg-black flex overflow-hidden">
+    <section className="w-full h-[52vh] md:h-[65vh] lg:h-screen bg-black flex overflow-hidden relative">
 
       {/* ── LEFT SIDEBAR — columna sólida negra ── */}
       <div
@@ -91,18 +169,23 @@ function HeroSection() {
       >
         <div style={{ height: '80px', flexShrink: 0 }} />
         <nav className="flex-1 flex flex-col items-center justify-center gap-6">
-          {LEFT_NAV.map(({ Icon, label, href, active }) => (
-            <Link
-              key={label} href={href} title={label}
-              className={`p-1.5 transition-all duration-200 ${
-                active
-                  ? 'text-[#C4822A] drop-shadow-[0_0_8px_rgba(196,130,42,0.5)]'
-                  : 'text-white/25 hover:text-white/65'
-              }`}
-            >
-              <Icon size={15} strokeWidth={1.3} />
-            </Link>
-          ))}
+          {LEFT_NAV.map(({ id, Icon, label }) => {
+            const isActive = activeTab === id
+            return (
+              <button
+                key={id}
+                onClick={() => handleTabClick(id)}
+                title={label}
+                className={`p-1.5 transition-all duration-200 focus:outline-none ${
+                  isActive
+                    ? 'text-[#C4822A] drop-shadow-[0_0_8px_rgba(196,130,42,0.5)] scale-110'
+                    : 'text-white/25 hover:text-white/65'
+                }`}
+              >
+                <Icon size={15} strokeWidth={1.3} />
+              </button>
+            )
+          })}
         </nav>
         <div className="pb-5 flex flex-col items-center gap-3">
           <div style={{ width: '1px', height: '24px', background: 'rgba(255,255,255,0.07)' }} />
@@ -115,61 +198,285 @@ function HeroSection() {
         </div>
       </div>
 
-      {/* ── VIDEO CENTER — el video solo vive aquí ── */}
+      {/* ── VIDEO/INTERACTIVE CENTER ── */}
       <div className="flex-1 relative overflow-hidden">
-        <video
-          ref={videoRef}
-          autoPlay loop muted playsInline
-          className="absolute inset-0 w-full h-full object-cover object-center select-none"
-          style={{ transform: 'scale(1.32)', transformOrigin: 'center center' }}
-        >
-          <source src="/videos/hero-video.mp4" type="video/mp4" />
-        </video>
+        {/* Render base ambient video (needed for home and video mode) */}
+        {(activeTab === 'inicio' || activeTab === 'video') && (
+          <>
+            <video
+              ref={videoRef}
+              autoPlay
+              loop
+              playsInline
+              muted={isMuted}
+              className="absolute inset-0 w-full h-full object-cover object-center select-none"
+              style={{ transform: 'scale(1.32)', transformOrigin: 'center center' }}
+            >
+              <source src="/videos/hero-video.mp4" type="video/mp4" />
+            </video>
 
-        {/* Top vignette */}
-        <div
-          className="absolute inset-x-0 top-0 h-36 pointer-events-none z-[6]"
-          style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.60) 0%, transparent 100%)' }}
-        />
-        {/* Bottom fade */}
-        <div
-          className="absolute inset-x-0 bottom-0 h-28 pointer-events-none z-[6]"
-          style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.82) 0%, transparent 100%)' }}
-        />
+            {/* Top vignette */}
+            <div
+              className="absolute inset-x-0 top-0 h-36 pointer-events-none z-[6]"
+              style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.60) 0%, transparent 100%)' }}
+            />
+            {/* Bottom fade */}
+            <div
+              className="absolute inset-x-0 bottom-0 h-28 pointer-events-none z-[6]"
+              style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.82) 0%, transparent 100%)' }}
+            />
 
-        {/* Desktop CTA */}
-        <motion.div
-          className="absolute bottom-8 z-10 hidden lg:flex flex-col gap-2"
-          style={{ left: '28px' }}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.5 }}
-        >
-          <span className="font-code text-[8px] tracking-[0.38em] text-white/30 uppercase">
-            JOINING CULTURE
-          </span>
-          <Link
-            href="/tienda"
-            className="inline-flex items-center gap-2 font-code text-[10px] tracking-[0.22em] text-white/55 hover:text-white transition-colors uppercase group"
+            {/* Desktop CTA */}
+            {activeTab === 'inicio' && (
+              <motion.div
+                className="absolute bottom-8 z-10 hidden lg:flex flex-col gap-2"
+                style={{ left: '28px' }}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.5 }}
+              >
+                <span className="font-code text-[8px] tracking-[0.38em] text-white/30 uppercase">
+                  JOINING CULTURE
+                </span>
+                <Link
+                  href="/tienda"
+                  className="inline-flex items-center gap-2 font-code text-[10px] tracking-[0.22em] text-white/55 hover:text-white transition-colors uppercase group"
+                >
+                  VER COLECCIÓN
+                  <ArrowRight size={10} strokeWidth={2} className="group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              </motion.div>
+            )}
+
+            {/* Mobile CTA */}
+            {activeTab === 'inicio' && (
+              <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-2 z-10 lg:hidden">
+                <span className="font-code text-[8px] tracking-[0.35em] text-white/30 uppercase">
+                  JOINING CULTURE
+                </span>
+                <Link
+                  href="/tienda"
+                  className="inline-flex items-center gap-2 font-code text-[10px] tracking-[0.22em] text-white/65 border border-white/20 px-7 py-3 uppercase hover:text-white hover:border-white/50 transition-colors group"
+                >
+                  VER COLECCIÓN
+                  <ArrowRight size={10} strokeWidth={2} className="group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              </div>
+            )}
+
+            {/* Custom video mode controls overlay */}
+            {activeTab === 'video' && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="absolute inset-0 bg-black/40 z-10 flex flex-col justify-between p-6 md:p-8 animate-fade-in"
+              >
+                {/* Top Status */}
+                <div className="flex items-center justify-between pointer-events-auto">
+                  <span className="font-code text-[8px] tracking-[0.35em] text-white/50 uppercase">
+                    CAMPAÑA DE VIDEO EN REPRODUCCIÓN
+                  </span>
+                  <button
+                    onClick={() => setActiveTab('inicio')}
+                    className="bg-black/50 border border-white/10 hover:border-white/30 text-white/60 hover:text-white transition-all p-1.5 rounded-sm focus:outline-none"
+                    title="Cerrar Controles"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+
+                {/* Center Play/Pause Big Button */}
+                <div className="flex-1 flex items-center justify-center pointer-events-auto">
+                  <button
+                    onClick={() => setIsVideoPlaying(!isVideoPlaying)}
+                    className="w-14 h-14 rounded-full border border-white/20 bg-black/55 text-white hover:scale-105 hover:bg-black/70 transition-all flex items-center justify-center shadow-lg focus:outline-none"
+                  >
+                    {isVideoPlaying ? <Pause size={20} className="fill-white" /> : <Play size={20} className="fill-white translate-x-0.5" />}
+                  </button>
+                </div>
+
+                {/* Bottom Controls */}
+                <div className="flex items-center justify-between pointer-events-auto">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setIsMuted(!isMuted)}
+                      className="bg-black/50 border border-white/10 hover:border-white/30 text-white p-2 rounded-sm flex items-center justify-center transition-all focus:outline-none"
+                      title={isMuted ? 'Activar Sonido' : 'Silenciar'}
+                    >
+                      {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
+                    </button>
+                    <span className="font-code text-[9px] tracking-wider text-white/70">
+                      {isMuted ? 'SONIDO DESACTIVADO' : 'SONIDO ACTIVADO'}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIsMuted(true)
+                      setActiveTab('inicio')
+                    }}
+                    className="font-code text-[8px] tracking-widest text-white/50 hover:text-white border border-white/15 px-3 py-1.5 hover:border-white/40 rounded-sm transition-all focus:outline-none"
+                  >
+                    SALIR DE CAMPAÑA
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </>
+        )}
+
+        {/* ── SEARCH OVERLAY ── */}
+        {activeTab === 'buscar' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="absolute inset-0 z-20 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-8"
           >
-            VER COLECCIÓN
-            <ArrowRight size={10} strokeWidth={2} className="group-hover:translate-x-0.5 transition-transform" />
-          </Link>
-        </motion.div>
+            {/* Close Button */}
+            <button
+              onClick={() => setActiveTab('inicio')}
+              className="absolute top-6 right-6 text-white/40 hover:text-white transition-colors p-2 focus:outline-none"
+            >
+              <X size={20} strokeWidth={1.5} />
+            </button>
 
-        {/* Mobile CTA */}
-        <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-2 z-10 lg:hidden">
-          <span className="font-code text-[8px] tracking-[0.35em] text-white/30 uppercase">
-            JOINING CULTURE
-          </span>
-          <Link
-            href="/tienda"
-            className="inline-flex items-center gap-2 font-code text-[10px] tracking-[0.22em] text-white/65 border border-white/20 px-7 py-3 uppercase hover:text-white hover:border-white/50 transition-colors group"
+            <div className="w-full max-w-xl text-left">
+              <span className="font-code text-[8px] tracking-[0.4em] text-[#C4822A] uppercase block mb-3">
+                BÚSQUEDA EN EL CATÁLOGO
+              </span>
+              <div className="relative border-b border-white/20 pb-2 flex items-center">
+                <Search size={18} className="text-white/40 mr-3" />
+                <input
+                  type="text"
+                  placeholder="ESCRIBE PARA BUSCAR..."
+                  autoFocus
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-transparent border-none text-white font-code text-base tracking-widest focus:outline-none w-full uppercase"
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery('')} className="text-white/40 hover:text-white p-1 focus:outline-none">
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+
+              {/* Results */}
+              <div className="mt-8 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+                {searchQuery ? (
+                  (() => {
+                    const filtered = PRODUCTS.filter(p =>
+                      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      p.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      p.model.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    if (filtered.length > 0) {
+                      return (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {filtered.map(p => (
+                            <Link
+                              key={p.id}
+                              href={`/producto/${p.slug}`}
+                              className="flex items-center gap-4 bg-white/[0.03] border border-white/[0.06] p-3 rounded-lg hover:border-white/20 hover:bg-white/[0.05] transition-all group"
+                            >
+                              <div className="relative w-16 h-16 bg-[#121212] rounded-md overflow-hidden flex items-center justify-center p-2 flex-shrink-0">
+                                <Image src={p.image} alt={p.name} fill className="object-contain p-1 group-hover:scale-110 transition-transform" />
+                              </div>
+                              <div>
+                                <p className="font-code text-[8px] tracking-widest text-white/40 uppercase leading-none mb-1">{p.code}</p>
+                                <h4 className="font-code text-[11px] tracking-wider text-white uppercase font-bold leading-none mb-1">{p.name}</h4>
+                                <p className="font-display text-[12px] text-[#C4822A] font-bold">{p.price.toFixed(2)} EUR</p>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      )
+                    } else {
+                      return (
+                        <p className="font-code text-xs text-white/30 uppercase text-center py-8">
+                          No se encontraron resultados para &quot;{searchQuery}&quot;
+                        </p>
+                      )
+                    }
+                  })()
+                ) : (
+                  <div>
+                    <p className="font-code text-[9px] tracking-[0.2em] text-white/30 uppercase mb-4">
+                      BÚSQUEDAS POPULARES
+                    </p>
+                    <div className="flex flex-wrap gap-2.5">
+                      {['CLASSIC BLUE', 'ONYX BLACK', 'OLIVE CRYSTAL', 'SMOKE GREY'].map(term => (
+                        <button
+                          key={term}
+                          onClick={() => setSearchQuery(term)}
+                          className="font-code text-[9px] tracking-widest px-4 py-2.5 border border-white/10 rounded-full text-white/40 hover:text-white hover:border-white/30 transition-all bg-white/[0.01] focus:outline-none"
+                        >
+                          {term}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ── 3D VISOR OVERLAY ── */}
+        {activeTab === 'explorar' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="absolute inset-0 z-20 bg-[#080808] flex flex-col justify-between"
           >
-            VER COLECCIÓN
-            <ArrowRight size={10} strokeWidth={2} className="group-hover:translate-x-0.5 transition-transform" />
-          </Link>
-        </div>
+            {/* Visor 3D */}
+            <div className="absolute inset-0">
+              <Viewer3D activeColor={active3dColor} activeView={active3dView} hideControls={true} />
+            </div>
+
+            {/* Header info */}
+            <div className="absolute top-6 left-6 z-10 text-left pointer-events-none">
+              <span className="font-code text-[8px] tracking-[0.4em] text-white/30 uppercase">VISOR INTERACTIVO 3D</span>
+              <h2 className="font-code text-[11px] tracking-widest text-[#C4822A] mt-1 uppercase">
+                {FRAME_COLORS.find(c => c.hex === active3dColor)?.label || 'CLASSIC'} FRAME
+              </h2>
+            </div>
+
+            {/* Close button */}
+            <button
+              onClick={() => setActiveTab('inicio')}
+              className="absolute top-6 right-6 text-white/40 hover:text-white transition-colors p-2 z-30 focus:outline-none"
+            >
+              <X size={20} strokeWidth={1.5} />
+            </button>
+
+            {/* Instructions footer overlay */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none z-10">
+              <p className="font-code text-[8px] tracking-[0.25em] text-white/20 uppercase whitespace-nowrap">
+                ARRASTRA PARA ROTAR · HAZ ZOOM PARA AMPLIAR
+              </p>
+            </div>
+
+            {/* Frame color customizer in 3D mode */}
+            <div className="absolute bottom-6 left-6 z-30 flex items-center gap-3.5 bg-black/60 backdrop-blur-md px-5 py-3.5 border border-white/10 rounded-lg">
+              <span className="font-code text-[8px] tracking-widest text-white/40 uppercase">COLOR:</span>
+              <div className="flex gap-2">
+                {FRAME_COLORS.map((c) => (
+                  <button
+                    key={c.hex}
+                    title={c.label}
+                    onClick={() => setActive3dColor(c.hex)}
+                    style={{ backgroundColor: c.hex }}
+                    className={`w-5 h-5 rounded-full border transition-all duration-200 focus:outline-none ${
+                      active3dColor === c.hex
+                        ? 'border-white scale-110 shadow-[0_0_8px_rgba(255,255,255,0.4)]'
+                        : 'border-white/15 hover:border-white/40'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
       </div>
 
       {/* ── RIGHT SIDEBAR — columna sólida negra ── */}
@@ -179,25 +486,50 @@ function HeroSection() {
       >
         <div style={{ height: '80px', flexShrink: 0 }} />
 
-        {/* Plus */}
-        <button className="mt-3 mb-1 text-white/30 hover:text-white transition-colors p-1.5">
+        {/* Plus / Dynamic Info */}
+        <button
+          onClick={() => {
+            if (activeTab === 'explorar') {
+              setActive3dView('Frontal')
+              setActive3dColor('#0D2147')
+            } else {
+              setIsMuted(!isMuted)
+            }
+          }}
+          className="mt-3 mb-1 text-white/30 hover:text-white transition-colors p-1.5 focus:outline-none"
+          title={activeTab === 'explorar' ? 'Resetear Modelo 3D' : (isMuted ? 'Activar Sonido' : 'Silenciar')}
+        >
           <Plus size={15} strokeWidth={1.3} />
         </button>
 
         {/* Scroll track */}
         <div className="flex-1 flex flex-col items-center justify-center gap-2">
-          <button className="text-white/25 hover:text-white/60 transition-colors p-1">
+          <button
+            onClick={() => handleRightSidebarChevron('up')}
+            className="text-white/25 hover:text-white/60 transition-colors p-1 focus:outline-none"
+            title={activeTab === 'explorar' ? 'Cámara Anterior' : 'Subir'}
+          >
             <ChevronUp size={13} strokeWidth={1.5} />
           </button>
+          
           <div className="flex flex-col items-center gap-[3px] py-1">
             <div style={{ width: '1px', height: '28px', background: 'rgba(255,255,255,0.10)' }} />
-            <div style={{
-              width: '7px', height: '7px', borderRadius: '50%',
-              background: '#C4822A', boxShadow: '0 0 6px rgba(196,130,42,0.7)',
-            }} />
+            <div
+              style={{
+                width: '7px', height: '7px', borderRadius: '50%',
+                background: '#C4822A',
+                boxShadow: '0 0 6px rgba(196,130,42,0.7)',
+              }}
+              title={activeTab === 'explorar' ? `Vista 3D: ${active3dView}` : 'Sección Activa'}
+            />
             <div style={{ width: '1px', height: '28px', background: 'rgba(255,255,255,0.10)' }} />
           </div>
-          <button className="text-white/25 hover:text-white/60 transition-colors p-1">
+
+          <button
+            onClick={() => handleRightSidebarChevron('down')}
+            className="text-white/25 hover:text-white/60 transition-colors p-1 focus:outline-none"
+            title={activeTab === 'explorar' ? 'Siguiente Cámara' : 'Bajar'}
+          >
             <ChevronDown size={13} strokeWidth={1.5} />
           </button>
         </div>
@@ -205,14 +537,141 @@ function HeroSection() {
         {/* Bottom arrows */}
         <div className="pb-5 flex flex-col items-center gap-0.5">
           <div style={{ width: '1px', height: '24px', background: 'rgba(255,255,255,0.07)', marginBottom: '8px' }} />
-          <button className="text-white/20 hover:text-white/45 transition-colors p-0.5">
+          <button
+            onClick={() => handleRightSidebarChevron('up')}
+            className="text-white/20 hover:text-white/45 transition-colors p-0.5 focus:outline-none"
+          >
             <ChevronUp size={11} strokeWidth={1.3} />
           </button>
-          <button className="text-white/20 hover:text-white/45 transition-colors p-0.5">
+          <button
+            onClick={() => handleRightSidebarChevron('down')}
+            className="text-white/20 hover:text-white/45 transition-colors p-0.5 focus:outline-none"
+          >
             <ChevronDown size={11} strokeWidth={1.3} />
           </button>
         </div>
       </div>
+
+      {/* ── LEFT DRAWER MENU ── */}
+      <AnimatePresence>
+        {drawerOpen && (
+          <>
+            {/* Backdrop Blur Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.6 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setDrawerOpen(false)}
+              className="fixed inset-0 bg-black z-45 backdrop-blur-sm cursor-pointer"
+            />
+
+            {/* Drawer Content */}
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed top-0 left-0 bottom-0 w-[320px] bg-black z-50 border-r border-white/[0.08] shadow-2xl flex flex-col justify-between p-8"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <Link href="/" onClick={() => setDrawerOpen(false)} className="flex items-center">
+                  <Image
+                    src="/images/logo-grenade-white.png"
+                    alt="STENCIL2"
+                    width={24}
+                    height={38}
+                    className="h-10 w-auto object-contain"
+                  />
+                </Link>
+                <button
+                  onClick={() => setDrawerOpen(false)}
+                  className="w-8 h-8 rounded-full border border-white/10 hover:border-white/20 text-white/50 hover:text-white flex items-center justify-center transition-colors focus:outline-none"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+
+              {/* Navigation Links */}
+              <div className="flex-1 flex flex-col justify-center gap-7 my-12 text-left">
+                <span className="font-code text-[8px] tracking-[0.35em] text-[#C4822A] uppercase">CATEGORÍAS</span>
+                <nav className="flex flex-col gap-5">
+                  <Link
+                    href="/tienda"
+                    onClick={() => setDrawerOpen(false)}
+                    className="font-bebas text-3xl tracking-wide text-white hover:text-[#C4822A] hover:pl-2 transition-all duration-300"
+                  >
+                    CATÁLOGO COMPLETO
+                  </Link>
+                  <Link
+                    href="/tienda?gender=men"
+                    onClick={() => setDrawerOpen(false)}
+                    className="font-bebas text-3xl tracking-wide text-white hover:text-[#C4822A] hover:pl-2 transition-all duration-300"
+                  >
+                    COLECCIÓN HOMBRE
+                  </Link>
+                  <Link
+                    href="/tienda?gender=women"
+                    onClick={() => setDrawerOpen(false)}
+                    className="font-bebas text-3xl tracking-wide text-white hover:text-[#C4822A] hover:pl-2 transition-all duration-300"
+                  >
+                    COLECCIÓN MUJER
+                  </Link>
+                </nav>
+
+                <div className="h-px bg-white/[0.08] my-2" />
+
+                <span className="font-code text-[8px] tracking-[0.35em] text-white/30 uppercase">INFORMACIÓN</span>
+                <nav className="flex flex-col gap-3 font-code text-[10px] tracking-widest text-white/50">
+                  <Link href="/nosotros" onClick={() => setDrawerOpen(false)} className="hover:text-white transition-colors">
+                    SOBRE NOSOTROS
+                  </Link>
+                  <Link href="/contacto" onClick={() => setDrawerOpen(false)} className="hover:text-white transition-colors">
+                    SOPORTE Y CONTACTO
+                  </Link>
+                  <Link href="/faq" onClick={() => setDrawerOpen(false)} className="hover:text-white transition-colors">
+                    PREGUNTAS FRECUENTES (FAQ)
+                  </Link>
+                </nav>
+              </div>
+
+              {/* Footer / Account */}
+              <div className="border-t border-white/[0.08] pt-6 flex flex-col gap-5 text-left">
+                <div className="flex justify-between items-center">
+                  <Link
+                    href="/cuenta"
+                    onClick={() => setDrawerOpen(false)}
+                    className="font-code text-[10px] tracking-wider text-white hover:text-[#C4822A] transition-colors"
+                  >
+                    MI CUENTA
+                  </Link>
+                  <Link
+                    href="/carrito"
+                    onClick={() => setDrawerOpen(false)}
+                    className="font-code text-[10px] tracking-wider text-white hover:text-[#C4822A] transition-colors"
+                  >
+                    CARRITO
+                  </Link>
+                </div>
+                <div className="flex gap-4">
+                  {['instagram', 'tiktok', 'facebook'].map((social) => (
+                    <a
+                      key={social}
+                      href="#"
+                      className="font-code text-[9px] tracking-widest text-white/30 hover:text-white transition-colors uppercase"
+                    >
+                      {social}
+                    </a>
+                  ))}
+                </div>
+                <p className="font-code text-[8px] text-white/20 tracking-wider">
+                  © 2026 STENCIL2 · JOINING CULTURE
+                </p>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
     </section>
   )
@@ -252,17 +711,30 @@ function TrustBadgesBar() {
 /* ─── COLLECTIONS ─────────────────────────────────────────────────── */
 
 function CollectionsSection() {
+  const [lightbox, setLightbox] = useState<{ image: string; name: string } | null>(null)
+
+  useEffect(() => {
+    if (lightbox) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [lightbox])
+
   return (
-    <section className="bg-black pt-10 pb-14">
+    <section id="collections-section" className="bg-black pt-10 pb-14">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div id="featured-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
 
           {/* Editorial banner (Column 1, spans both rows on large screens) */}
           <div className="relative overflow-hidden rounded-xl sm:col-span-2 lg:col-span-1 lg:row-span-2 lg:h-auto h-[390px] aspect-[3/4] sm:aspect-auto lg:aspect-auto border border-white/[0.055] group flex flex-col justify-between p-6 md:p-8 z-10">
             <div className="absolute inset-0 overflow-hidden z-0">
               <Image
-                src="/images/joining-culture.png"
+                src="/images/JOINING.png?v=2"
                 alt="JOINING CULTURE"
                 fill
                 className="object-cover object-center opacity-62 group-hover:opacity-74 group-hover:scale-[1.04] transition-all duration-700"
@@ -277,7 +749,7 @@ function CollectionsSection() {
             />
 
             {/* Top Text Group */}
-            <div className="relative z-10 text-left">
+            <div className="relative z-10 text-left mt-[38%] lg:mt-[26%]">
               <p className="font-code text-[8px] tracking-[0.35em] text-white/40 uppercase mb-3">
                 NUEVA COLECCIÓN
               </p>
@@ -325,7 +797,8 @@ function CollectionsSection() {
               <Link
                 key={p.id}
                 href={`/producto/${p.id}`}
-                className="relative flex flex-col text-left overflow-hidden rounded-xl transition-all duration-300 lg:h-[390px] aspect-[3/4] lg:aspect-auto group bg-[#0f0f0f] border border-white/[0.06] hover:border-white/20 hover:shadow-2xl"
+                style={{ background: p.bgColor }}
+                className="relative flex flex-col text-left overflow-hidden rounded-xl transition-all duration-300 lg:h-[390px] aspect-[3/4] lg:aspect-auto group border border-white/[0.06] hover:border-white/20 hover:shadow-2xl"
               >
                 {p.isNew && (
                   <span
@@ -336,30 +809,39 @@ function CollectionsSection() {
                   </span>
                 )}
 
-                {/* Real fotorrealistic sunglasses image from AI */}
-                <div className="relative flex-1 flex items-center justify-center p-4 min-h-[230px] overflow-hidden">
-                  {/* Radial colored glow matching the frame color */}
-                  <div
-                    className="absolute inset-0 opacity-40 group-hover:opacity-60 transition-opacity duration-500"
-                    style={{
-                      background: `radial-gradient(circle at center, ${p.frameColor}33 0%, transparent 70%)`,
-                    }}
-                  />
-                  <div
-                    className="relative w-full h-[152px] max-w-[242px] transition-all duration-500 group-hover:scale-105 z-10"
-                  >
+                {/* Real fotorrealistic sunglasses image from AI — click opens the real photo, not the product/3D page */}
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setLightbox({ image: p.image, name: p.name })
+                  }}
+                  className="relative flex-1 min-h-[230px] overflow-hidden cursor-zoom-in"
+                  style={{ background: p.bgColor }}
+                >
+                  <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">
                     <Image
-                      src={`${p.image}?v=7`}
+                      src={`${p.image}?v=8`}
                       alt={p.name}
                       fill
-                      className="object-contain"
-                      sizes="260px"
+                      className="object-cover"
+                      sizes="400px"
                     />
+                  </div>
+
+                  {/* Expand hint icon */}
+                  <div className="absolute top-3 right-3 z-20 w-7 h-7 rounded-full bg-black/40 border border-white/20 text-white/70 flex items-center justify-center">
+                    <Maximize2 size={11} strokeWidth={2} />
                   </div>
                 </div>
 
                 {/* Details Footer */}
-                <div className="flex items-center justify-between px-5 pb-5 w-full bg-[#0f0f0f] pt-3 border-t border-white/[0.04] z-10">
+                <div
+                  style={{ background: p.bgColor }}
+                  className="flex items-center justify-between px-5 pb-5 w-full pt-3 border-t border-white/[0.04] z-10"
+                >
                   <div>
                     <p className="font-code text-[9px] tracking-[0.18em] text-white/50 group-hover:text-white/80 transition-colors uppercase leading-none">
                       {p.name}
@@ -378,6 +860,44 @@ function CollectionsSection() {
 
         </div>
       </div>
+
+      {/* Lightbox — full uncropped image, tap/click to close */}
+      <AnimatePresence>
+        {lightbox && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[100] bg-black/92 flex items-center justify-center p-6"
+            onClick={() => setLightbox(null)}
+          >
+            <button
+              type="button"
+              onClick={() => setLightbox(null)}
+              className="absolute top-5 right-5 z-[110] w-11 h-11 rounded-full border border-white/20 bg-black/60 text-white/80 hover:text-white hover:border-white/50 flex items-center justify-center transition-all active:scale-90"
+              aria-label="Cerrar"
+            >
+              <X size={18} strokeWidth={2} />
+            </button>
+            <motion.div
+              initial={{ scale: 0.96 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.96 }}
+              transition={{ duration: 0.2 }}
+              className="relative w-full max-w-2xl h-[70vh] cursor-zoom-out"
+            >
+              <Image
+                src={`${lightbox.image}?v=8`}
+                alt={lightbox.name}
+                fill
+                className="object-contain"
+                sizes="800px"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   )
 }

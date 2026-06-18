@@ -144,6 +144,7 @@ export default function TiendaMujerPage() {
                   gender={p.gender.toUpperCase() as 'MEN' | 'WOMEN' | 'UNISEX'}
                   model={p.model}
                   slug={p.slug}
+                  image={p.image}
                 />
               </div>
             ))}
