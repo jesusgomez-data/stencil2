@@ -83,7 +83,7 @@ export default function Navbar() {
               alt="STENCIL2"
               width={48}
               height={78}
-              className="h-16 w-auto object-contain hover:scale-105 transition-transform duration-300"
+              className="h-12 md:h-14 w-auto object-contain hover:scale-105 transition-transform duration-300"
               priority
             />
           </Link>

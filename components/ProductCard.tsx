@@ -90,7 +90,7 @@ export default function ProductCard({ code, name, price, gender, model, slug, im
             src={image}
             alt={name}
             fill
-            className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
+            className="object-contain p-4 md:p-6 transition-transform duration-700 group-hover:scale-105"
             sizes="400px"
           />
           <div className="absolute top-4 right-4 z-20 w-7 h-7 rounded-full bg-black/40 border border-white/20 text-white/70 flex items-center justify-center">
@@ -155,7 +155,7 @@ export default function ProductCard({ code, name, price, gender, model, slug, im
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-[100] bg-black/92 flex items-center justify-center p-6"
+              className="fixed inset-0 z-[100] bg-black/75 backdrop-blur-lg flex items-center justify-center p-6"
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()

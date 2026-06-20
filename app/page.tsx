@@ -654,13 +654,19 @@ function HeroSection() {
                   </Link>
                 </div>
                 <div className="flex gap-4">
-                  {['instagram', 'tiktok', 'facebook'].map((social) => (
+                  {[
+                    { name: 'instagram', url: 'https://www.instagram.com/stencil2' },
+                    { name: 'tiktok', url: 'https://www.tiktok.com/@stencil.2' },
+                    { name: 'facebook', url: 'https://www.facebook.com/stencil2' }
+                  ].map((social) => (
                     <a
-                      key={social}
-                      href="#"
+                      key={social.name}
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="font-code text-[9px] tracking-widest text-white/30 hover:text-white transition-colors uppercase"
                     >
-                      {social}
+                      {social.name}
                     </a>
                   ))}
                 </div>
@@ -826,7 +832,7 @@ function CollectionsSection() {
                       src={`${p.image}?v=8`}
                       alt={p.name}
                       fill
-                      className="object-cover"
+                      className="object-contain p-4 md:p-6"
                       sizes="400px"
                     />
                   </div>
@@ -869,7 +875,7 @@ function CollectionsSection() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[100] bg-black/92 flex items-center justify-center p-6"
+            className="fixed inset-0 z-[100] bg-black/75 backdrop-blur-lg flex items-center justify-center p-6"
             onClick={() => setLightbox(null)}
           >
             <button

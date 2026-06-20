@@ -3,9 +3,9 @@ import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 
 const SOCIAL_LINKS = [
-  { label: 'Instagram', href: '#' },
-  { label: 'TikTok',    href: '#' },
-  { label: 'Facebook',  href: '#' },
+  { label: 'Instagram', href: 'https://www.instagram.com/stencil2' },
+  { label: 'TikTok',    href: 'https://www.tiktok.com/@stencil.2' },
+  { label: 'Facebook',  href: 'https://www.facebook.com/stencil2' },
 ]
 
 const HELP_LINKS = [
@@ -37,13 +37,15 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-4">
               {SOCIAL_LINKS.map(({ label, href }) => (
-                <Link
+                <a
                   key={label}
                   href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="font-code text-[10px] text-white/35 hover:text-white transition-colors tracking-wide"
                 >
                   {label}
-                </Link>
+                </a>
               ))}
             </div>
           </div>
