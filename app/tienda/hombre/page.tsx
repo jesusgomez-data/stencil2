@@ -30,9 +30,7 @@ export default function TiendaHombrePage() {
     { value: 'all', label: 'TODOS LOS MODELOS' },
     { value: 'wayfarer', label: 'WAYFARER' },
     { value: 'round', label: 'ROUND' },
-    { value: 'shield', label: 'SHIELD' },
     { value: 'aviator', label: 'AVIATOR' },
-    { value: 'cat-eye', label: 'CAT-EYE' },
     { value: 'sport', label: 'SPORT' },
   ]
 

@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import Viewer3D from '@/components/Viewer3D'
 import { PRODUCTS } from '@/lib/products'
 import { Product } from '@/types'
 import { useCart } from '@/context/CartContext'
-import { Truck, RotateCcw, ShieldCheck, ChevronDown, ChevronUp, Check, ArrowRight } from 'lucide-react'
+import { Truck, RotateCcw, ShieldCheck, ChevronDown, ChevronUp, Check, ArrowRight, X, Maximize2 } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 
 export default function ProductDetailPage({ params }: { params: { slug: string } }) {
@@ -22,6 +24,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
   const [activeView, setActiveView] = useState('Frontal')
   const [quantity, setQuantity] = useState(1)
   const [isAdded, setIsAdded] = useState(false)
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   
   // Accordion states
   const [openAccordion, setOpenAccordion] = useState<string | null>(null)
@@ -291,6 +294,106 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
           </div>
 
         </div>
+
+        {/* GALLERY — todas las imágenes oficiales del modelo */}
+        {product.gallery && product.gallery.length > 0 && (
+          <section className="max-w-[1400px] mx-auto mt-16 px-6 lg:px-10">
+            <div className="border-b border-white/[0.07] pb-6 mb-8 text-left">
+              <p className="font-code text-[9px] tracking-[0.35em] text-white/30 uppercase mb-3">
+                GALERÍA OFICIAL
+              </p>
+              <h2 className="font-bebas text-[36px] md:text-[48px] tracking-wide leading-none text-white uppercase">
+                {product.name}
+              </h2>
+              <p className="font-code text-[10px] text-white/40 mt-3 uppercase tracking-wider">
+                {product.gallery.length} TOMAS · HAZ CLIC PARA AMPLIAR
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+              {product.gallery.map((img, i) => (
+                <button
+                  key={img}
+                  onClick={() => setLightboxIndex(i)}
+                  className="group relative aspect-square bg-[#050505] border border-white/[0.06] overflow-hidden rounded-sm hover:border-white/20 transition-colors cursor-zoom-in"
+                >
+                  <Image
+                    src={img}
+                    alt={`${product.name} — vista ${i + 1}`}
+                    fill
+                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                    className="object-contain p-4 md:p-6 transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/40 border border-white/20 text-white/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Maximize2 size={11} strokeWidth={2} />
+                  </div>
+                  <div className="absolute bottom-3 left-3 font-code text-[8px] tracking-[0.2em] text-white/30 uppercase">
+                    {String(i + 1).padStart(2, '0')}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Lightbox */}
+        <AnimatePresence>
+          {lightboxIndex !== null && product.gallery && product.gallery[lightboxIndex] && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-lg flex items-center justify-center p-6"
+              onClick={() => setLightboxIndex(null)}
+            >
+              <button
+                type="button"
+                onClick={() => setLightboxIndex(null)}
+                className="absolute top-5 right-5 z-[110] w-11 h-11 rounded-full border border-white/20 bg-black/60 text-white/80 hover:text-white hover:border-white/50 flex items-center justify-center transition-all"
+                aria-label="Cerrar"
+              >
+                <X size={18} strokeWidth={2} />
+              </button>
+              {lightboxIndex > 0 && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex - 1) }}
+                  className="absolute left-4 z-[110] w-11 h-11 rounded-full border border-white/20 bg-black/60 text-white/80 hover:text-white hover:border-white/50 flex items-center justify-center transition-all"
+                  aria-label="Anterior"
+                >
+                  <ChevronDown size={18} strokeWidth={2} className="rotate-90" />
+                </button>
+              )}
+              {lightboxIndex < product.gallery.length - 1 && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex + 1) }}
+                  className="absolute right-4 z-[110] w-11 h-11 rounded-full border border-white/20 bg-black/60 text-white/80 hover:text-white hover:border-white/50 flex items-center justify-center transition-all"
+                  aria-label="Siguiente"
+                >
+                  <ChevronDown size={18} strokeWidth={2} className="-rotate-90" />
+                </button>
+              )}
+              <motion.div
+                initial={{ scale: 0.96 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.96 }}
+                transition={{ duration: 0.2 }}
+                className="relative w-full max-w-4xl h-[80vh]"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Image
+                  src={product.gallery[lightboxIndex]}
+                  alt={`${product.name} — vista ${lightboxIndex + 1}`}
+                  fill
+                  className="object-contain"
+                  sizes="1200px"
+                />
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
 
       <Footer />

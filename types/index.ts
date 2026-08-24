@@ -17,6 +17,7 @@ export interface Product {
   composition: string
   isFeatured?: boolean
   image: string
+  gallery?: string[]
   frameColor: string
   colors: ProductColor[]
 }

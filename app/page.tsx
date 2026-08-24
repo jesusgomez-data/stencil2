@@ -29,7 +29,7 @@ const LEFT_NAV = [
 ]
 
 const TRUST_BADGES = [
-  { Icon: Truck,      title: 'ENVÍO GRATIS',  desc: 'En compras mayores a $50'     },
+  { Icon: Truck,      title: 'ENVÍO GRATIS',  desc: 'En compras mayores a 50 EUR'   },
   { Icon: Shield,     title: 'PAGOS SEGUROS', desc: 'Tus datos siempre protegidos'  },
   { Icon: Award,      title: 'GARANTÍA',      desc: '30 días de garantía'           },
   { Icon: Headphones, title: 'ATENCIÓN 24/7', desc: 'Estamos para ayudarte'         },
@@ -39,8 +39,8 @@ const COLLECTION_PRODUCTS = [
   {
     id:              'classic-blue',
     name:            'CLASSIC BLUE',
-    price:           '$ 29.00',
-    image:           '/images/classic-blue-dark.png',
+    price:           '29.00',
+    image:           '/images/a01.png?v=4',
     frameColor:      '#C4822A',
     bgColor:         '#040404',
     isNew:           false,
@@ -49,8 +49,8 @@ const COLLECTION_PRODUCTS = [
   {
     id:              'onyx-black',
     name:            'ONYX BLACK',
-    price:           '$ 29.00',
-    image:           '/images/onyx-black-dark.png',
+    price:           '29.00',
+    image:           '/images/b01.png?v=4',
     frameColor:      '#111111',
     bgColor:         '#030303',
     isNew:           false,
@@ -59,8 +59,8 @@ const COLLECTION_PRODUCTS = [
   {
     id:              'olive-crystal',
     name:            'OLIVE CRYSTAL',
-    price:           '$ 29.00',
-    image:           '/images/olive-crystal-dark.png',
+    price:           '29.00',
+    image:           '/images/c01.png?v=4',
     frameColor:      '#3A5A28',
     bgColor:         '#050505',
     isNew:           false,
@@ -69,8 +69,8 @@ const COLLECTION_PRODUCTS = [
   {
     id:              'smoke-grey',
     name:            'SMOKE GREY',
-    price:           '$ 29.00',
-    image:           '/images/smoke-grey-dark.png',
+    price:           '29.00',
+    image:           '/images/d02.png?v=4',
     frameColor:      '#555555',
     bgColor:         '#080808',
     isNew:           false,
@@ -829,7 +829,7 @@ function CollectionsSection() {
                 >
                   <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">
                     <Image
-                      src={`${p.image}?v=8`}
+                      src={p.image}
                       alt={p.name}
                       fill
                       className="object-contain p-4 md:p-6"
@@ -853,7 +853,7 @@ function CollectionsSection() {
                       {p.name}
                     </p>
                     <p className="font-display text-[13px] font-bold text-white mt-1">
-                      {p.price}
+                      {p.price} <span className="font-code text-[8px] font-normal tracking-widest text-white/40">EUR</span>
                     </p>
                   </div>
                   <div className="w-7 h-7 rounded-full border border-white/[0.09] text-white/28 group-hover:border-white/52 group-hover:text-white flex items-center justify-center flex-shrink-0 transition-all">
@@ -894,7 +894,7 @@ function CollectionsSection() {
               className="relative w-full max-w-2xl h-[70vh] cursor-zoom-out"
             >
               <Image
-                src={`${lightbox.image}?v=8`}
+                src={lightbox.image}
                 alt={lightbox.name}
                 fill
                 className="object-contain"
