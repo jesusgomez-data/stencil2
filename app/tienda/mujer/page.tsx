@@ -137,12 +137,14 @@ export default function TiendaMujerPage() {
               <div key={p.id} className="h-[360px] border border-white/[0.052] rounded-xl overflow-hidden hover:border-white/15 transition-all">
                 <ProductCard
                   code={p.code}
+                  letter={p.letter}
                   name={p.name}
                   price={p.price.toFixed(2)}
                   gender={p.gender.toUpperCase() as 'MEN' | 'WOMEN' | 'UNISEX'}
                   model={p.model}
                   slug={p.slug}
                   image={p.image}
+                  gallery={p.gallery}
                 />
               </div>
             ))}

@@ -6,11 +6,12 @@ import Image from 'next/image'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import Viewer3D from '@/components/Viewer3D'
+import ProductGallery from '@/components/ProductGallery'
 import { PRODUCTS } from '@/lib/products'
+import { getShotLabel } from '@/lib/imageCatalog'
 import { Product } from '@/types'
 import { useCart } from '@/context/CartContext'
-import { Truck, RotateCcw, ShieldCheck, ChevronDown, ChevronUp, Check, ArrowRight, X, Maximize2 } from 'lucide-react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { Truck, RotateCcw, ShieldCheck, ChevronDown, ChevronUp, Check, ArrowRight, Maximize2 } from 'lucide-react'
 import Link from 'next/link'
 
 export default function ProductDetailPage({ params }: { params: { slug: string } }) {
@@ -300,7 +301,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
           <section className="max-w-[1400px] mx-auto mt-16 px-6 lg:px-10">
             <div className="border-b border-white/[0.07] pb-6 mb-8 text-left">
               <p className="font-code text-[9px] tracking-[0.35em] text-white/30 uppercase mb-3">
-                GALERÍA OFICIAL
+                GALERÍA OFICIAL — MODELO {product.letter}
               </p>
               <h2 className="font-bebas text-[36px] md:text-[48px] tracking-wide leading-none text-white uppercase">
                 {product.name}
@@ -319,7 +320,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                 >
                   <Image
                     src={img}
-                    alt={`${product.name} — vista ${i + 1}`}
+                    alt={`${product.name} — toma ${getShotLabel(img)}`}
                     fill
                     sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                     className="object-contain p-4 md:p-6 transition-transform duration-500 group-hover:scale-105"
@@ -328,7 +329,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                     <Maximize2 size={11} strokeWidth={2} />
                   </div>
                   <div className="absolute bottom-3 left-3 font-code text-[8px] tracking-[0.2em] text-white/30 uppercase">
-                    {String(i + 1).padStart(2, '0')}
+                    {getShotLabel(img)}
                   </div>
                 </button>
               ))}
@@ -336,64 +337,16 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
           </section>
         )}
 
-        {/* Lightbox */}
-        <AnimatePresence>
-          {lightboxIndex !== null && product.gallery && product.gallery[lightboxIndex] && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-lg flex items-center justify-center p-6"
-              onClick={() => setLightboxIndex(null)}
-            >
-              <button
-                type="button"
-                onClick={() => setLightboxIndex(null)}
-                className="absolute top-5 right-5 z-[110] w-11 h-11 rounded-full border border-white/20 bg-black/60 text-white/80 hover:text-white hover:border-white/50 flex items-center justify-center transition-all"
-                aria-label="Cerrar"
-              >
-                <X size={18} strokeWidth={2} />
-              </button>
-              {lightboxIndex > 0 && (
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex - 1) }}
-                  className="absolute left-4 z-[110] w-11 h-11 rounded-full border border-white/20 bg-black/60 text-white/80 hover:text-white hover:border-white/50 flex items-center justify-center transition-all"
-                  aria-label="Anterior"
-                >
-                  <ChevronDown size={18} strokeWidth={2} className="rotate-90" />
-                </button>
-              )}
-              {lightboxIndex < product.gallery.length - 1 && (
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex + 1) }}
-                  className="absolute right-4 z-[110] w-11 h-11 rounded-full border border-white/20 bg-black/60 text-white/80 hover:text-white hover:border-white/50 flex items-center justify-center transition-all"
-                  aria-label="Siguiente"
-                >
-                  <ChevronDown size={18} strokeWidth={2} className="-rotate-90" />
-                </button>
-              )}
-              <motion.div
-                initial={{ scale: 0.96 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0.96 }}
-                transition={{ duration: 0.2 }}
-                className="relative w-full max-w-4xl h-[80vh]"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Image
-                  src={product.gallery[lightboxIndex]}
-                  alt={`${product.name} — vista ${lightboxIndex + 1}`}
-                  fill
-                  className="object-contain"
-                  sizes="1200px"
-                />
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Lightbox premium — navegación exclusiva dentro del modelo */}
+        <ProductGallery
+          images={product.gallery}
+          productName={product.name}
+          productCode={product.code}
+          letter={product.letter}
+          initialIndex={lightboxIndex ?? 0}
+          open={lightboxIndex !== null}
+          onClose={() => setLightboxIndex(null)}
+        />
       </main>
 
       <Footer />

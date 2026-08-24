@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowUpRight, Maximize2, X } from 'lucide-react'
+import { ArrowUpRight, Maximize2 } from 'lucide-react'
 import {
   WayfarerSVG,
   RoundSVG,
@@ -15,6 +15,7 @@ import {
   SportSVG,
 } from './SunglassesIllustration'
 
+import ProductGallery from './ProductGallery'
 import { GlassesModel } from '@/types'
 
 const ILLUSTRATIONS: Record<GlassesModel, React.ComponentType<React.SVGProps<SVGSVGElement> & { color?: string }>> = {
@@ -36,17 +37,21 @@ const BG_COLORS: Record<GlassesModel, string> = {
 }
 
 export interface ProductCardProps {
-  code:    string
-  name:    string
-  price:   string
-  gender:  'MEN' | 'WOMEN' | 'UNISEX'
-  model:   GlassesModel
-  slug:    string
-  image?:  string
+  code:     string
+  letter:   string
+  name:     string
+  price:    string
+  gender:   'MEN' | 'WOMEN' | 'UNISEX'
+  model:    GlassesModel
+  slug:     string
+  image?:   string
+  gallery?: string[]
   isLarge?: boolean
 }
 
-export default function ProductCard({ code, name, price, gender, model, slug, image, isLarge }: ProductCardProps) {
+export default function ProductCard({
+  code, letter, name, price, gender, model, slug, image, gallery, isLarge,
+}: ProductCardProps) {
   const Illustration = ILLUSTRATIONS[model]
   const bg = BG_COLORS[model]
   const [lightboxOpen, setLightboxOpen] = useState(false)
@@ -56,16 +61,7 @@ export default function ProductCard({ code, name, price, gender, model, slug, im
     setMounted(true)
   }, [])
 
-  useEffect(() => {
-    if (lightboxOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
-    return () => {
-      document.body.style.overflow = 'unset'
-    }
-  }, [lightboxOpen])
+  const images = gallery && gallery.length > 0 ? gallery : image ? [image] : []
 
   return (
     <Link href={`/producto/${slug}`} className="group block relative overflow-hidden h-full" style={{ background: bg }}>
@@ -74,7 +70,7 @@ export default function ProductCard({ code, name, price, gender, model, slug, im
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-1/2 bg-white/[0.03] blur-2xl rounded-full" />
       </div>
 
-      {/* Product photo or illustration fallback — click on the photo opens the real photo, not the 3D product page */}
+      {/* Product photo or illustration fallback — click on the photo opens the model gallery */}
       {image ? (
         <div
           role="button"
@@ -83,6 +79,13 @@ export default function ProductCard({ code, name, price, gender, model, slug, im
             e.preventDefault()
             e.stopPropagation()
             setLightboxOpen(true)
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              e.stopPropagation()
+              setLightboxOpen(true)
+            }
           }}
           className="absolute inset-0 overflow-hidden cursor-zoom-in"
         >
@@ -113,6 +116,11 @@ export default function ProductCard({ code, name, price, gender, model, slug, im
       {/* Gender tag */}
       <div className="absolute top-5 left-5">
         <span className="font-code text-[9px] tracking-[0.25em] text-white/30 uppercase">{gender}</span>
+      </div>
+
+      {/* Model letter tag */}
+      <div className="absolute top-5 right-12">
+        <span className="font-code text-[9px] tracking-[0.25em] text-white/30 uppercase">MODELO {letter}</span>
       </div>
 
       {/* Corner arrow */}
@@ -146,46 +154,19 @@ export default function ProductCard({ code, name, price, gender, model, slug, im
       {/* Bottom border accent */}
       <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-red-cta scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
 
-      {/* Lightbox — real photo, no 3D viewer. Rendered via portal so it's never nested inside the <Link>. */}
-      {image && mounted && createPortal(
-        <AnimatePresence>
-          {lightboxOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-[100] bg-black/75 backdrop-blur-lg flex items-center justify-center p-6"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                setLightboxOpen(false)
-              }}
-            >
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  setLightboxOpen(false)
-                }}
-                className="absolute top-5 right-5 z-[110] w-11 h-11 rounded-full border border-white/20 bg-black/60 text-white/80 hover:text-white hover:border-white/50 flex items-center justify-center transition-all active:scale-90"
-                aria-label="Cerrar"
-              >
-                <X size={18} strokeWidth={2} />
-              </button>
-              <motion.div
-                initial={{ scale: 0.96 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0.96 }}
-                transition={{ duration: 0.2 }}
-                className="relative w-full max-w-2xl h-[70vh] cursor-zoom-out"
-              >
-                <Image src={image} alt={name} fill className="object-contain" sizes="800px" />
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>,
+      {/* Lightbox premium — galería completa del modelo, renderizada vía portal
+          para no anidarla dentro del <Link>. La navegación queda confinada al
+          modelo: nunca mezcla con otras letras. */}
+      {images.length > 0 && mounted && createPortal(
+        <ProductGallery
+          images={images}
+          productName={name}
+          productCode={code}
+          letter={letter}
+          initialIndex={0}
+          open={lightboxOpen}
+          onClose={() => setLightboxOpen(false)}
+        />,
         document.body
       )}
     </Link>

@@ -7,6 +7,7 @@ export interface ProductColor {
 
 export interface Product {
   id: string
+  letter: string
   code: string
   name: string
   price: number
@@ -17,7 +18,7 @@ export interface Product {
   composition: string
   isFeatured?: boolean
   image: string
-  gallery?: string[]
+  gallery: string[]
   frameColor: string
   colors: ProductColor[]
 }

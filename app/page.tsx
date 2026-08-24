@@ -14,6 +14,7 @@ import {
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import Viewer3D, { FRAME_COLORS } from '@/components/Viewer3D'
+import ProductGallery from '@/components/ProductGallery'
 import { PRODUCTS } from '@/lib/products'
 
 /* ─── Data ────────────────────────────────────────────────────────── */
@@ -40,7 +41,6 @@ const COLLECTION_PRODUCTS = [
     id:              'classic-blue',
     name:            'CLASSIC BLUE',
     price:           '29.00',
-    image:           '/images/a01.png?v=4',
     frameColor:      '#C4822A',
     bgColor:         '#040404',
     isNew:           false,
@@ -50,7 +50,6 @@ const COLLECTION_PRODUCTS = [
     id:              'onyx-black',
     name:            'ONYX BLACK',
     price:           '29.00',
-    image:           '/images/b01.png?v=4',
     frameColor:      '#111111',
     bgColor:         '#030303',
     isNew:           false,
@@ -60,7 +59,6 @@ const COLLECTION_PRODUCTS = [
     id:              'olive-crystal',
     name:            'OLIVE CRYSTAL',
     price:           '29.00',
-    image:           '/images/c01.png?v=4',
     frameColor:      '#3A5A28',
     bgColor:         '#050505',
     isNew:           false,
@@ -70,7 +68,6 @@ const COLLECTION_PRODUCTS = [
     id:              'smoke-grey',
     name:            'SMOKE GREY',
     price:           '29.00',
-    image:           '/images/d02.png?v=4',
     frameColor:      '#555555',
     bgColor:         '#080808',
     isNew:           false,
@@ -717,10 +714,12 @@ function TrustBadgesBar() {
 /* ─── COLLECTIONS ─────────────────────────────────────────────────── */
 
 function CollectionsSection() {
-  const [lightbox, setLightbox] = useState<{ image: string; name: string } | null>(null)
+  const [galleryProduct, setGalleryProduct] = useState<{
+    id: string; name: string; letter: string; code: string; image: string; images: string[]
+  } | null>(null)
 
   useEffect(() => {
-    if (lightbox) {
+    if (galleryProduct) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = 'unset'
@@ -728,7 +727,7 @@ function CollectionsSection() {
     return () => {
       document.body.style.overflow = 'unset'
     }
-  }, [lightbox])
+  }, [galleryProduct])
 
   return (
     <section id="collections-section" className="bg-black pt-10 pb-14">
@@ -799,6 +798,11 @@ function CollectionsSection() {
 
           {/* Product cards (sits automatically in columns 2 to 5, Row 2) */}
           {COLLECTION_PRODUCTS.map((p) => {
+            const product = PRODUCTS.find((pr) => pr.id === p.id)
+            const mainImage = product?.image ?? ''
+            const galleryImages = product?.gallery ?? (mainImage ? [mainImage] : [])
+            const letter = product?.letter ?? ''
+            const code = product?.code ?? ''
             return (
               <Link
                 key={p.id}
@@ -815,32 +819,50 @@ function CollectionsSection() {
                   </span>
                 )}
 
-                {/* Real fotorrealistic sunglasses image from AI — click opens the real photo, not the product/3D page */}
+                {/* Real fotorrealistic sunglasses image — click opens the model gallery */}
                 <div
                   role="button"
                   tabIndex={0}
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
-                    setLightbox({ image: p.image, name: p.name })
+                    setGalleryProduct({
+                      id: p.id,
+                      name: product?.name ?? p.name,
+                      letter,
+                      code,
+                      image: mainImage,
+                      images: galleryImages,
+                    })
                   }}
                   className="relative flex-1 min-h-[230px] overflow-hidden cursor-zoom-in"
                   style={{ background: p.bgColor }}
                 >
                   <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">
-                    <Image
-                      src={p.image}
-                      alt={p.name}
-                      fill
-                      className="object-contain p-4 md:p-6"
-                      sizes="400px"
-                    />
+                    {mainImage && (
+                      <Image
+                        src={mainImage}
+                        alt={product?.name ?? p.name}
+                        fill
+                        className="object-contain p-4 md:p-6"
+                        sizes="400px"
+                      />
+                    )}
                   </div>
 
                   {/* Expand hint icon */}
                   <div className="absolute top-3 right-3 z-20 w-7 h-7 rounded-full bg-black/40 border border-white/20 text-white/70 flex items-center justify-center">
                     <Maximize2 size={11} strokeWidth={2} />
                   </div>
+
+                  {/* Model letter tag */}
+                  {letter && (
+                    <div className="absolute top-3 left-3 z-20">
+                      <span className="font-code text-[8px] tracking-[0.25em] text-white/40 uppercase">
+                        MODELO {letter}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Details Footer */}
@@ -867,43 +889,18 @@ function CollectionsSection() {
         </div>
       </div>
 
-      {/* Lightbox — full uncropped image, tap/click to close */}
-      <AnimatePresence>
-        {lightbox && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[100] bg-black/75 backdrop-blur-lg flex items-center justify-center p-6"
-            onClick={() => setLightbox(null)}
-          >
-            <button
-              type="button"
-              onClick={() => setLightbox(null)}
-              className="absolute top-5 right-5 z-[110] w-11 h-11 rounded-full border border-white/20 bg-black/60 text-white/80 hover:text-white hover:border-white/50 flex items-center justify-center transition-all active:scale-90"
-              aria-label="Cerrar"
-            >
-              <X size={18} strokeWidth={2} />
-            </button>
-            <motion.div
-              initial={{ scale: 0.96 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.96 }}
-              transition={{ duration: 0.2 }}
-              className="relative w-full max-w-2xl h-[70vh] cursor-zoom-out"
-            >
-              <Image
-                src={lightbox.image}
-                alt={lightbox.name}
-                fill
-                className="object-contain"
-                sizes="800px"
-              />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Lightbox premium — galería completa del modelo seleccionado */}
+      {galleryProduct && (
+        <ProductGallery
+          images={galleryProduct.images}
+          productName={galleryProduct.name}
+          productCode={galleryProduct.code}
+          letter={galleryProduct.letter}
+          initialIndex={0}
+          open={galleryProduct !== null}
+          onClose={() => setGalleryProduct(null)}
+        />
+      )}
     </section>
   )
 }

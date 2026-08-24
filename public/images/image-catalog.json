@@ -1,0 +1,30 @@
+{
+  "A": [
+    "/images/a01.png",
+    "/images/a02.png",
+    "/images/a03.png"
+  ],
+  "B": [
+    "/images/b01.png",
+    "/images/b02.png",
+    "/images/b03.png"
+  ],
+  "C": [
+    "/images/c01.png",
+    "/images/c02.png",
+    "/images/c03.png",
+    "/images/c04.png",
+    "/images/c05.png"
+  ],
+  "D": [
+    "/images/d02.png",
+    "/images/d03.png",
+    "/images/d04.png",
+    "/images/d05.png",
+    "/images/d06.png",
+    "/images/d07.png"
+  ],
+  "X": [
+    "/images/x.png"
+  ]
+}
