@@ -16,6 +16,7 @@ import {
 } from './SunglassesIllustration'
 
 import ProductGallery from './ProductGallery'
+import ShareButton from './ShareButton'
 import { GlassesModel } from '@/types'
 
 const ILLUSTRATIONS: Record<GlassesModel, React.ComponentType<React.SVGProps<SVGSVGElement> & { color?: string }>> = {
@@ -135,9 +136,15 @@ export default function ProductCard({
             <p className="font-code text-[10px] tracking-widest text-gray-mid uppercase mb-1">{code}</p>
             <p className="font-display text-base font-semibold text-white leading-tight">{name}</p>
           </div>
-          <div className="text-right">
-            <p className="font-display text-xl font-semibold text-white">{price}</p>
-            <p className="font-code text-[9px] tracking-widest text-gray-mid">EUR</p>
+          <div className="flex items-end gap-3">
+            <div className="text-right">
+              <p className="font-display text-xl font-semibold text-white">{price}</p>
+              <p className="font-code text-[9px] tracking-widest text-gray-mid">EUR</p>
+            </div>
+            <ShareButton
+              title={`${name} — STENCIL2`}
+              url={`${typeof window !== 'undefined' ? window.location.origin : ''}/producto/${slug}`}
+            />
           </div>
         </div>
 

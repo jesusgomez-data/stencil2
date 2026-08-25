@@ -15,6 +15,7 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import Viewer3D, { FRAME_COLORS } from '@/components/Viewer3D'
 import ProductGallery from '@/components/ProductGallery'
+import ShareButton from '@/components/ShareButton'
 import { PRODUCTS } from '@/lib/products'
 
 /* ─── Data ────────────────────────────────────────────────────────── */
@@ -878,8 +879,14 @@ function CollectionsSection() {
                       {p.price} <span className="font-code text-[8px] font-normal tracking-widest text-white/40">EUR</span>
                     </p>
                   </div>
-                  <div className="w-7 h-7 rounded-full border border-white/[0.09] text-white/28 group-hover:border-white/52 group-hover:text-white flex items-center justify-center flex-shrink-0 transition-all">
-                    <Plus size={11} strokeWidth={2.2} />
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <ShareButton
+                      title={`${product?.name ?? p.name} — STENCIL2`}
+                      url={`${typeof window !== 'undefined' ? window.location.origin : ''}/producto/${p.id}`}
+                    />
+                    <div className="w-7 h-7 rounded-full border border-white/[0.09] text-white/28 group-hover:border-white/52 group-hover:text-white flex items-center justify-center flex-shrink-0 transition-all">
+                      <Plus size={11} strokeWidth={2.2} />
+                    </div>
                   </div>
                 </div>
               </Link>
