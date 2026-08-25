@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
+import Image from 'next/image'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
@@ -73,18 +74,58 @@ function TiendaContent() {
       <Navbar />
 
       <main className="flex-1 pt-28 pb-16 px-6 lg:px-10 max-w-[1400px] mx-auto w-full">
-        {/* Editorial Header */}
-        <div className="border-b border-white/[0.07] pb-8 mb-10 text-left">
-          <p className="font-code text-[9px] tracking-[0.35em] text-white/30 uppercase mb-3">
-            CATÁLOGO OFICIAL S2
-          </p>
-          <h1 className="font-bebas text-[48px] md:text-[64px] tracking-wide leading-none text-white uppercase">
-            {selectedGender === 'men' ? 'COLECCIÓN HOMBRE' : selectedGender === 'women' ? 'COLECCIÓN MUJER' : 'TODAS LAS GAFAS'}
-          </h1>
-          <p className="font-code text-[11px] text-white/40 max-w-xl mt-3 leading-relaxed">
-            Diseñadas bajo los estándares de la cultura urbana y el streetwear premium. Lentes polarizadas de protección total UV400, monturas de acetato pulido a mano y polímeros flexibles.
-          </p>
-        </div>
+        {/* Portada de la colección — Camaleon */}
+        <section className="relative mb-12 rounded-2xl overflow-hidden border border-white/[0.055] bg-[#050505]">
+          <div className="flex flex-col-reverse md:flex-row">
+            {/* Texto editorial (izquierda en desktop) */}
+            <div className="relative flex-1 flex flex-col justify-center px-6 md:px-10 py-10 md:py-16 text-left">
+              <div
+                className="absolute inset-0 z-0"
+                style={{
+                  background:
+                    'linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 60%, rgba(0,0,0,0) 100%)',
+                }}
+              />
+              <div className="relative z-10">
+                <p className="font-code text-[9px] tracking-[0.35em] text-white/40 uppercase mb-4">
+                  COLECCIÓN OFICIAL · {selectedGender === 'men' ? 'HOMBRE' : selectedGender === 'women' ? 'MUJER' : 'UNISEX'}
+                </p>
+                <h1 className="font-bebas text-[44px] md:text-[60px] tracking-wide leading-[0.9] text-white uppercase">
+                  LAS GAFAS
+                  <br />
+                  <span className="text-white/85">DE LA CULTURA</span>
+                </h1>
+                <p className="font-code text-[11px] text-white/50 max-w-md mt-5 leading-relaxed">
+                  Diseñadas bajo los estándares de la cultura urbana y el streetwear premium. Lentes polarizadas de protección total UV400, monturas de acetato pulido a mano y polímeros flexibles.
+                </p>
+                <div className="hidden md:flex items-center gap-5 mt-8">
+                  <span className="font-code text-[8px] tracking-[0.3em] text-white/30 uppercase">EST. 2026</span>
+                  <span className="w-8 h-[1px] bg-white/20" />
+                  <span className="font-code text-[8px] tracking-[0.3em] text-white/30 uppercase">STENCIL2</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Imagen completa (derecha en desktop) */}
+            <div className="relative w-full md:w-[42%] aspect-[4/5] md:aspect-auto md:min-h-[420px] shrink-0">
+              <Image
+                src="/images/Camaleon.png"
+                alt="Colección STENCIL2"
+                fill
+                priority
+                className="object-cover object-center"
+                sizes="(max-width: 768px) 100vw, 42vw"
+              />
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    'linear-gradient(to left, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.35) 100%)',
+                }}
+              />
+            </div>
+          </div>
+        </section>
 
         {/* Filters and Search Bar Row */}
         <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center mb-8 w-full">
@@ -196,7 +237,7 @@ function TiendaContent() {
         {filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredProducts.map((p) => (
-              <div key={p.id} className="h-[360px] border border-white/[0.052] rounded-xl overflow-hidden hover:border-white/15 transition-all">
+              <div key={p.id} className="h-[360px] border border-white/[0.052] rounded-2xl overflow-hidden hover:border-white/15 transition-all">
                 <ProductCard
                   code={p.code}
                   letter={p.letter}
