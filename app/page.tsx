@@ -16,6 +16,7 @@ import Footer from '@/components/Footer'
 import Viewer3D, { FRAME_COLORS } from '@/components/Viewer3D'
 import ProductGallery from '@/components/ProductGallery'
 import ShareButton from '@/components/ShareButton'
+import FavoriteButton from '@/components/FavoriteButton'
 import { PRODUCTS } from '@/lib/products'
 
 /* ─── Data ────────────────────────────────────────────────────────── */
@@ -856,9 +857,14 @@ function CollectionsSection() {
                     <Maximize2 size={11} strokeWidth={2} />
                   </div>
 
+                  {/* Like button — arriba a la izquierda */}
+                  <div className="absolute top-3 left-3 z-30">
+                    <FavoriteButton slug={p.id} />
+                  </div>
+
                   {/* Model letter tag */}
                   {letter && (
-                    <div className="absolute top-3 left-3 z-20">
+                    <div className="absolute top-12 left-3 z-20">
                       <span className="font-code text-[8px] tracking-[0.25em] text-white/40 uppercase">
                         MODELO {letter}
                       </span>

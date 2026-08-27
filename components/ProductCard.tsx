@@ -17,6 +17,7 @@ import {
 
 import ProductGallery from './ProductGallery'
 import ShareButton from './ShareButton'
+import FavoriteButton from './FavoriteButton'
 import { GlassesModel } from '@/types'
 
 const ILLUSTRATIONS: Record<GlassesModel, React.ComponentType<React.SVGProps<SVGSVGElement> & { color?: string }>> = {
@@ -114,8 +115,13 @@ export default function ProductCard({
         </motion.div>
       )}
 
+      {/* Like button — encima de la etiqueta de género */}
+      <div className="absolute top-3 left-5 z-20">
+        <FavoriteButton slug={slug} />
+      </div>
+
       {/* Gender tag */}
-      <div className="absolute top-5 left-5">
+      <div className="absolute top-12 left-5">
         <span className="font-code text-[9px] tracking-[0.25em] text-white/30 uppercase">{gender}</span>
       </div>
 
