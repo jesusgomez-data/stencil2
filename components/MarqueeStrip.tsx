@@ -10,8 +10,6 @@ const ITEMS = [
   'ENVÍO GRATIS +50€',
   'VISOR 360°',
   'S2-004',
-  'S2-005',
-  'S2-006',
   'JOINING CULTURE',
 ]
 

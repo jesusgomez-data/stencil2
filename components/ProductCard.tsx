@@ -66,7 +66,7 @@ export default function ProductCard({
   const images = gallery && gallery.length > 0 ? gallery : image ? [image] : []
 
   return (
-    <Link href={`/producto/${slug}`} className="group block relative overflow-hidden h-full" style={{ background: bg }}>
+    <Link href={`/producto/${slug}`} className="group block relative overflow-hidden h-full min-h-96" style={{ background: bg }}>
       {/* Glow spot */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-1/2 bg-white/[0.03] blur-2xl rounded-full" />

@@ -20,24 +20,24 @@ function loadFavorites(): string[] {
   }
 }
 
-/**
- * Botón de "me gusta" (corazón) con persistencia local.
- * El like se guarda por slug en localStorage del navegador.
- */
 export default function FavoriteButton({ slug, className = '' }: FavoriteButtonProps) {
   const [liked, setLiked] = useState(false)
+  const [showCount, setShowCount] = useState(false)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => setMounted(true), [])
 
   useEffect(() => {
-    setLiked(loadFavorites().includes(slug))
+    const isLiked = loadFavorites().includes(slug)
+    setLiked(isLiked)
+    setShowCount(isLiked)
   }, [slug])
 
   const toggle = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault()
       e.stopPropagation()
+      setShowCount(true)
       setLiked((prev) => {
         const favs = loadFavorites()
         const next = prev ? favs.filter((s) => s !== slug) : [...favs, slug]
@@ -52,24 +52,47 @@ export default function FavoriteButton({ slug, className = '' }: FavoriteButtonP
     [slug]
   )
 
+  const count = liked ? 1 : 0
+  const stopCardNavigation = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
   return (
-    <button
-      type="button"
-      onClick={toggle}
-      aria-label={liked ? 'Quitar de favoritos' : 'Añadir a favoritos'}
-      aria-pressed={liked}
-      className={`w-7 h-7 rounded-full border flex items-center justify-center transition-all active:scale-90 ${
-        liked
-          ? 'border-[#CC0000]/60 bg-[#CC0000]/15 text-[#CC0000]'
-          : 'border-white/[0.12] bg-black/30 text-white/45 hover:text-white hover:border-white/40'
-      } ${className}`}
-      style={{ backdropFilter: 'blur(4px)' }}
+    <div
+      className={`flex items-center gap-2 ${className}`}
+      onClick={stopCardNavigation}
     >
-      <Heart
-        size={11}
-        strokeWidth={2}
-        className={liked ? 'fill-current' : ''}
-      />
-    </button>
+      <button
+        type="button"
+        onClick={toggle}
+        aria-label={
+          liked
+            ? `Quitar de favoritos. ${count} usuarios dieron like.`
+            : `Añadir a favoritos. ${count} usuarios dieron like.`
+        }
+        aria-pressed={liked}
+        className={`w-7 h-7 rounded-full border flex items-center justify-center transition-all active:scale-90 ${
+          liked
+            ? 'border-[#CC0000]/60 bg-[#CC0000]/15 text-[#CC0000]'
+            : 'border-white/[0.12] bg-black/30 text-white/45 hover:text-white hover:border-white/40'
+        }`}
+        style={{ backdropFilter: 'blur(4px)' }}
+      >
+        <Heart
+          size={11}
+          strokeWidth={2}
+          className={liked ? 'fill-current' : ''}
+        />
+      </button>
+      {mounted && showCount && (
+        <span
+          className="rounded-full border border-white/[0.12] bg-black/35 px-2 py-1 font-code text-[9px] leading-none tracking-[0.14em] text-white/60"
+          style={{ backdropFilter: 'blur(4px)' }}
+        >
+          {count} likes
+        </span>
+      )}
+    </div>
   )
 }

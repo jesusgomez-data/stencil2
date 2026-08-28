@@ -152,7 +152,9 @@ function buildProduct(seed: ProductSeed): Product {
   }
 }
 
-export const PRODUCTS: Product[] = SEEDS.map(buildProduct)
+export const PRODUCTS: Product[] = SEEDS
+  .filter((seed) => seed.slug !== 'aviator-gold')
+  .map(buildProduct)
 
 /** Busca un producto por su slug. */
 export function getProductBySlug(slug: string): Product | undefined {
