@@ -9,7 +9,8 @@ interface IntroAnimationProps {
 }
 
 export default function IntroAnimation({ onComplete }: IntroAnimationProps) {
-  const [stage, setStage] = useState<1 | 2 | 'done'>(1)
+  const [stage, setStage] = useState<1 | 2>(1)
+  const [isVisible, setIsVisible] = useState(true)
 
   useEffect(() => {
     // Stage 1: Grenade logo (0s to 1.3s)
@@ -19,7 +20,7 @@ export default function IntroAnimation({ onComplete }: IntroAnimationProps) {
 
     // Stage 2: Script logo (1.3s to 2.8s)
     const timer2 = setTimeout(() => {
-      setStage('done')
+      setIsVisible(false)
       if (onComplete) onComplete()
     }, 2800)
 
@@ -30,15 +31,13 @@ export default function IntroAnimation({ onComplete }: IntroAnimationProps) {
   }, [onComplete])
 
   const handleSkip = () => {
-    setStage('done')
+    setIsVisible(false)
     if (onComplete) onComplete()
   }
 
-  if (stage === 'done') return null
-
   return (
     <AnimatePresence>
-      {stage !== 'done' && (
+      {isVisible && (
         <motion.div
           key="intro-overlay"
           initial={{ opacity: 1 }}
