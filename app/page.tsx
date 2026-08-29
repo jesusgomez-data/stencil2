@@ -8,7 +8,7 @@ import {
   ArrowRight, Truck, Shield, Award, Headphones,
   ChevronLeft, ChevronRight, Plus, ChevronUp, ChevronDown,
   Home, Search, Compass, LayoutGrid, Play, AlignJustify, Grid3x3,
-  Volume2, VolumeX, Pause, X, Maximize2
+  Volume2, VolumeX, Pause, X, Maximize2, Check
 } from 'lucide-react'
 
 import Navbar from '@/components/Navbar'
@@ -18,6 +18,8 @@ import ProductGallery from '@/components/ProductGallery'
 import ShareButton from '@/components/ShareButton'
 import FavoriteButton from '@/components/FavoriteButton'
 import { PRODUCTS } from '@/lib/products'
+import { useCart } from '@/context/CartContext'
+import IntroAnimation from '@/components/IntroAnimation'
 
 /* ─── Data ────────────────────────────────────────────────────────── */
 
@@ -41,7 +43,7 @@ const TRUST_BADGES = [
 const COLLECTION_PRODUCTS = [
   {
     id:              'classic-blue',
-    name:            'CLASSIC BLUE',
+    name:            'KSO-KC',
     price:           '29.00',
     frameColor:      '#C4822A',
     bgColor:         '#040404',
@@ -50,7 +52,7 @@ const COLLECTION_PRODUCTS = [
   },
   {
     id:              'onyx-black',
-    name:            'ONYX BLACK',
+    name:            'IBZEN-SOIRES NAES',
     price:           '29.00',
     frameColor:      '#111111',
     bgColor:         '#030303',
@@ -59,7 +61,7 @@ const COLLECTION_PRODUCTS = [
   },
   {
     id:              'olive-crystal',
-    name:            'OLIVE CRYSTAL',
+    name:            'MAGMAFLOW',
     price:           '29.00',
     frameColor:      '#3A5A28',
     bgColor:         '#050505',
@@ -403,7 +405,7 @@ function HeroSection() {
                       BÚSQUEDAS POPULARES
                     </p>
                     <div className="flex flex-wrap gap-2.5">
-                      {['CLASSIC BLUE', 'ONYX BLACK', 'OLIVE CRYSTAL', 'SMOKE GREY'].map(term => (
+                      {['KSO-KC', 'IBZEN-SOIRES NAES', 'MAGMAFLOW', 'SMOKE GREY'].map(term => (
                         <button
                           key={term}
                           onClick={() => setSearchQuery(term)}
@@ -719,6 +721,8 @@ function CollectionsSection() {
   const [galleryProduct, setGalleryProduct] = useState<{
     id: string; name: string; letter: string; code: string; image: string; images: string[]
   } | null>(null)
+  const [addedId, setAddedId] = useState<string | null>(null)
+  const { addToCart } = useCart()
 
   useEffect(() => {
     if (galleryProduct) {
@@ -730,6 +734,26 @@ function CollectionsSection() {
       document.body.style.overflow = 'unset'
     }
   }, [galleryProduct])
+
+  const handleQuickAddCollection = (e: React.MouseEvent, p: typeof COLLECTION_PRODUCTS[0]) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const product = PRODUCTS.find((pr) => pr.id === p.id)
+    const numericPrice = parseFloat(p.price.replace(/[^0-9.]/g, '')) || 29.00
+    addToCart({
+      id: p.id,
+      code: product?.code ?? '',
+      name: product?.name ?? p.name,
+      slug: p.id,
+      price: numericPrice,
+      image: product?.image ?? '',
+      model: product?.model ?? 'wayfarer',
+      color: product?.frameColor ?? '#1a1a1a',
+      colorLabel: product?.colors[0]?.label ?? 'Estándar',
+    }, 1)
+    setAddedId(p.id)
+    setTimeout(() => setAddedId(null), 1800)
+  }
 
   return (
     <section id="collections-section" className="bg-black pt-10 pb-14">
@@ -805,6 +829,8 @@ function CollectionsSection() {
             const galleryImages = product?.gallery ?? (mainImage ? [mainImage] : [])
             const letter = product?.letter ?? ''
             const code = product?.code ?? ''
+            const isThisAdded = addedId === p.id
+
             return (
               <Link
                 key={p.id}
@@ -890,9 +916,17 @@ function CollectionsSection() {
                       title={`${product?.name ?? p.name} — STENCIL2`}
                       url={`${typeof window !== 'undefined' ? window.location.origin : ''}/producto/${p.id}`}
                     />
-                    <div className="w-7 h-7 rounded-full border border-white/[0.09] text-white/28 group-hover:border-white/52 group-hover:text-white flex items-center justify-center flex-shrink-0 transition-all">
-                      <Plus size={11} strokeWidth={2.2} />
-                    </div>
+                    <button
+                      onClick={(e) => handleQuickAddCollection(e, p)}
+                      title="Añadir al carrito"
+                      className={`w-7 h-7 rounded-full border flex items-center justify-center flex-shrink-0 transition-all ${
+                        isThisAdded
+                          ? 'bg-[#1C3B1C] border-[#2c5c2c] text-white scale-110'
+                          : 'border-white/[0.12] text-white/40 hover:border-white/60 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      {isThisAdded ? <Check size={11} strokeWidth={2.5} /> : <Plus size={11} strokeWidth={2.2} />}
+                    </button>
                   </div>
                 </div>
               </Link>
@@ -923,6 +957,7 @@ function CollectionsSection() {
 export default function HomePage() {
   return (
     <div className="bg-black min-h-screen">
+      <IntroAnimation />
       <Navbar />
       <HeroSection />
       <TrustBadgesBar />

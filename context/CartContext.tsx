@@ -74,11 +74,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     discount = subtotal * 0.1
   }
 
+  const taxableAmount = Math.max(0, subtotal - discount)
+  // IVA 21% automático sobre la base imponible
+  const tax = taxableAmount * 0.21
+
   const promoFreeShipping = promoCode === 'S2-FREE'
-  const isShippingFree = (subtotal - discount >= 50) || promoFreeShipping
+  const isShippingFree = (taxableAmount >= 50) || promoFreeShipping
   const shippingCost = cartItems.length === 0 ? 0 : (isShippingFree ? 0 : 4.95)
 
-  const total = subtotal - discount + shippingCost
+  const total = taxableAmount + tax + shippingCost
 
   const addToCart = (newItem: Omit<CartItem, 'quantity'>, quantity: number = 1) => {
     setCartItems((prevItems) => {
@@ -143,6 +147,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       items: [...cartItems],
       subtotal,
       discount,
+      tax,
       shipping: shippingCost,
       total,
       pointsEarned,
@@ -162,6 +167,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         cartItems,
         promoCode,
         discount,
+        tax,
         shippingCost,
         subtotal,
         total,

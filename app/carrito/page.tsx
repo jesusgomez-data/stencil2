@@ -31,6 +31,7 @@ export default function CarritoPage() {
     cartItems,
     promoCode,
     discount,
+    tax,
     shippingCost,
     subtotal,
     total,
@@ -108,14 +109,26 @@ export default function CarritoPage() {
                       {/* Product Visual & Identity */}
                       <div className="flex items-center gap-5 flex-1 min-w-0">
                         {/* Interactive Colored Glasses Visual */}
-                        <div className="w-[100px] h-[64px] flex-shrink-0 bg-black/40 border border-white/[0.04] rounded-lg p-2 flex items-center justify-center relative overflow-hidden">
-                          <div
-                            className="absolute inset-0"
-                            style={{
-                              background: `radial-gradient(ellipse at 50% 50%, ${item.color}20 0%, transparent 80%)`,
-                            }}
-                          />
-                          <Illustration color={item.color} className="w-full h-full opacity-85" />
+                        <div className="w-[100px] h-[64px] flex-shrink-0 bg-black/40 border border-white/[0.08] rounded-lg p-1.5 flex items-center justify-center relative overflow-hidden">
+                          {item.image ? (
+                            <Image
+                              src={item.image}
+                              alt={item.name}
+                              width={90}
+                              height={55}
+                              className="object-contain w-full h-full"
+                            />
+                          ) : (
+                            <>
+                              <div
+                                className="absolute inset-0"
+                                style={{
+                                  background: `radial-gradient(ellipse at 50% 50%, ${item.color}20 0%, transparent 80%)`,
+                                }}
+                              />
+                              <Illustration color={item.color} className="w-full h-full opacity-85" />
+                            </>
+                          )}
                         </div>
 
                         {/* Title details */}
@@ -126,9 +139,15 @@ export default function CarritoPage() {
                           <Link href={`/producto/${item.slug}`} className="font-display text-sm font-semibold text-white hover:text-white/80 transition-colors uppercase tracking-wide truncate block">
                             {item.name}
                           </Link>
-                          <span className="font-code text-[9px] tracking-widest text-[#C4822A] uppercase block mt-0.5">
-                            COLOR: {item.colorLabel}
-                          </span>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span
+                              className="w-2.5 h-2.5 rounded-full inline-block border border-white/20 flex-shrink-0"
+                              style={{ backgroundColor: item.color }}
+                            />
+                            <span className="font-code text-[9px] tracking-widest text-[#C4822A] uppercase block">
+                              COLOR: {item.colorLabel || 'Estándar'}
+                            </span>
+                          </div>
                         </div>
                       </div>
 
@@ -236,6 +255,11 @@ export default function CarritoPage() {
                   )}
 
                   <div className="flex justify-between">
+                    <span>IVA (21%)</span>
+                    <span className="text-white font-medium">+{tax.toFixed(2)} EUR</span>
+                  </div>
+
+                  <div className="flex justify-between">
                     <span>ENVÍO</span>
                     <span className="text-white font-medium">
                       {shippingCost === 0 ? 'GRATIS' : `${shippingCost.toFixed(2)} EUR`}
@@ -250,8 +274,8 @@ export default function CarritoPage() {
                     <span className="font-display text-2xl font-bold text-white block">
                       {total.toFixed(2)} <span className="text-sm font-code text-white/40 ml-1">EUR</span>
                     </span>
-                    <span className="font-code text-[8px] tracking-wider text-white/25 block uppercase mt-0.5">
-                      21% IVA INCLUIDO
+                    <span className="font-code text-[8px] tracking-wider text-white/40 block uppercase mt-0.5">
+                      IVA Y ENVÍO INCLUIDOS
                     </span>
                   </div>
                 </div>

@@ -10,7 +10,7 @@ import { ArrowLeft, Check, CreditCard, Shield, Truck, Sparkles, ShoppingBag } fr
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function CheckoutPage() {
-  const { cartItems, total, subtotal, discount, shippingCost, promoCode, completeCheckout } = useCart()
+  const { cartItems, total, subtotal, discount, tax, shippingCost, promoCode, completeCheckout } = useCart()
   const [step, setStep] = useState<'details' | 'payment' | 'success'>('details')
   const [createdOrder, setCreatedOrder] = useState<Order | null>(null)
   
@@ -409,6 +409,10 @@ export default function CheckoutPage() {
                   </div>
                 )}
                 <div className="flex justify-between">
+                  <span>IVA (21%)</span>
+                  <span className="text-white">+{tax.toFixed(2)} EUR</span>
+                </div>
+                <div className="flex justify-between">
                   <span>ENVÍO</span>
                   <span className="text-white">
                     {shippingCost === 0 ? 'GRATIS' : `${shippingCost.toFixed(2)} EUR`}
@@ -423,8 +427,8 @@ export default function CheckoutPage() {
                   <span className="font-display text-xl font-bold text-white block">
                     {total.toFixed(2)} EUR
                   </span>
-                  <span className="font-code text-[7px] tracking-wider text-white/20 block uppercase mt-0.5">
-                    21% IVA Incluido
+                  <span className="font-code text-[7px] tracking-wider text-white/30 block uppercase mt-0.5">
+                    IVA y Envío incluidos
                   </span>
                 </div>
               </div>

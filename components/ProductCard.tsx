@@ -5,7 +5,8 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowUpRight, Maximize2 } from 'lucide-react'
+import { ArrowUpRight, Maximize2, ShoppingBag, Check } from 'lucide-react'
+import { useCart } from '@/context/CartContext'
 import {
   WayfarerSVG,
   RoundSVG,
@@ -58,10 +59,31 @@ export default function ProductCard({
   const bg = BG_COLORS[model]
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [justAdded, setJustAdded] = useState(false)
+  const { addToCart } = useCart()
 
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  const handleQuickAdd = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const numericPrice = parseFloat(price.replace(/[^0-9.]/g, '')) || 29.00
+    addToCart({
+      id: slug,
+      code,
+      name,
+      slug,
+      price: numericPrice,
+      image: image || '',
+      model,
+      color: '#1a1a1a',
+      colorLabel: 'Estándar',
+    }, 1)
+    setJustAdded(true)
+    setTimeout(() => setJustAdded(false), 1800)
+  }
 
   const images = gallery && gallery.length > 0 ? gallery : image ? [image] : []
 
@@ -142,11 +164,25 @@ export default function ProductCard({
             <p className="font-code text-[10px] tracking-widest text-gray-mid uppercase mb-1">{code}</p>
             <p className="font-display text-base font-semibold text-white leading-tight">{name}</p>
           </div>
-          <div className="flex items-end gap-3">
+          <div className="flex items-end gap-2">
             <div className="text-right">
               <p className="font-display text-xl font-semibold text-white">{price}</p>
               <p className="font-code text-[9px] tracking-widest text-gray-mid">EUR</p>
             </div>
+            
+            {/* Quick Add To Cart Button */}
+            <button
+              onClick={handleQuickAdd}
+              title="Añadir al carrito"
+              className={`w-8 h-8 rounded-full border transition-all flex items-center justify-center ${
+                justAdded
+                  ? 'bg-[#1C3B1C] border-[#2c5c2c] text-white scale-105'
+                  : 'bg-black/60 border-white/20 text-white/70 hover:text-white hover:border-white/50 hover:bg-white/10'
+              }`}
+            >
+              {justAdded ? <Check size={13} strokeWidth={2.5} /> : <ShoppingBag size={13} strokeWidth={1.5} />}
+            </button>
+
             <ShareButton
               title={`${name} — STENCIL2`}
               url={`${typeof window !== 'undefined' ? window.location.origin : ''}/producto/${slug}`}
@@ -156,7 +192,7 @@ export default function ProductCard({
 
         {/* Hover CTA bar */}
         <div className="overflow-hidden h-0 group-hover:h-10 transition-all duration-300 ease-in-out mt-2">
-          <div className="flex items-center justify-center border border-white/20 py-2.5">
+          <div className="flex items-center justify-center border border-white/20 py-2.5 bg-black/40 backdrop-blur-sm">
             <span className="font-code text-[10px] tracking-widest text-white uppercase">
               VER MODELO →
             </span>

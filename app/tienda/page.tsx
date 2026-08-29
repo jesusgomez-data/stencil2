@@ -107,14 +107,14 @@ function TiendaContent() {
             </div>
 
             {/* Imagen completa (derecha en desktop) */}
-            <div className="relative w-full md:w-[42%] aspect-[4/5] md:aspect-auto md:min-h-[420px] shrink-0">
+            <div className="relative w-full md:w-[35%] aspect-[4/5] md:aspect-auto md:min-h-[420px] shrink-0">
               <Image
                 src="/images/Camaleon.png"
                 alt="Colección STENCIL2"
                 fill
                 priority
-                className="object-cover object-center"
-                sizes="(max-width: 768px) 100vw, 42vw"
+                className="object-contain object-center"
+                sizes="(max-width: 768px) 100vw, 35vw"
               />
               <div
                 className="absolute inset-0"

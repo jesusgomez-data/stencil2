@@ -42,6 +42,7 @@ export interface Order {
   items: CartItem[]
   subtotal: number
   discount: number
+  tax: number
   shipping: number
   total: number
   pointsEarned: number
@@ -59,6 +60,7 @@ export interface CartContextType {
   cartItems: CartItem[]
   promoCode: string | null
   discount: number
+  tax: number
   shippingCost: number
   subtotal: number
   total: number

@@ -6,9 +6,9 @@ import { getModelGallery, getModelMainImage } from '@/lib/imageCatalog'
  *
  * Cada producto se identifica por una LETRA (modelo de gafa). Las imágenes se
  * asignan AUTOMÁTICAMENTE desde el catálogo de imágenes (image-catalog.json):
- *   - A → CLASSIC BLUE   (a01, a02, a03...)
- *   - B → ONYX BLACK     (b01, b02, b03...)
- *   - C → OLIVE CRYSTAL  (c01, c02, c03...)
+ *   - A → KSO-KC  (a01, a02, a03...)
+ *   - B → IBZEN-SOIRES NAES    (b01, b02, b03...)
+ *   - C → MAGMAFLOW  (c01, c02, c03...)
  *   - D → SMOKE GREY     (d01, d02, d03...)
  *   - X → AVIATOR GOLD   (x01, x02, x03...)
  *
@@ -38,12 +38,12 @@ const SEEDS: ProductSeed[] = [
     id: 'classic-blue',
     letter: 'A',
     code: 'S2-001',
-    name: 'CLASSIC BLUE',
+    name: 'KSO-KC',
     price: 29.00,
     gender: 'unisex',
     model: 'wayfarer',
     slug: 'classic-blue',
-    description: 'La montura Classic Blue combina nuestra icónica forma Wayfarer con un sutil acabado translúcido. Lentes polarizadas de alta resistencia con protección total UV400. Diseñadas para destacar en cualquier escenario urbano.',
+    description: 'La montura KSO-KC combina nuestra icónica forma Wayfarer con un sutil acabado translúcido. Lentes polarizadas de alta resistencia con protección total UV400. Diseñadas para destacar en cualquier escenario urbano.',
     composition: '100% Acetato premium, bisagras de 5 dientes reforzadas',
     isFeatured: true,
     frameColor: '#0D2147',
@@ -58,12 +58,12 @@ const SEEDS: ProductSeed[] = [
     id: 'onyx-black',
     letter: 'B',
     code: 'S2-002',
-    name: 'ONYX BLACK',
+    name: 'IBZEN-SOIRES NAES',
     price: 29.00,
     gender: 'unisex',
     model: 'wayfarer',
     slug: 'onyx-black',
-    description: 'Minimalismo y sofisticación en su forma más pura. La montura Onyx Black es el clásico atemporal de STENCIL2. Fabricadas con acetato pulido a mano para un acabado brillante inigualable y durabilidad extrema.',
+    description: 'Minimalismo y sofisticación en su forma más pura. La montura IBZEN-SOIRES NAES es el clásico atemporal de STENCIL2. Fabricadas con acetato pulido a mano para un acabado brillante inigualable y durabilidad extrema.',
     composition: '100% Acetato orgánico, lentes CR-39 polarizadas',
     isFeatured: true,
     frameColor: '#1a1a1a',
@@ -77,12 +77,12 @@ const SEEDS: ProductSeed[] = [
     id: 'olive-crystal',
     letter: 'C',
     code: 'S2-003',
-    name: 'OLIVE CRYSTAL',
+    name: 'MAGMAFLOW',
     price: 29.00,
     gender: 'unisex',
     model: 'round',
     slug: 'olive-crystal',
-    description: 'Montura redonda de inspiración retro adaptada a la cultura urbana. El color Olive Crystal presenta un tono verde oliva cristalino con varillas de metal ligero. Lentes oscuras polarizadas para una máxima nitidez visual.',
+    description: 'Montura redonda de inspiración retro adaptada a la cultura urbana. El modelo MAGMAFLOW presenta un tono verde oliva cristalino con varillas de metal ligero. Lentes oscuras polarizadas para una máxima nitidez visual.',
     composition: 'Combinación de acetato inyectado y patillas de acero inoxidable',
     isFeatured: true,
     frameColor: '#3A5A28',

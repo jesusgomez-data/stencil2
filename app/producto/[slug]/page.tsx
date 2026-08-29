@@ -11,7 +11,8 @@ import { PRODUCTS } from '@/lib/products'
 import { getShotLabel } from '@/lib/imageCatalog'
 import { Product } from '@/types'
 import { useCart } from '@/context/CartContext'
-import { Truck, RotateCcw, ShieldCheck, ChevronDown, ChevronUp, Check, ArrowRight, Maximize2 } from 'lucide-react'
+import { Truck, RotateCcw, ShieldCheck, ChevronDown, ChevronUp, Check, ArrowRight, Maximize2, ShoppingBag } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 
 export default function ProductDetailPage({ params }: { params: { slug: string } }) {
@@ -214,10 +215,40 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                     ¡AÑADIDO AL CARRITO!
                   </>
                 ) : (
-                  'AÑADIR AL CARRITO'
+                  <>
+                    <ShoppingBag size={12} strokeWidth={1.8} />
+                    AÑADIR AL CARRITO
+                  </>
                 )}
               </button>
             </div>
+
+            {/* Direct action links when added */}
+            <AnimatePresence>
+              {isAdded && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden mb-6"
+                >
+                  <div className="flex gap-2.5">
+                    <Link
+                      href="/carrito"
+                      className="flex-1 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-code text-[9px] tracking-widest py-3 text-center uppercase font-bold rounded-sm transition-colors flex items-center justify-center gap-1.5"
+                    >
+                      VER CARRITO →
+                    </Link>
+                    <Link
+                      href="/checkout"
+                      className="flex-1 bg-[#CC0000] hover:bg-[#B00000] text-white font-code text-[9px] tracking-widest py-3 text-center uppercase font-bold rounded-sm transition-colors flex items-center justify-center gap-1.5"
+                    >
+                      PAGAR AHORA
+                    </Link>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Specifications & Composition */}
             <div className="border-t border-white/[0.08] pt-6 mb-6 text-left">

@@ -24,7 +24,7 @@ export default function NosotrosPage() {
           </p>
 
           <p>
-            Fundada en 2026 en España, STENCIL2 surge de la necesidad de ofrecer gafas de sol de alta gama sin el sobreprecio habitual de las marcas de lujo. Nos centramos en lo esencial: monturas de acetato orgánico cortado a mano, polímeros de memoria flexible y lentes polarizadas de protección total UV400.
+            Fundada en 2026 en Venezuela, STENCIL2 surge de la necesidad de ofrecer gafas de sol de alta gama sin el sobreprecio habitual de las marcas de lujo. Nos centramos en lo esencial: monturas de acetato orgánico cortado a mano, polímeros de memoria flexible y lentes polarizadas de protección total UV400.
           </p>
 
           <p>
