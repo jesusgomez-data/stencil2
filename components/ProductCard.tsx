@@ -158,16 +158,18 @@ export default function ProductCard({
       </div>
 
       {/* Bottom info */}
-      <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black/80 via-black/20 to-transparent">
+      <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black/85 via-black/30 to-transparent">
         <div className="flex items-end justify-between">
-          <div>
-            <p className="font-code text-[10px] tracking-widest text-gray-mid uppercase mb-1">{code}</p>
-            <p className="font-display text-base font-semibold text-white leading-tight">{name}</p>
+          <div className="max-w-[65%] pr-2">
+            <p className="font-code text-[9px] tracking-[0.2em] text-white/40 uppercase mb-1">{code}</p>
+            <p className="font-code text-[11px] tracking-[0.14em] text-white/90 uppercase font-semibold leading-snug group-hover:text-white transition-colors">
+              {name}
+            </p>
           </div>
-          <div className="flex items-end gap-2">
+          <div className="flex items-end gap-2 flex-shrink-0">
             <div className="text-right">
-              <p className="font-display text-xl font-semibold text-white">{price}</p>
-              <p className="font-code text-[9px] tracking-widest text-gray-mid">EUR</p>
+              <p className="font-display text-base font-bold text-white leading-none">{price}</p>
+              <p className="font-code text-[8px] tracking-widest text-white/40 uppercase mt-0.5">EUR</p>
             </div>
             
             {/* Quick Add To Cart Button */}
@@ -192,8 +194,8 @@ export default function ProductCard({
 
         {/* Hover CTA bar */}
         <div className="overflow-hidden h-0 group-hover:h-10 transition-all duration-300 ease-in-out mt-2">
-          <div className="flex items-center justify-center border border-white/20 py-2.5 bg-black/40 backdrop-blur-sm">
-            <span className="font-code text-[10px] tracking-widest text-white uppercase">
+          <div className="flex items-center justify-center border border-white/20 py-2 bg-black/40 backdrop-blur-sm">
+            <span className="font-code text-[9px] tracking-[0.25em] text-white uppercase">
               VER MODELO →
             </span>
           </div>
