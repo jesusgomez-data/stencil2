@@ -123,7 +123,13 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
 
             {/* The 3D Canvas */}
             <div className="flex-1 w-full h-full relative">
-              <Viewer3D activeColor={selectedColor} activeView={activeView} hideControls={true} />
+              <Viewer3D 
+                activeColor={selectedColor} 
+                activeView={activeView} 
+                images={product.gallery} 
+                letter={product.letter}
+                hideControls={true} 
+              />
             </div>
 
             {/* Hint bar at bottom */}
