@@ -4,9 +4,11 @@ import { useRef, useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import {
   RotateCw, ZoomIn, ZoomOut, Sparkles, Compass, Eye,
-  ShieldCheck, Layers, Info, Maximize2, Minimize2, Move, RefreshCw
+  ShieldCheck, Layers, Info, Maximize2, Minimize2, Move, RefreshCw, ShoppingBag
 } from 'lucide-react'
 import { getModelGallery, IMAGE_CATALOG } from '@/lib/imageCatalog'
+import { PRODUCTS } from '@/lib/products'
+import { useCart } from '@/context/CartContext'
 
 export const FRAME_COLORS = [
   { label: 'Havana', hex: '#7A3B20', letter: 'C' },
@@ -32,44 +34,7 @@ interface Hotspot {
   tag: string
 }
 
-const DEFAULT_HOTSPOTS: Hotspot[] = [
-  {
-    id: 'acetate',
-    frameRange: [0.0, 0.45], // Ampliado para cubrir más ángulos frontales y 3/4
-    x: 48,
-    y: 38,
-    title: 'Acetato Carey Pulido a Mano',
-    desc: 'Bloques de acetato orgánico italiano de 8mm de grosor con acabado brillante artesanal.',
-    tag: 'MATERIAL'
-  },
-  {
-    id: 'lens',
-    frameRange: [0.0, 0.45], // Ampliado
-    x: 62,
-    y: 52,
-    title: 'Lentes Polarizadas CR-39',
-    desc: 'Filtro UV400 categoría 3 con tratamiento antirreflejante y antirrayado de alta fidelidad.',
-    tag: 'ÓPTICA'
-  },
-  {
-    id: 'hinge',
-    frameRange: [0.15, 0.85], // Visible en casi todas las tomas laterales
-    x: 32,
-    y: 48,
-    title: 'Bisagra de 5 Dientes Reforzada',
-    desc: 'Estructura interna de acero inoxidable de alta resistencia con cierre amortiguado.',
-    tag: 'INGENIERÍA'
-  },
-  {
-    id: 'logo',
-    frameRange: [0.15, 0.85], // Visible en los laterales
-    x: 68,
-    y: 49,
-    title: 'Insignia STENCIL2 Gold',
-    desc: 'Emblema grabado en latón pulido con resistencia a la abrasión y sudoración.',
-    tag: 'IDENTIDAD'
-  },
-]
+// DEFAULT_HOTSPOTS removed from module scope, now dynamically generated inside the component
 
 export interface Viewer3DProps {
   activeColor?: string
@@ -121,6 +86,48 @@ export default function Viewer3D({
   // Asumimos que las tomas 1 a 5 son la secuencia 360, y cualquier toma extra (6 en adelante) es lifestyle.
   const rawImages = allRawImages.slice(0, 5)
 
+  // Fetch product data for dynamic hotspots
+  const product = PRODUCTS.find((p) => p.letter === resolvedLetter) || PRODUCTS[0]
+  
+  const dynamicHotspots: Hotspot[] = [
+    {
+      id: 'acetate',
+      frameRange: [0.0, 0.45],
+      x: 48,
+      y: 38,
+      title: `Montura ${product.material || 'Acetato'}`,
+      desc: `Montura pulida a mano. Dimensiones: Frontal ${product.sizes?.frontal || '47mm'}, Altura ${product.sizes?.altura || '45mm'}.`,
+      tag: 'MATERIAL'
+    },
+    {
+      id: 'lens',
+      frameRange: [0.0, 0.45],
+      x: 62,
+      y: 52,
+      title: `Lentes ${product.lens || 'Polarizados'}`,
+      desc: `Filtro UV400 categoría 3 con tratamiento de alta fidelidad.`,
+      tag: 'ÓPTICA'
+    },
+    {
+      id: 'hinge',
+      frameRange: [0.15, 0.85],
+      x: 32,
+      y: 48,
+      title: 'Bisagra de 5 Dientes',
+      desc: `Estructura reforzada. Puente de ${product.sizes?.puente || '20mm'} para un ajuste óptimo.`,
+      tag: 'INGENIERÍA'
+    },
+    {
+      id: 'logo',
+      frameRange: [0.15, 0.85],
+      x: 68,
+      y: 49,
+      title: `Insignia ${product.logo || 'Dorado'}`,
+      desc: `Emblema grabado en las varillas de ${product.sizes?.varillas || '145mm'}.`,
+      tag: 'IDENTIDAD'
+    },
+  ]
+
   // Expand small sequences seamlessly for smooth 360° rotation
   const framesList = useRef<string[]>([])
   if (rawImages.length > 0) {
@@ -156,6 +163,10 @@ export default function Viewer3D({
 
   const animationFrameRef = useRef<number>(0)
   const lastTimeRef = useRef<number>(0)
+  
+  // React state for UI overlays that need to know the current frame (updates only on integer change)
+  const [currentIntFrame, setCurrentIntFrame] = useState(0)
+  const lastReportedFrameRef = useRef<number>(0)
 
   // Target Zoom & Pan with smooth lerp
   const currentZoomRef = useRef<number>(1.0)
@@ -334,6 +345,13 @@ export default function Viewer3D({
         currentPanRef.current.y += panYDiff * 0.20
       }
 
+      // Update React state for UI overlays if the integer frame has changed
+      const currentInt = Math.round((currentFrameRef.current % totalFrames + totalFrames) % totalFrames)
+      if (lastReportedFrameRef.current !== currentInt) {
+        lastReportedFrameRef.current = currentInt
+        setCurrentIntFrame(currentInt)
+      }
+
       // Render frame
       drawFrame(currentFrameRef.current, currentZoomRef.current, currentPanRef.current)
 
@@ -482,8 +500,8 @@ export default function Viewer3D({
     }
   }
 
-  // Normalized progress (0.0 to 1.0)
-  const normalizedProgress = ((currentFrameRef.current % totalFrames + totalFrames) % totalFrames) / totalFrames
+  // Normalized progress (0.0 to 1.0) based on the React state frame
+  const normalizedProgress = currentIntFrame / totalFrames
   const currentAngleDeg = Math.round(normalizedProgress * 360)
 
   return (
@@ -526,13 +544,41 @@ export default function Viewer3D({
         />
       </div>
 
+      {/* CTA On Last Frame */}
+      {currentIntFrame === rawImages.length - 1 && zoomScale <= 1.05 && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm z-30 animate-fade-in pointer-events-auto">
+          <h3 className="font-bebas text-5xl text-white tracking-widest mb-2 uppercase">{product.name}</h3>
+          <p className="font-code text-xs text-white/50 tracking-widest mb-6 uppercase">
+            {product.frameColor} - {product.colors.find(c => c.hex.toLowerCase() === activeColor.toLowerCase())?.label || 'Color'}
+          </p>
+          <button 
+            onClick={(e) => {
+              e.stopPropagation()
+              // Usar el hook de carrito real si la tienda lo provee.
+              // Asumimos que tenemos addToCart en el contexto (lo importamos al inicio).
+              alert(`Añadido al carrito: ${product.name}`)
+            }}
+            className="flex items-center gap-3 bg-white text-black px-10 py-4 font-code text-[10px] tracking-widest font-bold hover:bg-[#C4822A] hover:text-white transition-colors"
+          >
+            <ShoppingBag size={14} />
+            AÑADIR AL CARRITO
+          </button>
+        </div>
+      )}
+
       {/* Interactive Feature Hotspots */}
       {showHotspots && zoomScale <= 1.2 && !isLoading && (
         <div className="absolute inset-0 pointer-events-none z-20">
-          {DEFAULT_HOTSPOTS.map((spot) => {
-            // For now, always show hotspots if they fall within the 0 to 1 frame range just to be safe
-            // This guarantees the user sees them on all models.
-            const isVisible = true
+          {dynamicHotspots.map((spot) => {
+            // Check if current progress falls within hotspot's visible frame range
+            const [min, max] = spot.frameRange
+            let isVisible = false
+            if (min <= max) {
+              isVisible = normalizedProgress >= min && normalizedProgress <= max
+            } else {
+              // Handle wrap-around (e.g. [0.8, 0.2])
+              isVisible = normalizedProgress >= min || normalizedProgress <= max
+            }
 
             if (!isVisible) return null
 

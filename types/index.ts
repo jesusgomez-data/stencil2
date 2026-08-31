@@ -21,6 +21,15 @@ export interface Product {
   gallery: string[]
   frameColor: string
   colors: ProductColor[]
+  logo?: string
+  material?: string
+  lens?: string
+  sizes?: {
+    varillas: string
+    puente: string
+    frontal: string
+    altura: string
+  }
 }
 
 export interface CartItem {

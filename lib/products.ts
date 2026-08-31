@@ -31,85 +31,110 @@ interface ProductSeed {
   isFeatured?: boolean
   frameColor: string
   colors: ProductColor[]
+  logo?: string
+  material?: string
+  lens?: string
+  sizes?: {
+    varillas: string
+    puente: string
+    frontal: string
+    altura: string
+  }
 }
 
 const SEEDS: ProductSeed[] = [
   {
     id: 'classic-blue',
     letter: 'A',
-    code: 'S2-001',
-    name: 'KSO-KC',
+    code: 'GLT6652-C4',
+    name: 'Kso -KC',
     price: 29.00,
     gender: 'unisex',
     model: 'wayfarer',
-    slug: 'classic-blue',
-    description: 'La montura KSO-KC combina nuestra icónica forma Wayfarer con un sutil acabado translúcido. Lentes polarizadas de alta resistencia con protección total UV400. Diseñadas para destacar en cualquier escenario urbano.',
+    slug: 'kso-kc',
+    description: 'La montura Kso -KC combina nuestra icónica forma Wayfarer. Lentes polarizadas de alta resistencia con protección total UV400. Diseñadas para destacar en cualquier escenario urbano.',
     composition: '100% Acetato premium, bisagras de 5 dientes reforzadas',
     isFeatured: true,
-    frameColor: '#0D2147',
+    frameColor: '#1a1a1a',
     colors: [
+      { label: 'Negro Clasic', hex: '#1a1a1a' },
       { label: 'Azul', hex: '#0D2147' },
-      { label: 'Negro', hex: '#1a1a1a' },
       { label: 'Havana', hex: '#7A3B20' },
       { label: 'Verde', hex: '#1C3B1C' }
-    ]
+    ],
+    logo: 'Dorado',
+    material: 'Acetato',
+    lens: 'Polarized TAC 1.1 / No polarizado',
+    sizes: { varillas: '145 mm', puente: '26 mm', frontal: '47 mm', altura: '45 mm' }
   },
   {
     id: 'onyx-black',
     letter: 'B',
-    code: 'S2-002',
-    name: 'IBZEN-SOIRES NAES',
+    code: 'GLT6642-C1',
+    name: 'Ibsen Soires Naes',
     price: 29.00,
     gender: 'unisex',
     model: 'wayfarer',
-    slug: 'onyx-black',
-    description: 'Minimalismo y sofisticación en su forma más pura. La montura IBZEN-SOIRES NAES es el clásico atemporal de STENCIL2. Fabricadas con acetato pulido a mano para un acabado brillante inigualable y durabilidad extrema.',
+    slug: 'ibsen-soires-naes',
+    description: 'Minimalismo y sofisticación en su forma más pura. Fabricadas con acetato pulido a mano para un acabado brillante inigualable y durabilidad extrema.',
     composition: '100% Acetato orgánico, lentes CR-39 polarizadas',
     isFeatured: true,
-    frameColor: '#1a1a1a',
+    frameColor: '#C4822A',
     colors: [
+      { label: 'Carey Ambar', hex: '#C4822A' },
       { label: 'Negro', hex: '#1a1a1a' },
-      { label: 'Havana', hex: '#7A3B20' },
       { label: 'Azul', hex: '#0D2147' }
-    ]
+    ],
+    logo: 'Dorado',
+    material: 'Acetato',
+    lens: 'Polarized TAC 1.1 / No polarizado',
+    sizes: { varillas: '145 mm', puente: '19 mm', frontal: '52 mm', altura: '50 mm' }
   },
   {
     id: 'olive-crystal',
     letter: 'C',
-    code: 'S2-003',
-    name: 'MAGMAFLOW',
+    code: 'GLT96153S-C4',
+    name: 'Tropical Smoke',
     price: 29.00,
     gender: 'unisex',
     model: 'round',
-    slug: 'olive-crystal',
-    description: 'Montura redonda de inspiración retro adaptada a la cultura urbana. El modelo MAGMAFLOW presenta un tono verde oliva cristalino con varillas de metal ligero. Lentes oscuras polarizadas para una máxima nitidez visual.',
+    slug: 'tropical-smoke',
+    description: 'Montura redonda de inspiración retro adaptada a la cultura urbana. Lentes oscuras polarizadas para una máxima nitidez visual.',
     composition: 'Combinación de acetato inyectado y patillas de acero inoxidable',
     isFeatured: true,
-    frameColor: '#3A5A28',
+    frameColor: '#7A3B20',
     colors: [
+      { label: 'Habana Clasic', hex: '#7A3B20' },
       { label: 'Verde', hex: '#3A5A28' },
-      { label: 'Havana', hex: '#7A3B20' },
       { label: 'Negro', hex: '#1a1a1a' }
-    ]
+    ],
+    logo: 'Dorado',
+    material: 'Acetato',
+    lens: 'Polarized TAC 1.1 / No polarizado',
+    sizes: { varillas: '145 mm', puente: '26 mm', frontal: '47 mm', altura: '45 mm' }
   },
   {
     id: 'smoke-grey',
     letter: 'D',
-    code: 'S2-004',
-    name: 'SMOKE GREY',
+    code: 'GLT6630-C3',
+    name: 'Spice Fler',
     price: 29.00,
     gender: 'unisex',
     model: 'sport',
-    slug: 'smoke-grey',
-    description: 'Diseño deportivo y aerodinámico optimizado para el día a día. Estructura envolvente ultra ligera en gris humo mate que garantiza un ajuste perfecto y cómodo durante horas de uso continuado.',
+    slug: 'spice-fler',
+    description: 'Diseño geométrico y moderno optimizado para el día a día. Estructura envolvente ultra ligera que garantiza un ajuste perfecto.',
     composition: 'TR90 (polímero termoplástico de memoria de forma de alta flexibilidad)',
     isFeatured: true,
-    frameColor: '#555555',
+    frameColor: '#1a1a1a',
     colors: [
-      { label: 'Gris Humo', hex: '#555555' },
       { label: 'Negro', hex: '#1a1a1a' },
+      { label: 'Gris Humo', hex: '#555555' },
       { label: 'Verde', hex: '#1C3B1C' }
-    ]
+    ],
+    logo: 'Dorado',
+    material: 'Acetato',
+    lens: 'Polarized TAC 1.1 / No polarizado',
+    sizes: { varillas: '145 mm', puente: '21 mm', frontal: '49 mm', altura: '46 mm' }
   },
   {
     id: 'aviator-gold',
@@ -148,7 +173,11 @@ function buildProduct(seed: ProductSeed): Product {
     image: getModelMainImage(seed.letter),
     gallery,
     frameColor: seed.frameColor,
-    colors: seed.colors
+    colors: seed.colors,
+    logo: seed.logo,
+    material: seed.material,
+    lens: seed.lens,
+    sizes: seed.sizes
   }
 }
 
