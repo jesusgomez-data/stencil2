@@ -185,6 +185,15 @@ export default function ProductCard({
               {justAdded ? <Check size={13} strokeWidth={2.5} /> : <ShoppingBag size={13} strokeWidth={1.5} />}
             </button>
 
+            {/* 3D View Button (Mobile Friendly Link) */}
+            <Link
+              href={`/producto/${slug}`}
+              title="Ver en 360°"
+              className="w-8 h-8 rounded-full border border-white/20 bg-black/60 text-white/70 hover:text-white hover:border-white/50 hover:bg-white/10 transition-all flex items-center justify-center"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
+            </Link>
+
             <ShareButton
               title={`${name} — STENCIL2`}
               url={`${typeof window !== 'undefined' ? window.location.origin : ''}/producto/${slug}`}
