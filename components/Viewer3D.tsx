@@ -296,15 +296,23 @@ export default function Viewer3D({
     ctx.fillStyle = shadowGrad
     ctx.fillRect(drawX - 80, rect.height / 2, drawW + 160, rect.height / 2)
 
-    // Draw primary frame (imgA)
-    ctx.globalAlpha = 1.0
-    ctx.drawImage(imgA, drawX, drawY, drawW, drawH)
-
-    // Original 3D crossfade transition that the user loves
-    // Will not ghost indefinitely because targetFrameRef is rounded on pointer release
-    if (blendRatio > 0.05 && imgB && imgB.complete && imgB.naturalWidth > 0) {
-      ctx.globalAlpha = blendRatio * 0.8
+    // Advanced Crossfade: Shift dominance at 0.5 to prevent double-solid ghosting
+    if (blendRatio < 0.5) {
+      // Closer to A
+      ctx.globalAlpha = 1.0
+      ctx.drawImage(imgA, drawX, drawY, drawW, drawH)
+      if (blendRatio > 0.01) {
+        ctx.globalAlpha = blendRatio * 1.2
+        ctx.drawImage(imgB, drawX, drawY, drawW, drawH)
+      }
+    } else {
+      // Closer to B
+      ctx.globalAlpha = 1.0
       ctx.drawImage(imgB, drawX, drawY, drawW, drawH)
+      if (blendRatio < 0.99) {
+        ctx.globalAlpha = (1.0 - blendRatio) * 1.2
+        ctx.drawImage(imgA, drawX, drawY, drawW, drawH)
+      }
     }
 
     ctx.restore()
@@ -327,10 +335,12 @@ export default function Viewer3D({
         targetFrameRef.current += dt * 1.8 // Gentle, elegant speed
       }
 
-      // Smooth frame interpolation (Slower lerp factor 0.06 for buttery smooth transitions)
+      // Smooth frame interpolation (Snappy lerp factor for 0.1s transitions)
       const frameDiff = targetFrameRef.current - currentFrameRef.current
       if (Math.abs(frameDiff) > 0.0001) {
-        currentFrameRef.current += frameDiff * 0.06
+        currentFrameRef.current += frameDiff * 0.35
+      } else {
+        currentFrameRef.current = targetFrameRef.current
       }
 
       // Smooth zoom interpolation
