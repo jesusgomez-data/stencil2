@@ -237,14 +237,12 @@ export default function Viewer3D({
 
     // Normalizing frameFloat into positive modulo range
     let norm = (frameFloat % total + total) % total
-    let indexA = Math.round(norm) % total
-    
-    // Calculate the sub-frame delta (-0.5 to 0.5) to create a Kinetic Parallax effect
-    let delta = norm - Math.round(norm)
-    // Translate up to 35px based on drag velocity/distance before snapping
-    let parallaxX = delta * -70 
+    let indexA = Math.floor(norm) % total
+    let indexB = (indexA + 1) % total
+    let blendRatio = norm - Math.floor(norm) // fraction between 0.0 and 1.0
 
     const imgA = loadedImagesRef.current[indexA]
+    const imgB = loadedImagesRef.current[indexB]
 
     if (!imgA || !imgA.complete || imgA.naturalWidth === 0) return
 
@@ -273,9 +271,9 @@ export default function Viewer3D({
       drawH = drawW / imgAspect
     }
 
-    // Apply Zoom & Pan transforms from center, plus Kinetic Parallax
+    // Apply Zoom & Pan transforms from center
     ctx.save()
-    ctx.translate(rect.width / 2 + pan.x + parallaxX, rect.height / 2 + pan.y)
+    ctx.translate(rect.width / 2 + pan.x, rect.height / 2 + pan.y)
     ctx.scale(zoom, zoom)
     ctx.translate(-rect.width / 2, -rect.height / 2)
 
@@ -299,9 +297,15 @@ export default function Viewer3D({
     ctx.fillRect(drawX - 80, rect.height / 2, drawW + 160, rect.height / 2)
 
     // Draw primary frame (imgA)
-    // Motion blur / crossfade is disabled for small frame counts to prevent ghosting
     ctx.globalAlpha = 1.0
     ctx.drawImage(imgA, drawX, drawY, drawW, drawH)
+
+    // Original 3D crossfade transition that the user loves
+    // Will not ghost indefinitely because targetFrameRef is rounded on pointer release
+    if (blendRatio > 0.05 && imgB && imgB.complete && imgB.naturalWidth > 0) {
+      ctx.globalAlpha = blendRatio * 0.8
+      ctx.drawImage(imgB, drawX, drawY, drawW, drawH)
+    }
 
     ctx.restore()
     ctx.restore()
@@ -423,6 +427,8 @@ export default function Viewer3D({
   const handlePointerUp = (e: React.PointerEvent) => {
     isInteractingRef.current = false
     isPanningRef.current = false
+    // Snap target to integer on release to guarantee it cleanly finishes crossfade and doesn't ghost
+    targetFrameRef.current = Math.round(targetFrameRef.current)
     if (containerRef.current && containerRef.current.hasPointerCapture(e.pointerId)) {
       containerRef.current.releasePointerCapture(e.pointerId)
     }
