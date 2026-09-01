@@ -665,14 +665,7 @@ export default function Viewer3D({
           </span>
         </div>
 
-        {zoomScale > 1.05 && (
-          <div className="flex items-center gap-1.5 bg-[#C4822A]/20 border border-[#C4822A]/40 backdrop-blur-md px-3 py-1.5 rounded-full animate-fade-in">
-            <Move size={10} className="text-[#C4822A]" />
-            <span className="font-code text-[8px] tracking-[0.25em] text-[#C4822A] uppercase font-bold">
-              MODO LUPA ({Math.round(zoomScale * 100)}%) · ARRASTRA PARA EXPLORAR
-            </span>
-          </div>
-        )}
+        {/* Removed Modo Lupa badge per user request */}
       </div>
 
       {/* TOP RIGHT: Luxury Tool Control Bar */}
@@ -690,16 +683,7 @@ export default function Viewer3D({
           <Sparkles size={14} />
         </button>
 
-        {/* Reset View Button */}
-        {(zoomScale > 1.05 || Math.abs(panOffset.x) > 5) && (
-          <button
-            onClick={() => handleSetZoom(1.0)}
-            title="Restablecer zoom 1:1"
-            className="p-2.5 bg-black/60 text-white/70 border border-white/20 hover:border-white/60 hover:text-white rounded-sm backdrop-blur-md transition-all"
-          >
-            <RefreshCw size={14} />
-          </button>
-        )}
+        {/* Removed Reset View Button per user request */}
       </div>
 
       {/* PROFESSIONAL MULTI-LEVEL ZOOM CONTROLLER (Right Float Dock) */}
