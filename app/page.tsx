@@ -912,6 +912,14 @@ function CollectionsSection() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
+                    {/* 3D View Link Button */}
+                    <div
+                      title="Ver en 360°"
+                      className="w-7 h-7 rounded-full border border-white/[0.12] text-white/40 hover:border-white/60 hover:text-white hover:bg-white/10 flex items-center justify-center flex-shrink-0 transition-all"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
+                    </div>
+
                     <ShareButton
                       title={`${product?.name ?? p.name} — STENCIL2`}
                       url={`${typeof window !== 'undefined' ? window.location.origin : ''}/producto/${p.id}`}
