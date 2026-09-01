@@ -60,6 +60,7 @@ export default function Viewer3D({
   showHotspotsDefault = true,
   onFrameChange,
 }: Viewer3DProps) {
+  const { addToCart, setIsCartOpen } = useCart()
   const [internalColor, setInternalColor] = useState(FRAME_COLORS[0].hex)
   const [internalView, setInternalView] = useState('Frontal')
   const [isAutoRotating, setIsAutoRotating] = useState(autoRotateDefault)
@@ -555,9 +556,20 @@ export default function Viewer3D({
           <button 
             onClick={(e) => {
               e.stopPropagation()
-              // Usar el hook de carrito real si la tienda lo provee.
-              // Asumimos que tenemos addToCart en el contexto (lo importamos al inicio).
-              alert(`Añadido al carrito: ${product.name}`)
+              const colorObj = product.colors.find(c => c.hex.toLowerCase() === activeColor.toLowerCase())
+              const colorLabel = colorObj ? colorObj.label : 'Classic'
+              addToCart({
+                id: product.id,
+                code: product.code,
+                name: product.name,
+                slug: product.slug,
+                price: product.price,
+                image: product.image,
+                model: product.model,
+                color: activeColor,
+                colorLabel: colorLabel
+              })
+              setIsCartOpen(true)
             }}
             className="flex items-center gap-3 bg-white text-black px-10 py-4 font-code text-[10px] tracking-widest font-bold hover:bg-[#C4822A] hover:text-white transition-colors"
           >
