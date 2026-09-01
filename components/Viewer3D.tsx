@@ -238,6 +238,11 @@ export default function Viewer3D({
     // Normalizing frameFloat into positive modulo range
     let norm = (frameFloat % total + total) % total
     let indexA = Math.round(norm) % total
+    
+    // Calculate the sub-frame delta (-0.5 to 0.5) to create a Kinetic Parallax effect
+    let delta = norm - Math.round(norm)
+    // Translate up to 35px based on drag velocity/distance before snapping
+    let parallaxX = delta * -70 
 
     const imgA = loadedImagesRef.current[indexA]
 
@@ -268,9 +273,9 @@ export default function Viewer3D({
       drawH = drawW / imgAspect
     }
 
-    // Apply Zoom & Pan transforms from center
+    // Apply Zoom & Pan transforms from center, plus Kinetic Parallax
     ctx.save()
-    ctx.translate(rect.width / 2 + pan.x, rect.height / 2 + pan.y)
+    ctx.translate(rect.width / 2 + pan.x + parallaxX, rect.height / 2 + pan.y)
     ctx.scale(zoom, zoom)
     ctx.translate(-rect.width / 2, -rect.height / 2)
 
