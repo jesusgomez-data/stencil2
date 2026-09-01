@@ -60,7 +60,7 @@ export default function Viewer3D({
   showHotspotsDefault = true,
   onFrameChange,
 }: Viewer3DProps) {
-  const { addToCart, setIsCartOpen } = useCart()
+  const { addToCart } = useCart()
   const [internalColor, setInternalColor] = useState(FRAME_COLORS[0].hex)
   const [internalView, setInternalView] = useState('Frontal')
   const [isAutoRotating, setIsAutoRotating] = useState(autoRotateDefault)
