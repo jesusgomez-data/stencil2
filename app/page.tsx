@@ -874,11 +874,11 @@ function CollectionsSection() {
                     <FavoriteButton slug={product?.slug || p.id} />
                   </div>
 
-                  {/* Model letter tag */}
+                  {/* Name tag replacing Model letter tag */}
                   {letter && (
                     <div className="absolute top-12 left-3 z-20">
                       <span className="font-code text-[8px] tracking-[0.25em] text-white/40 uppercase">
-                        MODELO {letter}
+                        {p.name}
                       </span>
                     </div>
                   )}
@@ -891,7 +891,7 @@ function CollectionsSection() {
                 >
                   <div>
                     <p className="font-code text-[9px] tracking-[0.18em] text-white/50 group-hover:text-white/80 transition-colors uppercase leading-none">
-                      {p.name}
+                      MODELO {letter}
                     </p>
                     <p className="font-display text-[13px] font-bold text-white mt-1">
                       {p.price} <span className="font-code text-[8px] font-normal tracking-widest text-white/40">EUR</span>
