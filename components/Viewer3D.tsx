@@ -581,7 +581,6 @@ export default function Viewer3D({
                 color: activeColor,
                 colorLabel: colorLabel
               })
-              setIsCartOpen(true)
             }}
             className="flex items-center gap-3 bg-white text-black px-10 py-4 font-code text-[10px] tracking-widest font-bold hover:bg-[#C4822A] hover:text-white transition-colors"
           >
