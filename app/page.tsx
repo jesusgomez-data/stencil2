@@ -434,31 +434,17 @@ function HeroSection() {
               <Viewer3D activeColor={active3dColor} activeView={active3dView} hideControls={true} />
             </div>
 
-            {/* Header info */}
-            <div className="absolute top-6 left-6 z-10 text-left pointer-events-none">
-              <span className="font-code text-[8px] tracking-[0.4em] text-white/30 uppercase">VISOR INTERACTIVO 3D</span>
-              <h2 className="font-code text-[11px] tracking-widest text-[#C4822A] mt-1 uppercase">
-                {FRAME_COLORS.find(c => c.hex === active3dColor)?.label || 'CLASSIC'} FRAME
-              </h2>
-            </div>
-
-            {/* Close button */}
+            {/* Close button (Moved below Viewer3D toolbar) */}
             <button
               onClick={() => setActiveTab('inicio')}
-              className="absolute top-6 right-6 text-white/40 hover:text-white transition-colors p-2 z-30 focus:outline-none"
+              className="absolute top-16 right-4 text-white/60 hover:text-white bg-black/60 border border-white/10 hover:border-white/40 transition-all p-2 z-30 rounded-sm focus:outline-none"
+              title="Cerrar Explorador 3D"
             >
-              <X size={20} strokeWidth={1.5} />
+              <X size={16} strokeWidth={2} />
             </button>
 
-            {/* Instructions footer overlay */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none z-10">
-              <p className="font-code text-[8px] tracking-[0.25em] text-white/20 uppercase whitespace-nowrap">
-                ARRASTRA PARA ROTAR · HAZ ZOOM PARA AMPLIAR
-              </p>
-            </div>
-
             {/* Frame color customizer in 3D mode */}
-            <div className="absolute bottom-6 left-6 z-30 flex items-center gap-3.5 bg-black/60 backdrop-blur-md px-5 py-3.5 border border-white/10 rounded-lg">
+            <div className="absolute bottom-16 left-1/2 -translate-x-1/2 md:bottom-6 md:left-6 md:translate-x-0 z-30 flex items-center gap-3.5 bg-black/60 backdrop-blur-md px-5 py-3.5 border border-white/10 rounded-lg">
               <span className="font-code text-[8px] tracking-widest text-white/40 uppercase">COLOR:</span>
               <div className="flex gap-2">
                 {FRAME_COLORS.map((c) => (

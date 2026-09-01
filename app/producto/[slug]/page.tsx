@@ -97,23 +97,18 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
         <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-[1fr_520px] lg:h-[calc(100vh-80px)] min-h-[600px]">
           
           {/* LEFT COLUMN: 3D Configurator */}
-          <div className="relative bg-[#080808] border-b lg:border-b-0 lg:border-r border-white/[0.06] flex flex-col h-[60vh] lg:h-full">
-            {/* Visual Header */}
-            <div className="absolute top-6 left-6 z-10 text-left pointer-events-none">
-              <span className="font-code text-[8px] tracking-[0.4em] text-white/30 uppercase">INTERACTIVE 3D PREVIEW</span>
-              <h2 className="font-code text-[10px] tracking-widest text-[#C4822A] mt-1 uppercase">{selectedColorLabel} FRAME</h2>
-            </div>
-
+          <div className="relative bg-[#080808] border-b lg:border-b-0 lg:border-r border-white/[0.06] flex flex-col h-[60vh] lg:h-full overflow-hidden">
+            
             {/* Custom Camera Presets controls overlaid on the 3D space */}
-            <div className="absolute top-6 right-6 flex flex-col gap-2.5 z-10">
+            <div className="absolute top-16 right-4 flex flex-col gap-1.5 z-20 pointer-events-auto">
               {['Frontal', 'Lateral', 'Superior', 'Atrás'].map((v) => (
                 <button
                   key={v}
                   onClick={() => setActiveView(v)}
-                  className={`font-code text-[9px] tracking-widest px-4 py-2 border transition-all uppercase rounded-sm select-none ${
+                  className={`font-code text-[9px] tracking-widest px-3.5 py-2 border transition-all uppercase rounded-sm select-none ${
                     activeView === v
-                      ? 'bg-white text-black border-white font-semibold'
-                      : 'bg-black/40 text-white/30 border-white/10 hover:border-white/30 hover:text-white'
+                      ? 'bg-white text-black border-white font-bold'
+                      : 'bg-black/60 text-white/40 border-white/10 hover:border-white/40 hover:text-white'
                   }`}
                 >
                   {v}
@@ -130,13 +125,6 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                 letter={product.letter}
                 hideControls={true} 
               />
-            </div>
-
-            {/* Hint bar at bottom */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none z-10">
-              <p className="font-code text-[8px] tracking-[0.25em] text-white/20 uppercase whitespace-nowrap">
-                ARRASTRA PARA ROTAR · HAZ ZOOM PARA AMPLIAR
-              </p>
             </div>
           </div>
 
