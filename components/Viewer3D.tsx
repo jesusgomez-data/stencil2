@@ -4,7 +4,8 @@ import { useRef, useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import {
   RotateCw, ZoomIn, ZoomOut, Sparkles, Compass, Eye,
-  ShieldCheck, Layers, Info, Maximize2, Minimize2, Move, RefreshCw, ShoppingBag
+  ShieldCheck, Layers, Info, Maximize2, Minimize2, Move, RefreshCw, ShoppingBag,
+  Play, Pause
 } from 'lucide-react'
 import { getModelGallery, IMAGE_CATALOG } from '@/lib/imageCatalog'
 import { PRODUCTS } from '@/lib/products'
@@ -674,7 +675,7 @@ export default function Viewer3D({
               : 'bg-black/60 text-white/50 border-white/10 hover:border-white/40 hover:text-white'
           }`}
         >
-          <RotateCw size={14} className={isAutoRotating ? 'animate-spin' : ''} />
+          {isAutoRotating ? <Pause size={14} /> : <Play size={14} className="ml-0.5" />}
         </button>
 
         {/* Toggle Hotspots */}
