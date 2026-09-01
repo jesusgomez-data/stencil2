@@ -834,7 +834,7 @@ function CollectionsSection() {
             return (
               <Link
                 key={p.id}
-                href={`/producto/${p.id}`}
+                href={`/producto/${product?.slug || p.id}`}
                 style={{ background: p.bgColor }}
                 className="relative flex flex-col text-left overflow-hidden rounded-2xl transition-all duration-300 lg:h-[390px] aspect-[3/4] lg:aspect-auto group border border-white/[0.06] hover:border-white/20 hover:shadow-2xl"
               >
@@ -885,7 +885,7 @@ function CollectionsSection() {
 
                   {/* Like button — arriba a la izquierda */}
                   <div className="absolute top-3 left-3 z-30">
-                    <FavoriteButton slug={p.id} />
+                    <FavoriteButton slug={product?.slug || p.id} />
                   </div>
 
                   {/* Model letter tag */}
@@ -922,7 +922,7 @@ function CollectionsSection() {
 
                     <ShareButton
                       title={`${product?.name ?? p.name} — STENCIL2`}
-                      url={`${typeof window !== 'undefined' ? window.location.origin : ''}/producto/${p.id}`}
+                      url={`${typeof window !== 'undefined' ? window.location.origin : ''}/producto/${product?.slug || p.id}`}
                     />
                     <button
                       onClick={(e) => handleQuickAddCollection(e, p)}
