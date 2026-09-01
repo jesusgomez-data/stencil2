@@ -238,12 +238,6 @@ export default function Viewer3D({
     // Normalizing frameFloat into positive modulo range
     let norm = (frameFloat % total + total) % total
     let indexA = Math.round(norm) % total
-    
-    // Distance to the nearest integer frame (0.0 to 0.5)
-    let distToSnap = Math.abs(norm - Math.round(norm))
-    
-    // Faux-3D rotation effect: squeeze horizontally to simulate depth during transition
-    let squeezeX = 1.0 - (distToSnap * 0.5)
 
     const imgA = loadedImagesRef.current[indexA]
 
@@ -274,16 +268,10 @@ export default function Viewer3D({
       drawH = drawW / imgAspect
     }
 
-    // Apply Zoom & Pan transforms from center with Faux-3D Squeeze
+    // Apply Zoom & Pan transforms from center
     ctx.save()
     ctx.translate(rect.width / 2 + pan.x, rect.height / 2 + pan.y)
-    
-    // Add a slight motion blur when rotating fast to make it look incredibly premium
-    if (distToSnap > 0.05) {
-      ctx.filter = `blur(${distToSnap * 8}px)`
-    }
-    
-    ctx.scale(zoom * squeezeX, zoom)
+    ctx.scale(zoom, zoom)
     ctx.translate(-rect.width / 2, -rect.height / 2)
 
     const drawX = (rect.width - drawW) / 2
