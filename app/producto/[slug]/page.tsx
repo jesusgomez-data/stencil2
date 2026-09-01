@@ -154,26 +154,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
               {product.description}
             </p>
 
-            {/* Color Selector */}
-            <div className="mb-6 text-left">
-              <p className="font-code text-[9px] tracking-[0.25em] text-white/30 uppercase mb-3">SELECCIONAR COLOR: <span className="text-white">{selectedColorLabel}</span></p>
-              <div className="flex items-center gap-3.5">
-                {product.colors.map((c) => (
-                  <button
-                    key={c.label}
-                    title={c.label}
-                    onClick={() => handleColorChange(c.hex, c.label)}
-                    style={{ backgroundColor: c.hex }}
-                    className={`w-7 h-7 rounded-full border-2 transition-all duration-200 ${
-                      selectedColor === c.hex
-                        ? 'border-white scale-110 shadow-[0_0_10px_rgba(255,255,255,0.4)]'
-                        : 'border-white/10 hover:border-white/40'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-
+            {/* Color Selector Removed per user request */}
             {/* Quantity Selector and CTA Button */}
             <div className="flex gap-4 items-stretch mb-8">
               {/* Quantity Selector */}
