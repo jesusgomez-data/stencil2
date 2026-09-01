@@ -677,19 +677,6 @@ export default function Viewer3D({
 
       {/* TOP RIGHT: Luxury Tool Control Bar */}
       <div className="absolute top-4 right-4 z-30 flex items-center gap-2 pointer-events-auto">
-        {/* Toggle Auto-Rotate */}
-        <button
-          onClick={() => setIsAutoRotating(!isAutoRotating)}
-          title={isAutoRotating ? 'Pausar giro automático' : 'Iniciar giro 360° continuo'}
-          className={`p-2.5 border rounded-sm backdrop-blur-md transition-all ${
-            isAutoRotating
-              ? 'bg-[#C4822A] text-black border-[#C4822A] shadow-[0_0_12px_rgba(196,130,42,0.4)]'
-              : 'bg-black/60 text-white/50 border-white/10 hover:border-white/40 hover:text-white'
-          }`}
-        >
-          {isAutoRotating ? <Pause size={14} /> : <Play size={14} className="ml-0.5" />}
-        </button>
-
         {/* Toggle Hotspots */}
         <button
           onClick={() => setShowHotspots(!showHotspots)}
