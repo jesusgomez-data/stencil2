@@ -64,9 +64,11 @@ const SEEDS: ProductSeed[] = [
       { label: 'Havana', hex: '#7A3B20' },
       { label: 'Verde', hex: '#1C3B1C' }
     ],
+    glassesColor: 'Negro Clasic',
+    frameType: 'Negro',
     logo: 'Dorado',
     material: 'Acetato',
-    lens: 'Polarized TAC 1.1 / No polarizado',
+    lens: 'No polarizado',
     sizes: { varillas: '145 mm', puente: '26 mm', frontal: '47 mm', altura: '45 mm' }
   },
   {
@@ -87,9 +89,11 @@ const SEEDS: ProductSeed[] = [
       { label: 'Negro', hex: '#1a1a1a' },
       { label: 'Azul', hex: '#0D2147' }
     ],
+    glassesColor: 'Carey Ambar',
+    frameType: 'Carey Negro Ambar',
     logo: 'Dorado',
     material: 'Acetato',
-    lens: 'Polarized TAC 1.1 / No polarizado',
+    lens: 'No polarizado',
     sizes: { varillas: '145 mm', puente: '19 mm', frontal: '52 mm', altura: '50 mm' }
   },
   {

@@ -228,18 +228,18 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
             {/* Specifications & Composition */}
             <div className="border-t border-white/[0.08] pt-6 mb-6 text-left">
               <span className="font-code text-[8px] tracking-[0.2em] text-white/30 uppercase block mb-3">DETALLES DEL PRODUCTO</span>
-              <div className="grid grid-cols-[110px_1fr] gap-y-2 font-code text-[9px] text-white/60 uppercase">
+              <div className="grid grid-cols-[140px_1fr] gap-y-2 font-code text-[9px] text-white/60 uppercase">
                 {product.glassesColor && <><span className="text-white/30">COLOR GAFA</span><span>{product.glassesColor}</span></>}
                 {product.frameType && <><span className="text-white/30">MONTURA</span><span>{product.frameType}</span></>}
                 {product.logo && <><span className="text-white/30">LOGO S2</span><span>{product.logo}</span></>}
                 <span className="text-white/30">GÉNERO</span><span>{product.gender === 'unisex' ? 'Unisex' : product.gender === 'men' ? 'Hombre' : 'Mujer'}</span>
-                <span className="text-white/30 truncate pr-2">NOMBRE DEL PRODUCTO</span><span className="truncate">{product.name}</span>
+                <span className="text-white/30">NOMBRE DEL PRODUCTO</span><span>{product.name}</span>
                 {product.material && <><span className="text-white/30">MATERIAL</span><span>{product.material}</span></>}
                 {product.lens && <><span className="text-white/30">LENTES</span><span>{product.lens}</span></>}
               </div>
 
               {product.sizes && (
-                <div className="grid grid-cols-[110px_1fr] gap-y-2 font-code text-[9px] text-white/60 uppercase mt-4 pt-4 border-t border-white/[0.04]">
+                <div className="grid grid-cols-[140px_1fr] gap-y-2 font-code text-[9px] text-white/60 uppercase mt-4 pt-4 border-t border-white/[0.04]">
                   <span className="text-white/30">VARILLAS</span><span>{product.sizes.varillas}</span>
                   <span className="text-white/30">PUENTE</span><span>{product.sizes.puente}</span>
                   <span className="text-white/30">FRONTAL</span><span>{product.sizes.frontal}</span>
