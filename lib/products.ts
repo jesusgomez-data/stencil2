@@ -31,6 +31,8 @@ interface ProductSeed {
   isFeatured?: boolean
   frameColor: string
   colors: ProductColor[]
+  glassesColor?: string
+  frameType?: string
   logo?: string
   material?: string
   lens?: string
@@ -108,9 +110,11 @@ const SEEDS: ProductSeed[] = [
       { label: 'Verde', hex: '#3A5A28' },
       { label: 'Negro', hex: '#1a1a1a' }
     ],
+    glassesColor: 'Habana Clasic',
+    frameType: 'Azul ahumado',
     logo: 'Dorado',
     material: 'Acetato',
-    lens: 'Polarized TAC 1.1 / No polarizado',
+    lens: 'No polarizado',
     sizes: { varillas: '145 mm', puente: '26 mm', frontal: '47 mm', altura: '45 mm' }
   },
   {
@@ -131,9 +135,11 @@ const SEEDS: ProductSeed[] = [
       { label: 'Gris Humo', hex: '#555555' },
       { label: 'Verde', hex: '#1C3B1C' }
     ],
+    glassesColor: 'Negro',
+    frameType: 'Negro',
     logo: 'Dorado',
     material: 'Acetato',
-    lens: 'Polarized TAC 1.1 / No polarizado',
+    lens: 'No polarizado',
     sizes: { varillas: '145 mm', puente: '21 mm', frontal: '49 mm', altura: '46 mm' }
   },
   {
@@ -174,6 +180,8 @@ function buildProduct(seed: ProductSeed): Product {
     gallery,
     frameColor: seed.frameColor,
     colors: seed.colors,
+    glassesColor: seed.glassesColor,
+    frameType: seed.frameType,
     logo: seed.logo,
     material: seed.material,
     lens: seed.lens,

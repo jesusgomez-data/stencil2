@@ -21,6 +21,8 @@ export interface Product {
   gallery: string[]
   frameColor: string
   colors: ProductColor[]
+  glassesColor?: string
+  frameType?: string
   logo?: string
   material?: string
   lens?: string
