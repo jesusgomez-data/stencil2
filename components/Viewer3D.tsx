@@ -237,12 +237,9 @@ export default function Viewer3D({
 
     // Normalizing frameFloat into positive modulo range
     let norm = (frameFloat % total + total) % total
-    let indexA = Math.floor(norm) % total
-    let indexB = (indexA + 1) % total
-    let blendRatio = norm - Math.floor(norm) // fraction between 0.0 and 1.0
+    let indexA = Math.round(norm) % total
 
     const imgA = loadedImagesRef.current[indexA]
-    const imgB = loadedImagesRef.current[indexB]
 
     if (!imgA || !imgA.complete || imgA.naturalWidth === 0) return
 
@@ -297,15 +294,9 @@ export default function Viewer3D({
     ctx.fillRect(drawX - 80, rect.height / 2, drawW + 160, rect.height / 2)
 
     // Draw primary frame (imgA)
+    // Motion blur / crossfade is disabled for small frame counts to prevent ghosting
     ctx.globalAlpha = 1.0
     ctx.drawImage(imgA, drawX, drawY, drawW, drawH)
-
-    // Motion Blur / Transition Crossfade (only active during movement now)
-    // Because targetFrameRef is discrete, this blend only happens while moving and cleanly resolves to 0 (no ghosting)
-    if (blendRatio > 0.05 && imgB && imgB.complete && imgB.naturalWidth > 0) {
-      ctx.globalAlpha = blendRatio * 0.8 // 80% max opacity for softer blur
-      ctx.drawImage(imgB, drawX, drawY, drawW, drawH)
-    }
 
     ctx.restore()
     ctx.restore()
