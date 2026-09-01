@@ -369,7 +369,7 @@ export default function Viewer3D({
     const preset = VIEW_PRESETS[activeView]
     if (!preset) return
     const target = preset.frameRatio * totalFrames
-    targetFrameRef.current = target
+    targetFrameRef.current = Math.round(target)
     setIsAutoRotating(false)
   }, [activeView, totalFrames])
 
