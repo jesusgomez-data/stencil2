@@ -163,7 +163,7 @@ export default function ProductCard({
           <div className="max-w-[65%] pr-2">
             <p className="font-code text-[9px] tracking-[0.2em] text-white/40 uppercase mb-1">{code}</p>
             <p className="font-code text-[11px] tracking-[0.14em] text-white/90 uppercase font-semibold leading-snug group-hover:text-white transition-colors">
-              MODELO {letter}
+              {letter}
             </p>
           </div>
           <div className="flex items-end gap-2 flex-shrink-0">

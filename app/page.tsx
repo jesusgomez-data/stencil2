@@ -891,7 +891,7 @@ function CollectionsSection() {
                 >
                   <div>
                     <p className="font-code text-[9px] tracking-[0.18em] text-white/50 group-hover:text-white/80 transition-colors uppercase leading-none">
-                      MODELO {letter}
+                      {letter}
                     </p>
                     <p className="font-display text-[13px] font-bold text-white mt-1">
                       {p.price} <span className="font-code text-[8px] font-normal tracking-widest text-white/40">EUR</span>
