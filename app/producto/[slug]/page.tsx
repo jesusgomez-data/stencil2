@@ -100,12 +100,12 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
           <div className="relative bg-[#080808] border-b lg:border-b-0 lg:border-r border-white/[0.06] flex flex-col h-[60vh] lg:h-full overflow-hidden">
             
             {/* Custom Camera Presets controls overlaid on the 3D space */}
-            <div className="absolute top-16 right-4 flex flex-col gap-1.5 z-20 pointer-events-auto">
+            <div className="absolute top-16 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-auto md:right-4 flex flex-row md:flex-col gap-1.5 z-20 pointer-events-auto w-max max-w-[90vw] overflow-x-auto no-scrollbar">
               {['Frontal', 'Lateral', 'Superior', 'Atrás'].map((v) => (
                 <button
                   key={v}
                   onClick={() => setActiveView(v)}
-                  className={`font-code text-[9px] tracking-widest px-3.5 py-2 border transition-all uppercase rounded-sm select-none ${
+                  className={`font-code text-[8px] md:text-[9px] tracking-widest px-3 md:px-3.5 py-1.5 md:py-2 border transition-all uppercase rounded-sm select-none whitespace-nowrap ${
                     activeView === v
                       ? 'bg-white text-black border-white font-bold'
                       : 'bg-black/60 text-white/40 border-white/10 hover:border-white/40 hover:text-white'
