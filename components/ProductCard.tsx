@@ -149,7 +149,7 @@ export default function ProductCard({
 
       {/* Name tag replacing Model letter tag */}
       <div className="absolute top-5 right-12">
-        <span className="font-code text-[9px] tracking-[0.25em] text-white/30 uppercase">{name}</span>
+        <span className="font-code text-[10px] font-bold tracking-[0.2em] text-white/90 uppercase drop-shadow-md">{name}</span>
       </div>
 
       {/* Corner arrow */}
@@ -160,12 +160,7 @@ export default function ProductCard({
       {/* Bottom info */}
       <div className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black/85 via-black/30 to-transparent">
         <div className="flex items-end justify-between">
-          <div className="max-w-[65%] pr-2">
-            <p className="font-code text-[9px] tracking-[0.2em] text-white/40 uppercase mb-1">{code}</p>
-            <p className="font-code text-[11px] tracking-[0.14em] text-white/90 uppercase font-semibold leading-snug group-hover:text-white transition-colors">
-              {letter}
-            </p>
-          </div>
+          <div className="flex-1"></div>
           <div className="flex items-end gap-2 flex-shrink-0">
             <div className="text-right">
               <p className="font-display text-base font-bold text-white leading-none">{price}</p>

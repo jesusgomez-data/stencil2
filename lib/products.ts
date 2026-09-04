@@ -46,6 +46,31 @@ interface ProductSeed {
 
 const SEEDS: ProductSeed[] = [
   {
+    id: 'onyx-black',
+    letter: 'B',
+    code: 'GLT6642-C1',
+    name: 'Ibsen Soires Naes',
+    price: 29.00,
+    gender: 'unisex',
+    model: 'wayfarer',
+    slug: 'ibsen-soires-naes',
+    description: 'Minimalismo y sofisticación en su forma más pura. Fabricadas con acetato pulido a mano para un acabado brillante inigualable y durabilidad extrema.',
+    composition: '100% Acetato orgánico, lentes CR-39 polarizadas',
+    isFeatured: true,
+    frameColor: '#C4822A',
+    colors: [
+      { label: 'Carey Ambar', hex: '#C4822A' },
+      { label: 'Negro', hex: '#1a1a1a' },
+      { label: 'Azul', hex: '#0D2147' }
+    ],
+    glassesColor: 'Carey Ambar',
+    frameType: 'Carey Negro Ambar',
+    logo: 'Dorado',
+    material: 'Acetato',
+    lens: 'No polarizado',
+    sizes: { varillas: '145 mm', puente: '19 mm', frontal: '52 mm', altura: '50 mm' }
+  },
+  {
     id: 'classic-blue',
     letter: 'A',
     code: 'GLT6652-C4',
@@ -70,31 +95,6 @@ const SEEDS: ProductSeed[] = [
     material: 'Acetato',
     lens: 'No polarizado',
     sizes: { varillas: '145 mm', puente: '26 mm', frontal: '47 mm', altura: '45 mm' }
-  },
-  {
-    id: 'onyx-black',
-    letter: 'B',
-    code: 'GLT6642-C1',
-    name: 'Ibsen Soires Naes',
-    price: 29.00,
-    gender: 'unisex',
-    model: 'wayfarer',
-    slug: 'ibsen-soires-naes',
-    description: 'Minimalismo y sofisticación en su forma más pura. Fabricadas con acetato pulido a mano para un acabado brillante inigualable y durabilidad extrema.',
-    composition: '100% Acetato orgánico, lentes CR-39 polarizadas',
-    isFeatured: true,
-    frameColor: '#C4822A',
-    colors: [
-      { label: 'Carey Ambar', hex: '#C4822A' },
-      { label: 'Negro', hex: '#1a1a1a' },
-      { label: 'Azul', hex: '#0D2147' }
-    ],
-    glassesColor: 'Carey Ambar',
-    frameType: 'Carey Negro Ambar',
-    logo: 'Dorado',
-    material: 'Acetato',
-    lens: 'No polarizado',
-    sizes: { varillas: '145 mm', puente: '19 mm', frontal: '52 mm', altura: '50 mm' }
   },
   {
     id: 'olive-crystal',

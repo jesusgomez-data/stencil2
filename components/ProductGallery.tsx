@@ -119,7 +119,7 @@ export default function ProductGallery({
       >
         <div className="flex items-baseline gap-3 md:gap-4 min-w-0">
           <span className="font-code text-[9px] tracking-[0.3em] text-white/30 uppercase shrink-0">
-            MODELO {letter}
+            MODELO
           </span>
           <h2 className="font-display text-sm md:text-lg font-semibold text-white uppercase truncate">
             {productName}
@@ -160,15 +160,28 @@ export default function ProductGallery({
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="absolute inset-0 flex items-center justify-center p-4 sm:p-10"
           >
-            <Image
-              src={current}
-              alt={`${productName} — toma ${label}`}
-              fill
-              sizes="(max-width: 768px) 100vw, 90vw"
-              className="object-contain"
-              priority
-              draggable={false}
-            />
+            {current.endsWith('.mp4') ? (
+              <video
+                src={current}
+                title={`${productName} — toma ${label}`}
+                className="w-full h-full object-contain"
+                autoPlay
+                loop
+                muted
+                playsInline
+                draggable={false}
+              />
+            ) : (
+              <Image
+                src={current}
+                alt={`${productName} — toma ${label}`}
+                fill
+                sizes="(max-width: 768px) 100vw, 90vw"
+                className="object-contain"
+                priority
+                draggable={false}
+              />
+            )}
           </motion.div>
         </AnimatePresence>
 
@@ -218,14 +231,23 @@ export default function ProductGallery({
                       : 'border-white/[0.08] bg-white/[0.02] opacity-50 hover:opacity-100 hover:border-white/25'
                   }`}
                 >
-                  <Image
-                    src={img}
-                    alt={`${productName} — toma ${getShotLabel(img)}`}
-                    fill
-                    sizes="96px"
-                    className="object-contain p-1.5"
-                    draggable={false}
-                  />
+                  {img.endsWith('.mp4') ? (
+                    <video
+                      src={img}
+                      className="w-full h-full object-cover p-0"
+                      muted
+                      playsInline
+                    />
+                  ) : (
+                    <Image
+                      src={img}
+                      alt={`${productName} — toma ${getShotLabel(img)}`}
+                      fill
+                      sizes="96px"
+                      className="object-contain p-1.5"
+                      draggable={false}
+                    />
+                  )}
                   <span className="absolute bottom-0.5 left-1.5 font-code text-[7px] tracking-wider text-white/50 uppercase">
                     {getShotLabel(img)}
                   </span>

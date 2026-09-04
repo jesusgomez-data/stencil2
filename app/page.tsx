@@ -42,20 +42,20 @@ const TRUST_BADGES = [
 
 const COLLECTION_PRODUCTS = [
   {
-    id:              'classic-blue',
-    name:            'KSO-KC',
-    price:           '29.00',
-    frameColor:      '#C4822A',
-    bgColor:         '#040404',
-    isNew:           false,
-    whiteBg:         false,
-  },
-  {
     id:              'onyx-black',
     name:            'IBZEN-SOIRES NAES',
     price:           '29.00',
     frameColor:      '#111111',
     bgColor:         '#030303',
+    isNew:           false,
+    whiteBg:         false,
+  },
+  {
+    id:              'classic-blue',
+    name:            'KSO-KC',
+    price:           '29.00',
+    frameColor:      '#C4822A',
+    bgColor:         '#040404',
     isNew:           false,
     whiteBg:         false,
   },
@@ -877,7 +877,7 @@ function CollectionsSection() {
                   {/* Name tag replacing Model letter tag */}
                   {letter && (
                     <div className="absolute top-12 left-3 z-20">
-                      <span className="font-code text-[8px] tracking-[0.25em] text-white/40 uppercase">
+                      <span className="font-code text-[10px] font-bold tracking-[0.2em] text-white/90 uppercase drop-shadow-md">
                         {p.name}
                       </span>
                     </div>
@@ -890,9 +890,6 @@ function CollectionsSection() {
                   className="flex items-center justify-between px-5 pb-5 w-full pt-3 border-t border-white/[0.04] z-10"
                 >
                   <div>
-                    <p className="font-code text-[9px] tracking-[0.18em] text-white/50 group-hover:text-white/80 transition-colors uppercase leading-none">
-                      {letter}
-                    </p>
                     <p className="font-display text-[13px] font-bold text-white mt-1">
                       {p.price} <span className="font-code text-[8px] font-normal tracking-widest text-white/40">EUR</span>
                     </p>

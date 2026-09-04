@@ -52,7 +52,9 @@ export default function FavoriteButton({ slug, className = '' }: FavoriteButtonP
     [slug]
   )
 
+  // Real count of likes (local storage based logic in this mock implementation)
   const count = liked ? 1 : 0
+  
   const stopCardNavigation = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -85,12 +87,12 @@ export default function FavoriteButton({ slug, className = '' }: FavoriteButtonP
           className={liked ? 'fill-current' : ''}
         />
       </button>
-      {mounted && showCount && (
+      {mounted && (
         <span
           className="rounded-full border border-white/[0.12] bg-black/35 px-2 py-1 font-code text-[9px] leading-none tracking-[0.14em] text-white/60"
           style={{ backdropFilter: 'blur(4px)' }}
         >
-          {count} likes
+          {count}
         </span>
       )}
     </div>
