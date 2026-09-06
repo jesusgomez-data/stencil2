@@ -73,6 +73,34 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={`${playfairDisplay.variable} ${sourceCodePro.variable} ${bebasNeue.variable} ${spaceGrotesk.variable} ${caveat.variable}`}>
+     <script dangerouslySetInnerHTML={{ __html: `
+  (async function registrarVisita() {
+    const supabaseUrl = 'https://qxgfijtibracrrlhceeo.supabase.co';
+    const supabaseAnonKey = 'sb_publishable_SAujRd5vtbNvHU4pxJj5Kw_iEvTbs8w';
+    const projectId = '29ecfe7e-1e59-43ea-a52d-7b00e7bcabcc'; // El ID largo de Supabase, ej: 123e4567-e89b-12d3...
+
+    try {
+      const resGet = await fetch(supabaseUrl + '/rest/v1/proyectos?id=eq.' + projectId + '&select=visitas', {
+        headers: { 'apikey': supabaseAnonKey, 'Authorization': 'Bearer ' + supabaseAnonKey }
+      });
+      const data = await resGet.json();
+      let visitasActuales = parseInt(data[0].visitas || "0");
+
+      await fetch(supabaseUrl + '/rest/v1/proyectos?id=eq.' + projectId, {
+        method: 'PATCH',
+        headers: { 
+          'apikey': supabaseAnonKey, 
+          'Authorization': 'Bearer ' + supabaseAnonKey,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ visitas: (visitasActuales + 1).toString() })
+      });
+    } catch(e) {}
+  })();
+`}} />
+
+     
       <body className="bg-black text-white antialiased">
         <CartProvider>
           {children}
