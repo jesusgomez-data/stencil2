@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Playfair_Display, Source_Code_Pro, Bebas_Neue, Space_Grotesk, Caveat } from 'next/font/google'
 import './globals.css'
 import { CartProvider } from '@/context/CartContext'
+import { Analytics } from '@vercel/analytics/next'
 
 const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
@@ -77,6 +78,7 @@ export default function RootLayout({
         <CartProvider>
           {children}
         </CartProvider>
+        <Analytics />
       </body>
     </html>
   )
