@@ -32,26 +32,41 @@ export default function CuentaPage() {
   const [openOrderIndex, setOpenOrderIndex] = useState<string | null>(null)
   
   // Profile local states
-  const [name, setName] = useState('Jesús Gómez')
-  const [email, setEmail] = useState('jesus@example.com')
-  const [phone, setPhone] = useState('600 123 456')
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [isSaved, setIsSaved] = useState(false)
 
   // Points Redemption State
   const [claimedCode, setClaimedCode] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
 
-  // Load profile from localStorage if exists
+  // Load profile from localStorage or most recent order
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedName = localStorage.getItem('stencil2_profile_name')
       const storedEmail = localStorage.getItem('stencil2_profile_email')
       const storedPhone = localStorage.getItem('stencil2_profile_phone')
-      if (storedName) setName(storedName)
-      if (storedEmail) setEmail(storedEmail)
-      if (storedPhone) setPhone(storedPhone)
+
+      if (storedName) {
+        setName(storedName)
+      } else if (orders.length > 0 && orders[0].shippingAddress?.name) {
+        setName(orders[0].shippingAddress.name)
+      }
+
+      if (storedEmail) {
+        setEmail(storedEmail)
+      } else if (orders.length > 0 && orders[0].shippingAddress?.email) {
+        setEmail(orders[0].shippingAddress.email)
+      }
+
+      if (storedPhone) {
+        setPhone(storedPhone)
+      } else if (orders.length > 0 && orders[0].shippingAddress?.phone) {
+        setPhone(orders[0].shippingAddress.phone)
+      }
     }
-  }, [])
+  }, [orders])
 
   const handleProfileSave = (e: React.FormEvent) => {
     e.preventDefault()
@@ -158,7 +173,8 @@ export default function CuentaPage() {
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full bg-black border border-white/15 text-white font-code text-[10px] tracking-widest px-4 py-3.5 focus:outline-none focus:border-white/30 transition-colors uppercase rounded-sm"
+                        placeholder="EJ: TU NOMBRE Y APELLIDOS"
+                        className="w-full bg-black border border-white/15 text-white font-code text-[10px] tracking-widest px-4 py-3.5 focus:outline-none focus:border-white/30 transition-colors uppercase rounded-sm placeholder:text-white/25"
                         required
                       />
                     </div>
@@ -168,7 +184,8 @@ export default function CuentaPage() {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full bg-black border border-white/15 text-white font-code text-[10px] tracking-widest px-4 py-3.5 focus:outline-none focus:border-white/30 transition-colors rounded-sm"
+                        placeholder="ejemplo@correo.com"
+                        className="w-full bg-black border border-white/15 text-white font-code text-[10px] tracking-widest px-4 py-3.5 focus:outline-none focus:border-white/30 transition-colors rounded-sm placeholder:text-white/25"
                         required
                       />
                     </div>
@@ -178,7 +195,8 @@ export default function CuentaPage() {
                         type="text"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        className="w-full bg-black border border-white/15 text-white font-code text-[10px] tracking-widest px-4 py-3.5 focus:outline-none focus:border-white/30 transition-colors rounded-sm"
+                        placeholder="+34 600 000 000"
+                        className="w-full bg-black border border-white/15 text-white font-code text-[10px] tracking-widest px-4 py-3.5 focus:outline-none focus:border-white/30 transition-colors rounded-sm placeholder:text-white/25"
                       />
                     </div>
 

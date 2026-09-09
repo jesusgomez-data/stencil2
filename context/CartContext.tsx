@@ -149,6 +149,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     setOrders((prevOrders) => [newOrder, ...prevOrders])
     setLoyaltyPoints((prevPoints) => prevPoints + pointsEarned)
+
+    if (typeof window !== 'undefined' && shippingAddress) {
+      if (shippingAddress.name) localStorage.setItem('stencil2_profile_name', shippingAddress.name)
+      if (shippingAddress.email) localStorage.setItem('stencil2_profile_email', shippingAddress.email)
+      if (shippingAddress.phone) localStorage.setItem('stencil2_profile_phone', shippingAddress.phone)
+    }
+
     clearCart()
 
     return newOrder
