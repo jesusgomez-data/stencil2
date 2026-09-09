@@ -255,8 +255,8 @@ export default function CarritoPage() {
                   )}
 
                   <div className="flex justify-between">
-                    <span>IVA (21%)</span>
-                    <span className="text-white font-medium">+{tax.toFixed(2)} EUR</span>
+                    <span>IVA INCLUIDO (21%)</span>
+                    <span className="text-white/80 font-medium">{tax.toFixed(2)} EUR</span>
                   </div>
 
                   <div className="flex justify-between">

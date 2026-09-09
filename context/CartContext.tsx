@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 
 import { CartItem, Order, CartContextType } from '@/types'
+import { calculateCartTotals } from '@/lib/pricing'
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
@@ -62,27 +63,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [orders, isMounted])
 
-  // Calculate pricing
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
-
-  // Descuentos soportados:
-  // S2-WELCOME10: 10% de descuento
-  // S2-10OFF: 10% de descuento
-  // S2-FREE: Envío gratuito sin importar total
-  let discount = 0
-  if (promoCode === 'S2-WELCOME10' || promoCode === 'S2-10OFF') {
-    discount = subtotal * 0.1
-  }
-
-  const taxableAmount = Math.max(0, subtotal - discount)
-  // IVA 21% automático sobre la base imponible
-  const tax = taxableAmount * 0.21
-
-  const promoFreeShipping = promoCode === 'S2-FREE'
-  const isShippingFree = (taxableAmount >= 50) || promoFreeShipping
-  const shippingCost = cartItems.length === 0 ? 0 : (isShippingFree ? 0 : 4.95)
-
-  const total = taxableAmount + tax + shippingCost
+  // Calculate pricing through centralized helper (IVA 21% incluido en PVP)
+  const {
+    subtotal,
+    discount,
+    taxableBase,
+    tax,
+    shippingCost,
+    total,
+    pointsEarned
+  } = calculateCartTotals(cartItems, promoCode)
 
   const addToCart = (newItem: Omit<CartItem, 'quantity'>, quantity: number = 1) => {
     setCartItems((prevItems) => {
@@ -135,10 +125,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setPromoCode(null)
   }
 
-  const completeCheckout = (shippingAddress: Order['shippingAddress']): Order => {
-    const pointsEarned = Math.round(total)
+  const completeCheckout = (
+    shippingAddress: Order['shippingAddress'],
+    metadata?: { orderId?: string; stripeId?: string }
+  ): Order => {
     const newOrder: Order = {
-      id: `S2-ORD-${Math.floor(100000 + Math.random() * 900000)}`,
+      id: metadata?.orderId || `S2-ORD-${Math.floor(100000 + Math.random() * 900000)}`,
       date: new Date().toLocaleDateString('es-ES', {
         year: 'numeric',
         month: 'long',
@@ -151,6 +143,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       shipping: shippingCost,
       total,
       pointsEarned,
+      stripeId: metadata?.stripeId,
       shippingAddress,
     }
 
@@ -168,6 +161,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         promoCode,
         discount,
         tax,
+        taxableBase,
         shippingCost,
         subtotal,
         total,

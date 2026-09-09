@@ -6,7 +6,10 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { useCart } from '@/context/CartContext'
 import { Order } from '@/types'
-import { ArrowLeft, Check, CreditCard, Shield, Truck, Sparkles, ShoppingBag } from 'lucide-react'
+import { getStripe } from '@/lib/stripe'
+import StripePaymentForm from '@/components/checkout/StripePaymentForm'
+import { Elements } from '@stripe/react-stripe-js'
+import { ArrowLeft, Check, CreditCard, Shield, Truck, Sparkles, ShoppingBag, AlertTriangle, Lock } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function CheckoutPage() {
@@ -24,12 +27,20 @@ export default function CheckoutPage() {
   const [formPhone, setFormPhone] = useState('')
   const [formErrors, setFormErrors] = useState<Record<string, string>>({})
 
-  // Payment Form State
+  // Stripe Integration States
+  const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [currentOrderId, setCurrentOrderId] = useState<string>('')
+  const [isDemoMode, setIsDemoMode] = useState(false)
+  const [demoNotice, setDemoNotice] = useState<string | null>(null)
+  const [isLoadingIntent, setIsLoadingIntent] = useState(false)
+  const [intentError, setIntentError] = useState<string | null>(null)
+
+  // Demo Payment Form State (Fallback when keys aren't set)
   const [cardNumber, setCardNumber] = useState('')
   const [cardHolder, setCardHolder] = useState('')
   const [cardExpiry, setCardExpiry] = useState('')
   const [cardCvc, setCardCvc] = useState('')
-  const [isProcessing, setIsProcessing] = useState(false)
+  const [isProcessingDemo, setIsProcessingDemo] = useState(false)
   const [paymentErrors, setPaymentErrors] = useState<Record<string, string>>({})
 
   const validateDetails = () => {
@@ -46,7 +57,7 @@ export default function CheckoutPage() {
     return Object.keys(errors).length === 0
   }
 
-  const validatePayment = () => {
+  const validateDemoPayment = () => {
     const errors: Record<string, string> = {}
     const cleanCard = cardNumber.replace(/\s/g, '')
     if (cleanCard.length < 16) errors.cardNumber = 'Número de tarjeta incompleto'
@@ -58,32 +69,105 @@ export default function CheckoutPage() {
     return Object.keys(errors).length === 0
   }
 
-  const handleNextStep = (e: React.FormEvent) => {
+  const handleNextStep = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (validateDetails()) {
+    if (!validateDetails()) return
+
+    setIsLoadingIntent(true)
+    setIntentError(null)
+
+    try {
+      const res = await fetch('/api/checkout/create-payment-intent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          items: cartItems.map((item) => ({
+            id: item.id,
+            slug: item.slug,
+            price: item.price,
+            quantity: item.quantity,
+            color: item.color,
+          })),
+          shippingAddress: {
+            name: `${formName} ${formLastName}`.trim(),
+            address: formAddress,
+            city: formCity,
+            postalCode: formPostalCode,
+            email: formEmail,
+            phone: formPhone,
+          },
+          promoCode,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Error al conectar con la pasarela de pago')
+      }
+
+      setCurrentOrderId(data.orderId)
+      setClientSecret(data.clientSecret)
+      setIsDemoMode(Boolean(data.demoMode))
+      if (data.message) {
+        setDemoNotice(data.message)
+      }
+
       setStep('payment')
+    } catch (err: any) {
+      console.error('Error al inicializar pago:', err)
+      setIntentError(err.message || 'No se pudo inicializar la pasarela de pagos. Por favor, reintenta.')
+    } finally {
+      setIsLoadingIntent(false)
     }
   }
 
-  const handlePaymentSubmit = (e: React.FormEvent) => {
+  // Handle successful Stripe payment
+  const handleStripeSuccess = (paymentIntentId: string) => {
+    const order = completeCheckout(
+      {
+        name: `${formName} ${formLastName}`.trim(),
+        address: formAddress,
+        city: formCity,
+        postalCode: formPostalCode,
+        email: formEmail,
+        phone: formPhone,
+      },
+      {
+        orderId: currentOrderId,
+        stripeId: paymentIntentId,
+      }
+    )
+    setCreatedOrder(order)
+    setStep('success')
+  }
+
+  // Handle simulated demo payment
+  const handleDemoPaymentSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (validatePayment()) {
-      setIsProcessing(true)
-      
-      // Simulate Stripe Processing
+    if (validateDemoPayment()) {
+      setIsProcessingDemo(true)
       setTimeout(() => {
-        setIsProcessing(false)
-        const order = completeCheckout({
-          name: `${formName} ${formLastName}`,
-          address: formAddress,
-          city: formCity,
-          postalCode: formPostalCode,
-          email: formEmail,
-          phone: formPhone,
-        })
+        setIsProcessingDemo(false)
+        const order = completeCheckout(
+          {
+            name: `${formName} ${formLastName}`.trim(),
+            address: formAddress,
+            city: formCity,
+            postalCode: formPostalCode,
+            email: formEmail,
+            phone: formPhone,
+          },
+          {
+            orderId: currentOrderId || `S2-ORD-${Math.floor(100000 + Math.random() * 900000)}`,
+            stripeId: `s2_demo_${Date.now()}`,
+          }
+        )
         setCreatedOrder(order)
         setStep('success')
-      }, 2000)
+      }, 1500)
     }
   }
 
@@ -132,6 +216,50 @@ export default function CheckoutPage() {
     )
   }
 
+  // Stripe appearance theme
+  const stripeOptions = clientSecret
+    ? {
+        clientSecret,
+        appearance: {
+          theme: 'night' as const,
+          variables: {
+            colorPrimary: '#FFFFFF',
+            colorBackground: '#0a0a0a',
+            colorText: '#FFFFFF',
+            colorDanger: '#CC0000',
+            fontFamily: 'monospace, Courier New, sans-serif',
+            borderRadius: '2px',
+            spacingUnit: '4px',
+          },
+          rules: {
+            '.Input': {
+              backgroundColor: '#000000',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              fontSize: '12px',
+            },
+            '.Input:focus': {
+              border: '1px solid rgba(255, 255, 255, 0.5)',
+              boxShadow: 'none',
+            },
+            '.Tab': {
+              backgroundColor: '#050505',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+            },
+            '.Tab--selected': {
+              backgroundColor: '#141414',
+              borderColor: '#FFFFFF',
+            },
+            '.Label': {
+              color: 'rgba(255, 255, 255, 0.6)',
+              fontSize: '10px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+            },
+          },
+        },
+      }
+    : null
+
   return (
     <div className="bg-black min-h-screen flex flex-col">
       <Navbar />
@@ -160,6 +288,13 @@ export default function CheckoutPage() {
                   </h1>
                 </div>
               </div>
+
+              {intentError && (
+                <div className="mb-6 p-4 bg-[#CC0000]/10 border border-[#CC0000]/30 rounded-sm text-[#ff6b6b] flex items-center gap-3">
+                  <AlertTriangle size={16} className="flex-shrink-0" />
+                  <p className="font-code text-[10px] uppercase tracking-wider">{intentError}</p>
+                </div>
+              )}
 
               {/* STEP 1: Details form */}
               {step === 'details' && (
@@ -252,122 +387,154 @@ export default function CheckoutPage() {
                   <div className="pt-4 border-t border-white/[0.05]">
                     <button
                       type="submit"
-                      className="w-full bg-white text-black hover:bg-white/80 font-code text-[10px] tracking-[0.25em] py-4 rounded-sm font-bold uppercase transition-colors"
+                      disabled={isLoadingIntent}
+                      className="w-full bg-white text-black hover:bg-white/80 font-code text-[10px] tracking-[0.25em] py-4 rounded-sm font-bold uppercase transition-colors flex items-center justify-center gap-2"
                     >
-                      CONTINUAR AL PAGO
+                      {isLoadingIntent ? (
+                        <span className="flex items-center gap-2">
+                          <span className="w-3.5 h-3.5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                          PREPARANDO PASARELA...
+                        </span>
+                      ) : (
+                        'CONTINUAR AL PAGO'
+                      )}
                     </button>
                   </div>
                 </form>
               )}
 
-              {/* STEP 2: Payment form */}
+              {/* STEP 2: Payment options */}
               {step === 'payment' && (
-                <form onSubmit={handlePaymentSubmit} className="space-y-6">
-                  
-                  {/* Virtual Credit Card Premium Illustration */}
-                  <div className="relative w-full aspect-[1.58/1] rounded-xl overflow-hidden bg-gradient-to-br from-white/10 to-white/[0.02] border border-white/20 p-6 flex flex-col justify-between shadow-2xl backdrop-blur-md mb-6">
-                    {/* Chip and logo */}
-                    <div className="flex justify-between items-start">
-                      <div className="w-10 h-7 rounded bg-amber-400/80 opacity-80 shadow-[0_0_8px_rgba(251,191,36,0.3)]" />
-                      <span className="font-code text-[11px] tracking-widest text-white font-bold opacity-80">STENCIL2</span>
-                    </div>
-
-                    {/* Card number */}
-                    <p className="font-code text-base md:text-lg tracking-[0.15em] text-white/90 text-center my-4 font-medium">
-                      {cardNumber || '•••• •••• •••• ••••'}
-                    </p>
-
-                    {/* Cardholder & expiry */}
-                    <div className="flex justify-between items-end">
-                      <div>
-                        <span className="font-code text-[7px] text-white/30 block tracking-wider">TITULAR</span>
-                        <span className="font-code text-[9px] text-white/80 block uppercase tracking-widest truncate max-w-[180px]">
-                          {cardHolder || 'NOMBRE APELLIDO'}
-                        </span>
+                <div>
+                  {/* REAL STRIPE ELEMENTS INTEGRATION */}
+                  {!isDemoMode && clientSecret && stripeOptions && getStripe() ? (
+                    <Elements stripe={getStripe()} options={stripeOptions}>
+                      <StripePaymentForm
+                        total={total}
+                        orderId={currentOrderId}
+                        customerEmail={formEmail}
+                        onPaymentSuccess={handleStripeSuccess}
+                      />
+                    </Elements>
+                  ) : (
+                    /* DEMO FALLBACK WHEN KEYS ARE NOT CONFIGURED IN .env.local */
+                    <div className="space-y-6">
+                      <div className="p-4 bg-[#C4822A]/10 border border-[#C4822A]/30 rounded-sm text-[#e6a247] flex items-start gap-3">
+                        <AlertTriangle size={16} className="flex-shrink-0 mt-0.5" />
+                        <div className="space-y-1">
+                          <p className="font-code text-[10px] font-bold tracking-wider uppercase">
+                            MODO DEMOSTRACIÓN ACTIVO
+                          </p>
+                          <p className="font-code text-[9px] text-white/70 leading-relaxed uppercase">
+                            {demoNotice || 'Para procesar transacciones reales con Stripe, añade tus claves en .env.local. A continuación puedes completar el flujo en modo simulación de prueba.'}
+                          </p>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <span className="font-code text-[7px] text-white/30 block tracking-wider">CADUCIDAD</span>
-                        <span className="font-code text-[9px] text-white/80 block tracking-wider">
-                          {cardExpiry || 'MM/AA'}
-                        </span>
+
+                      {/* Virtual Credit Card Premium Illustration */}
+                      <div className="relative w-full aspect-[1.58/1] rounded-xl overflow-hidden bg-gradient-to-br from-white/10 to-white/[0.02] border border-white/20 p-6 flex flex-col justify-between shadow-2xl backdrop-blur-md">
+                        <div className="flex justify-between items-start">
+                          <div className="w-10 h-7 rounded bg-amber-400/80 opacity-80 shadow-[0_0_8px_rgba(251,191,36,0.3)]" />
+                          <span className="font-code text-[11px] tracking-widest text-white font-bold opacity-80">STENCIL2</span>
+                        </div>
+
+                        <p className="font-code text-base md:text-lg tracking-[0.15em] text-white/90 text-center my-4 font-medium">
+                          {cardNumber || '•••• •••• •••• ••••'}
+                        </p>
+
+                        <div className="flex justify-between items-end">
+                          <div>
+                            <span className="font-code text-[7px] text-white/30 block tracking-wider">TITULAR</span>
+                            <span className="font-code text-[9px] text-white/80 block uppercase tracking-widest truncate max-w-[180px]">
+                              {cardHolder || 'NOMBRE APELLIDO'}
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <span className="font-code text-[7px] text-white/30 block tracking-wider">CADUCIDAD</span>
+                            <span className="font-code text-[9px] text-white/80 block tracking-wider">
+                              {cardExpiry || 'MM/AA'}
+                            </span>
+                          </div>
+                        </div>
                       </div>
+
+                      <form onSubmit={handleDemoPaymentSubmit} className="space-y-4">
+                        <div>
+                          <label className="font-code text-[9px] tracking-widest text-white/40 uppercase block mb-2">TITULAR DE LA TARJETA</label>
+                          <input
+                            type="text"
+                            placeholder="COMO APARECE EN LA TARJETA"
+                            value={cardHolder}
+                            onChange={(e) => setCardHolder(e.target.value)}
+                            className={`w-full bg-black border ${paymentErrors.cardHolder ? 'border-[#CC0000]' : 'border-white/15'} text-white font-code text-[10px] tracking-widest px-4 py-3 focus:outline-none focus:border-white/30 transition-colors uppercase rounded-sm`}
+                          />
+                          {paymentErrors.cardHolder && <p className="font-code text-[8px] text-[#CC0000] uppercase mt-1.5">{paymentErrors.cardHolder}</p>}
+                        </div>
+
+                        <div>
+                          <label className="font-code text-[9px] tracking-widest text-white/40 uppercase block mb-2">NÚMERO DE TARJETA</label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              placeholder="0000 0000 0000 0000"
+                              maxLength={19}
+                              value={cardNumber}
+                              onChange={(e) => handleCardNumberChange(e.target.value)}
+                              className={`w-full bg-black border ${paymentErrors.cardNumber ? 'border-[#CC0000]' : 'border-white/15'} text-white font-code text-[10px] tracking-widest pl-11 pr-4 py-3 focus:outline-none focus:border-white/30 transition-colors rounded-sm`}
+                            />
+                            <CreditCard size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+                          </div>
+                          {paymentErrors.cardNumber && <p className="font-code text-[8px] text-[#CC0000] uppercase mt-1.5">{paymentErrors.cardNumber}</p>}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="font-code text-[9px] tracking-widest text-white/40 uppercase block mb-2">VENCIMIENTO</label>
+                            <input
+                              type="text"
+                              placeholder="MM/AA"
+                              maxLength={5}
+                              value={cardExpiry}
+                              onChange={(e) => handleExpiryChange(e.target.value)}
+                              className={`w-full bg-black border ${paymentErrors.cardExpiry ? 'border-[#CC0000]' : 'border-white/15'} text-white font-code text-[10px] tracking-widest px-4 py-3 focus:outline-none focus:border-white/30 transition-colors rounded-sm`}
+                            />
+                            {paymentErrors.cardExpiry && <p className="font-code text-[8px] text-[#CC0000] uppercase mt-1.5">{paymentErrors.cardExpiry}</p>}
+                          </div>
+
+                          <div>
+                            <label className="font-code text-[9px] tracking-widest text-white/40 uppercase block mb-2">CÓDIGO CVC</label>
+                            <input
+                              type="password"
+                              placeholder="•••"
+                              maxLength={3}
+                              value={cardCvc}
+                              onChange={(e) => setCardCvc(e.target.value.replace(/[^0-9]/g, ''))}
+                              className={`w-full bg-black border ${paymentErrors.cardCvc ? 'border-[#CC0000]' : 'border-white/15'} text-white font-code text-[10px] tracking-widest px-4 py-3 focus:outline-none focus:border-white/30 transition-colors rounded-sm`}
+                            />
+                            {paymentErrors.cardCvc && <p className="font-code text-[8px] text-[#CC0000] uppercase mt-1.5">{paymentErrors.cardCvc}</p>}
+                          </div>
+                        </div>
+
+                        <div className="pt-4 border-t border-white/[0.05]">
+                          <button
+                            type="submit"
+                            disabled={isProcessingDemo}
+                            className="w-full bg-[#CC0000] hover:bg-[#B00000] disabled:bg-red-900 text-white font-code text-[10px] tracking-[0.25em] py-4 rounded-sm font-bold uppercase transition-colors flex items-center justify-center gap-2"
+                          >
+                            {isProcessingDemo ? (
+                              <span className="flex items-center gap-2">
+                                <span className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                PROCESANDO SIMULACIÓN...
+                              </span>
+                            ) : (
+                              `COMPLETAR PAGO (MODO PRUEBA) — ${total.toFixed(2)} EUR`
+                            )}
+                          </button>
+                        </div>
+                      </form>
                     </div>
-                  </div>
-
-                  {/* Payment Inputs */}
-                  <div>
-                    <label className="font-code text-[9px] tracking-widest text-white/40 uppercase block mb-2">TITULAR DE LA TARJETA</label>
-                    <input
-                      type="text"
-                      placeholder="COMO APARECE EN LA TARJETA"
-                      value={cardHolder}
-                      onChange={(e) => setCardHolder(e.target.value)}
-                      className={`w-full bg-black border ${paymentErrors.cardHolder ? 'border-[#CC0000]' : 'border-white/15'} text-white font-code text-[10px] tracking-widest px-4 py-3 focus:outline-none focus:border-white/30 transition-colors uppercase rounded-sm`}
-                    />
-                    {paymentErrors.cardHolder && <p className="font-code text-[8px] text-[#CC0000] uppercase mt-1.5">{paymentErrors.cardHolder}</p>}
-                  </div>
-
-                  <div>
-                    <label className="font-code text-[9px] tracking-widest text-white/40 uppercase block mb-2">NÚMERO DE TARJETA</label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="0000 0000 0000 0000"
-                        maxLength={19}
-                        value={cardNumber}
-                        onChange={(e) => handleCardNumberChange(e.target.value)}
-                        className={`w-full bg-black border ${paymentErrors.cardNumber ? 'border-[#CC0000]' : 'border-white/15'} text-white font-code text-[10px] tracking-widest pl-11 pr-4 py-3 focus:outline-none focus:border-white/30 transition-colors rounded-sm`}
-                      />
-                      <CreditCard size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
-                    </div>
-                    {paymentErrors.cardNumber && <p className="font-code text-[8px] text-[#CC0000] uppercase mt-1.5">{paymentErrors.cardNumber}</p>}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="font-code text-[9px] tracking-widest text-white/40 uppercase block mb-2">VENCIMIENTO</label>
-                      <input
-                        type="text"
-                        placeholder="MM/AA"
-                        maxLength={5}
-                        value={cardExpiry}
-                        onChange={(e) => handleExpiryChange(e.target.value)}
-                        className={`w-full bg-black border ${paymentErrors.cardExpiry ? 'border-[#CC0000]' : 'border-white/15'} text-white font-code text-[10px] tracking-widest px-4 py-3 focus:outline-none focus:border-white/30 transition-colors rounded-sm`}
-                      />
-                      {paymentErrors.cardExpiry && <p className="font-code text-[8px] text-[#CC0000] uppercase mt-1.5">{paymentErrors.cardExpiry}</p>}
-                    </div>
-
-                    <div>
-                      <label className="font-code text-[9px] tracking-widest text-white/40 uppercase block mb-2">CÓDIGO CVC</label>
-                      <input
-                        type="password"
-                        placeholder="•••"
-                        maxLength={3}
-                        value={cardCvc}
-                        onChange={(e) => setCardCvc(e.target.value.replace(/[^0-9]/g, ''))}
-                        className={`w-full bg-black border ${paymentErrors.cardCvc ? 'border-[#CC0000]' : 'border-white/15'} text-white font-code text-[10px] tracking-widest px-4 py-3 focus:outline-none focus:border-white/30 transition-colors rounded-sm`}
-                      />
-                      {paymentErrors.cardCvc && <p className="font-code text-[8px] text-[#CC0000] uppercase mt-1.5">{paymentErrors.cardCvc}</p>}
-                    </div>
-                  </div>
-
-                  <div className="pt-4 border-t border-white/[0.05]">
-                    <button
-                      type="submit"
-                      disabled={isProcessing}
-                      className="w-full bg-[#CC0000] hover:bg-[#B00000] disabled:bg-red-900 text-white font-code text-[10px] tracking-[0.25em] py-4 rounded-sm font-bold uppercase transition-colors flex items-center justify-center gap-2"
-                    >
-                      {isProcessing ? (
-                        <span className="flex items-center gap-2">
-                          <span className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                          PROCESANDO PAGO...
-                        </span>
-                      ) : (
-                        `COMPLETAR PAGO — ${total.toFixed(2)} EUR`
-                      )}
-                    </button>
-                  </div>
-                </form>
+                  )}
+                </div>
               )}
             </div>
 
@@ -409,8 +576,8 @@ export default function CheckoutPage() {
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span>IVA (21%)</span>
-                  <span className="text-white">+{tax.toFixed(2)} EUR</span>
+                  <span>IVA INCLUIDO (21%)</span>
+                  <span className="text-white/80 font-medium">{tax.toFixed(2)} EUR</span>
                 </div>
                 <div className="flex justify-between">
                   <span>ENVÍO</span>
@@ -437,7 +604,7 @@ export default function CheckoutPage() {
               <div className="border-t border-white/[0.05] pt-4 flex items-start gap-2.5">
                 <Shield size={14} className="text-white/30 flex-shrink-0 mt-0.5" />
                 <p className="font-code text-[8px] text-white/30 leading-normal uppercase">
-                  Tus transacciones se procesan de forma segura a través de encriptación SSL de nivel militar. STENCIL2 nunca almacena tu información financiera.
+                  Tus transacciones se procesan de forma encriptada a través de Stripe homologado PCI-DSS Level 1. STENCIL2 nunca almacena tu información bancaria.
                 </p>
               </div>
             </div>
@@ -466,6 +633,12 @@ export default function CheckoutPage() {
                   <span>NÚMERO DE PEDIDO:</span>
                   <span className="text-[#C4822A] font-bold">{createdOrder.id}</span>
                 </div>
+                {createdOrder.stripeId && (
+                  <div className="flex justify-between text-white/30">
+                    <span>ID TRANSACCIÓN:</span>
+                    <span className="text-white/50">{createdOrder.stripeId}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-white/30">
                   <span>FECHA DEL PEDIDO:</span>
                   <span className="text-white/70">{createdOrder.date}</span>

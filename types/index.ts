@@ -57,6 +57,7 @@ export interface Order {
   shipping: number
   total: number
   pointsEarned: number
+  stripeId?: string
   shippingAddress: {
     name: string
     address: string
@@ -72,6 +73,7 @@ export interface CartContextType {
   promoCode: string | null
   discount: number
   tax: number
+  taxableBase: number
   shippingCost: number
   subtotal: number
   total: number
@@ -83,5 +85,8 @@ export interface CartContextType {
   applyPromoCode: (code: string) => boolean
   removePromoCode: () => void
   clearCart: () => void
-  completeCheckout: (shippingAddress: Order['shippingAddress']) => Order
+  completeCheckout: (
+    shippingAddress: Order['shippingAddress'],
+    metadata?: { orderId?: string; stripeId?: string }
+  ) => Order
 }

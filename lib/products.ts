@@ -50,7 +50,7 @@ const SEEDS: ProductSeed[] = [
     letter: 'B',
     code: 'GLT6642-C1',
     name: 'Ibsen Soires Naes',
-    price: 29.00,
+    price: 1.00,
     gender: 'unisex',
     model: 'wayfarer',
     slug: 'ibsen-soires-naes',
@@ -75,7 +75,7 @@ const SEEDS: ProductSeed[] = [
     letter: 'A',
     code: 'GLT6652-C4',
     name: 'Kso -KC',
-    price: 29.00,
+    price: 1.00,
     gender: 'unisex',
     model: 'wayfarer',
     slug: 'kso-kc',
@@ -101,7 +101,7 @@ const SEEDS: ProductSeed[] = [
     letter: 'C',
     code: 'GLT96153S-C4',
     name: 'Tropical Smoke',
-    price: 29.00,
+    price: 1.00,
     gender: 'unisex',
     model: 'round',
     slug: 'tropical-smoke',
@@ -126,7 +126,7 @@ const SEEDS: ProductSeed[] = [
     letter: 'D',
     code: 'GLT6630-C3',
     name: 'Spice Fler',
-    price: 29.00,
+    price: 1.00,
     gender: 'unisex',
     model: 'sport',
     slug: 'spice-fler',
@@ -202,7 +202,13 @@ export function getProductBySlug(slug: string): Product | undefined {
   return PRODUCTS.find((p) => p.slug === slug)
 }
 
+/** Busca un producto por su ID. */
+export function getProductById(id: string): Product | undefined {
+  return PRODUCTS.find((p) => p.id === id)
+}
+
 /** Devuelve los productos destacados para la home. */
 export function getFeaturedProducts(): Product[] {
   return PRODUCTS.filter((p) => p.isFeatured)
 }
+

@@ -12,6 +12,7 @@
     "dependencies": {
         "@react-three/drei": "^9.115.0",
         "@react-three/fiber": "^8.17.10",
+        "@stripe/react-stripe-js": "^2.9.0",
         "@stripe/stripe-js": "^4.9.0",
         "@supabase/supabase-js": "^2.48.0",
         "@vercel/analytics": "^2.0.1",
