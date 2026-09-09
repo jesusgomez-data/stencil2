@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 
 import { CartItem, Order, CartContextType } from '@/types'
-import { calculateCartTotals } from '@/lib/pricing'
+import { calculateCartTotals, VALID_PROMO_CODES } from '@/lib/pricing'
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
@@ -109,7 +109,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const applyPromoCode = (code: string): boolean => {
     const cleanCode = code.trim().toUpperCase()
-    if (['S2-WELCOME10', 'S2-10OFF', 'S2-FREE'].includes(cleanCode)) {
+    if ((VALID_PROMO_CODES as readonly string[]).includes(cleanCode)) {
       setPromoCode(cleanCode)
       return true
     }
