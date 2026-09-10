@@ -20,6 +20,7 @@ import FavoriteButton from '@/components/FavoriteButton'
 import { PRODUCTS } from '@/lib/products'
 import { useCart } from '@/context/CartContext'
 import IntroAnimation from '@/components/IntroAnimation'
+import EditorialHeroBanner from '@/components/EditorialHeroBanner'
 
 /* ─── Data ────────────────────────────────────────────────────────── */
 
@@ -747,51 +748,9 @@ function CollectionsSection() {
 
         <div id="featured-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
 
-          {/* Editorial banner (Column 1, spans both rows on large screens) */}
-          <div className="relative overflow-hidden rounded-2xl sm:col-span-2 lg:col-span-1 lg:row-span-2 lg:h-auto h-[390px] aspect-[3/4] sm:aspect-auto lg:aspect-auto border border-white/[0.055] group flex flex-col justify-end p-6 md:p-8 z-10">
-            <div className="absolute inset-0 overflow-hidden z-0">
-              <Image
-                src="/images/JOINING.jpg?v=2"
-                alt="JOINING CULTURE"
-                fill
-                className="object-cover object-center opacity-62 group-hover:opacity-74 group-hover:scale-[1.04] transition-all duration-700"
-              />
-            </div>
-            <div
-              className="absolute inset-0 z-[1]"
-              style={{
-                background:
-                  'linear-gradient(to bottom, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0.92) 100%)',
-              }}
-            />
+          {/* Editorial banner animado (Column 1, spans both rows on large screens) */}
+          <EditorialHeroBanner />
 
-            {/* Top Text Group — pegado al CTA inferior */}
-            <div className="relative z-10 text-left mb-6">
-              <p className="font-code text-[8px] tracking-[0.35em] text-white/40 uppercase mb-3">
-                NUEVA COLECCIÓN
-              </p>
-              <h2 className="font-bebas text-[38px] leading-[0.88] text-white tracking-wide">
-                JOINING<br />CULTURE
-              </h2>
-            </div>
-
-            {/* Bottom Text Group */}
-            <div className="relative z-10 text-left">
-              <Link
-                href="/tienda"
-                className="group/cta inline-flex items-center font-code text-[9px] tracking-widest text-white/50 hover:text-white transition-all uppercase"
-              >
-                <span className="border-b border-white/20 group-hover/cta:border-white pb-1 mr-3 transition-colors">
-                  VER COLECCIÓN
-                </span>
-                <ArrowRight
-                  size={10}
-                  strokeWidth={2}
-                  className="group-hover/cta:translate-x-0.5 transition-transform"
-                />
-              </Link>
-            </div>
-          </div>
 
           {/* Header row (spans columns 2 to 5, Row 1 on large screens) */}
           <div className="sm:col-span-2 lg:col-span-4 lg:row-start-1 lg:col-start-2 flex items-center justify-between pb-3 mt-1 mb-2 lg:mb-0">

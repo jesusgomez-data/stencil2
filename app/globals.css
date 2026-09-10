@@ -55,3 +55,17 @@ body::after {
   .text-balance { text-wrap: balance; }
   .border-line { border-color: rgba(255,255,255,0.08); }
 }
+
+@keyframes editorialProgress {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+.animate-editorial-progress {
+  animation: editorialProgress 8000ms linear forwards;
+}
+
