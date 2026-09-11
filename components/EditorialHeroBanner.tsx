@@ -34,7 +34,7 @@ const SLIDES = [
   },
 ]
 
-const SLIDE_DURATION = 8000 // 8 segundos por diapositiva
+const SLIDE_DURATION = 4000 // 4 segundos por diapositiva
 
 export default function EditorialHeroBanner() {
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -57,7 +57,7 @@ export default function EditorialHeroBanner() {
     setCycleKey((k) => k + 1)
   }, [])
 
-  // Auto-rotación de 8 segundos
+  // Auto-rotación de 4 segundos
   useEffect(() => {
     if (isPaused) return
 
@@ -130,8 +130,8 @@ export default function EditorialHeroBanner() {
             animate={{ opacity: 0.68, scale: 1.07 }}
             exit={{ opacity: 0 }}
             transition={{
-              opacity: { duration: 1.4, ease: [0.16, 1, 0.3, 1] },
-              scale: { duration: 8, ease: 'linear' },
+              opacity: { duration: 1.0, ease: [0.16, 1, 0.3, 1] },
+              scale: { duration: 4, ease: 'linear' },
             }}
             className="absolute inset-0"
           >
@@ -190,6 +190,7 @@ export default function EditorialHeroBanner() {
                   className="h-full w-full bg-white rounded-full origin-left animate-editorial-progress"
                   style={{
                     animationPlayState: isPaused ? 'paused' : 'running',
+                    animationDuration: `${SLIDE_DURATION}ms`,
                   }}
                 />
               )}

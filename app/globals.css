@@ -66,6 +66,6 @@ body::after {
 }
 
 .animate-editorial-progress {
-  animation: editorialProgress 8000ms linear forwards;
+  animation: editorialProgress 4000ms linear forwards;
 }
 
