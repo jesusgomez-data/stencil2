@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { Mail, Phone, MapPin, Check, Store, ArrowRight } from 'lucide-react'
@@ -10,25 +11,42 @@ export default function ContactoPage() {
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
 
-  // Distribuidor oficial
+  // Distribuidor oficial B2B
   const [distributorEmail, setDistributorEmail] = useState('')
   const [distributorSent, setDistributorSent] = useState(false)
 
+  const [privacyAccepted, setPrivacyAccepted] = useState(false)
+  const [distributorPrivacyAccepted, setDistributorPrivacyAccepted] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+  const [distributorErrorMessage, setDistributorErrorMessage] = useState('')
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!privacyAccepted) {
+      setErrorMessage('Debes aceptar la Política de Privacidad')
+      return
+    }
     if (email && message) {
+      setErrorMessage('')
       setFormSent(true)
       setEmail('')
       setMessage('')
+      setPrivacyAccepted(false)
       setTimeout(() => setFormSent(false), 3000)
     }
   }
 
   const handleDistributorSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!distributorPrivacyAccepted) {
+      setDistributorErrorMessage('Debes aceptar la Política de Privacidad')
+      return
+    }
     if (distributorEmail) {
+      setDistributorErrorMessage('')
       setDistributorSent(true)
       setDistributorEmail('')
+      setDistributorPrivacyAccepted(false)
       setTimeout(() => setDistributorSent(false), 3000)
     }
   }
@@ -106,6 +124,24 @@ export default function ContactoPage() {
                 />
               </div>
 
+              <div className="flex items-start gap-2.5 pt-1">
+                <input
+                  type="checkbox"
+                  id="contact-privacy"
+                  checked={privacyAccepted}
+                  onChange={(e) => setPrivacyAccepted(e.target.checked)}
+                  className="mt-0.5 w-3.5 h-3.5 rounded border border-white/20 bg-black accent-[#C4822A] cursor-pointer"
+                  required
+                />
+                <label htmlFor="contact-privacy" className="font-code text-[9px] text-white/50 leading-tight uppercase cursor-pointer">
+                  He leído y acepto la <Link href="/privacidad" target="_blank" className="text-white underline hover:text-[#C4822A]">Política de Privacidad</Link>
+                </label>
+              </div>
+
+              {errorMessage && (
+                <p className="font-code text-[9px] text-[#CC0000] uppercase tracking-wider">{errorMessage}</p>
+              )}
+
               <button
                 type="submit"
                 className="w-full bg-white text-black hover:bg-white/80 font-code text-[10px] tracking-[0.2em] py-3.5 rounded-sm font-bold uppercase transition-all flex items-center justify-center gap-2"
@@ -174,6 +210,25 @@ export default function ContactoPage() {
                     required
                   />
                 </div>
+
+                <div className="flex items-start gap-2.5 pt-1">
+                  <input
+                    type="checkbox"
+                    id="distributor-privacy"
+                    checked={distributorPrivacyAccepted}
+                    onChange={(e) => setDistributorPrivacyAccepted(e.target.checked)}
+                    className="mt-0.5 w-3.5 h-3.5 rounded border border-white/20 bg-black accent-[#C4822A] cursor-pointer"
+                    required
+                  />
+                  <label htmlFor="distributor-privacy" className="font-code text-[9px] text-white/50 leading-tight uppercase cursor-pointer">
+                    Acepto la <Link href="/privacidad" target="_blank" className="text-white underline hover:text-[#C4822A]">Política de Privacidad</Link> para el tratamiento comercial de mis datos
+                  </label>
+                </div>
+
+                {distributorErrorMessage && (
+                  <p className="font-code text-[9px] text-[#CC0000] uppercase tracking-wider">{distributorErrorMessage}</p>
+                )}
+
                 <button
                   type="submit"
                   className="w-full bg-[#C4822A] hover:bg-[#d8943f] text-black font-code text-[10px] tracking-[0.2em] py-3.5 rounded-sm font-bold uppercase transition-all flex items-center justify-center gap-2 group"

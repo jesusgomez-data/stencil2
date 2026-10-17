@@ -15,11 +15,18 @@ const HELP_LINKS = [
 ]
 
 const INFO_LINKS = [
-  { label: 'Términos y condiciones', href: '/terminos'   },
-  { label: 'Política de privacidad', href: '/privacidad' },
+  { label: 'Aviso legal',            href: '/aviso-legal'  },
+  { label: 'Términos y condiciones', href: '/terminos'     },
+  { label: 'Política de privacidad', href: '/privacidad'   },
+  { label: 'Política de cookies',    href: '/cookies'      },
 ]
 
 export default function Footer() {
+  const handleOpenCookies = () => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('stencil2_open_cookie_settings'))
+    }
+  }
   return (
     <footer className="bg-black border-t border-white/[0.07]">
 
@@ -61,10 +68,13 @@ export default function Footer() {
                 placeholder="Tu correo electrónico"
                 className="flex-1 bg-white/[0.04] border border-white/15 text-white font-code text-[11px] px-4 py-2.5 placeholder:text-white/20 focus:outline-none focus:border-white/30 transition-colors min-w-0"
               />
-              <button className="bg-white/10 border border-white/20 text-white px-3 py-2.5 hover:bg-white hover:text-black transition-colors flex-shrink-0">
+              <button className="bg-white/10 border border-white/20 text-white px-3 py-2.5 hover:bg-white hover:text-black transition-colors flex-shrink-0" aria-label="Suscribirme">
                 <ArrowRight size={14} />
               </button>
             </div>
+            <p className="font-code text-[8px] text-white/30 leading-tight uppercase">
+              Al suscribirte aceptas nuestra <Link href="/privacidad" className="underline hover:text-white/60">Política de Privacidad</Link> y el envío de comunicaciones comerciales.
+            </p>
           </div>
 
           {/* Ayuda */}
@@ -92,6 +102,15 @@ export default function Footer() {
                   </Link>
                 </div>
               ))}
+              <div>
+                <button
+                  type="button"
+                  onClick={handleOpenCookies}
+                  className="font-code text-[10px] text-white/40 hover:text-[#C4822A] transition-colors uppercase text-left"
+                >
+                  Configurar cookies
+                </button>
+              </div>
             </nav>
           </div>
         </div>

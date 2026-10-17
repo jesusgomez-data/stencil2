@@ -44,7 +44,7 @@ const TRUST_BADGES = [
 const COLLECTION_PRODUCTS = [
   {
     id:              'onyx-black',
-    name:            'IBZEN-SOIRES NAES',
+    name:            'IBSEN SOIRES NAES',
     price:           '29.00',
     frameColor:      '#111111',
     bgColor:         '#030303',
@@ -62,7 +62,7 @@ const COLLECTION_PRODUCTS = [
   },
   {
     id:              'olive-crystal',
-    name:            'MAGMAFLOW',
+    name:            'TROPICAL SMOKE',
     price:           '29.00',
     frameColor:      '#3A5A28',
     bgColor:         '#050505',
@@ -71,13 +71,34 @@ const COLLECTION_PRODUCTS = [
   },
   {
     id:              'smoke-grey',
-    name:            'SMOKE GREY',
+    name:            'SPICE FLER',
     price:           '29.00',
     frameColor:      '#555555',
     bgColor:         '#080808',
     isNew:           false,
     whiteBg:         false,
   },
+]
+
+const MODEL_ALIASES: Record<string, string[]> = {
+  'classic-blue': ['kso-kc', 'kso kc', 'kso', 'kc', 'wayfarer', 'glt6652', 'glt6652-c4', 'azul', 'negro', 'havana', 'verde', 'classic blue'],
+  'onyx-black': ['ibsen', 'ibzen', 'soires', 'naes', 'ibsen soires naes', 'ibzen-soires naes', 'wayfarer', 'glt6642', 'glt6642-c1', 'carey', 'ambar', 'negro', 'onyx black'],
+  'olive-crystal': ['tropical', 'smoke', 'tropical smoke', 'magmaflow', 'magma', 'round', 'redonda', 'glt96153', 'glt96153s-c4', 'habana', 'verde', 'olive crystal'],
+  'smoke-grey': ['spice', 'fler', 'spice fler', 'smoke grey', 'smoke', 'grey', 'gris', 'sport', 'deportiva', 'glt6630', 'glt6630-c3', 'tr90', 'negro', 'smoke grey']
+}
+
+const POPULAR_SEARCH_MODELS = [
+  { label: 'KSO-KC', query: 'KSO-KC' },
+  { label: 'IBZEN-SOIRES NAES', query: 'Ibsen Soires Naes' },
+  { label: 'TROPICAL SMOKE', query: 'Tropical Smoke' },
+  { label: 'SPICE FLER', query: 'Spice Fler' },
+]
+
+const POPULAR_SEARCH_STYLES = [
+  { label: 'WAYFARER', query: 'wayfarer' },
+  { label: 'ROUND', query: 'round' },
+  { label: 'SPORT', query: 'sport' },
+  { label: 'CAREY', query: 'carey' },
 ]
 
 /* ─── HERO ────────────────────────────────────────────────────────── */
@@ -99,6 +120,12 @@ function HeroSection() {
     if (videoRef.current) {
       videoRef.current.playbackRate = 0.5
     }
+    const handleOpenSearch = () => {
+      setActiveTab('buscar')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+    window.addEventListener('stencil2_open_search', handleOpenSearch)
+    return () => window.removeEventListener('stencil2_open_search', handleOpenSearch)
   }, [])
 
   useEffect(() => {
@@ -331,90 +358,220 @@ function HeroSection() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="absolute inset-0 z-20 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-8"
+            className="absolute inset-0 z-20 bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-6 md:p-8"
           >
             {/* Close Button */}
             <button
               onClick={() => setActiveTab('inicio')}
               className="absolute top-6 right-6 text-white/40 hover:text-white transition-colors p-2 focus:outline-none"
+              title="Cerrar búsqueda"
             >
               <X size={20} strokeWidth={1.5} />
             </button>
 
-            <div className="w-full max-w-xl text-left">
-              <span className="font-code text-[8px] tracking-[0.4em] text-[#C4822A] uppercase block mb-3">
-                BÚSQUEDA EN EL CATÁLOGO
-              </span>
-              <div className="relative border-b border-white/20 pb-2 flex items-center">
-                <Search size={18} className="text-white/40 mr-3" />
+            <div className="w-full max-w-2xl text-left">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-code text-[8px] tracking-[0.4em] text-[#C4822A] uppercase block font-bold">
+                  BÚSQUEDA EN EL CATÁLOGO OFICIAL
+                </span>
+                <span className="font-code text-[8px] tracking-wider text-white/30 uppercase">
+                  STENCIL2 · 4 MODELOS
+                </span>
+              </div>
+
+              <div className="relative border-b border-white/20 pb-2.5 flex items-center">
+                <Search size={18} className="text-white/40 mr-3 flex-shrink-0" />
                 <input
                   type="text"
-                  placeholder="ESCRIBE PARA BUSCAR..."
+                  placeholder="ESCRIBE PARA BUSCAR (EJ. KSO-KC, TROPICAL, WAYFARER)..."
                   autoFocus
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-transparent border-none text-white font-code text-base tracking-widest focus:outline-none w-full uppercase"
+                  className="bg-transparent border-none text-white font-code text-sm md:text-base tracking-widest focus:outline-none w-full uppercase placeholder:text-white/25"
                 />
                 {searchQuery && (
-                  <button onClick={() => setSearchQuery('')} className="text-white/40 hover:text-white p-1 focus:outline-none">
-                    <X size={14} />
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="text-white/40 hover:text-white p-1 focus:outline-none ml-2"
+                    title="Borrar búsqueda"
+                  >
+                    <X size={15} />
                   </button>
                 )}
               </div>
 
-              {/* Results */}
-              <div className="mt-8 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+              {/* Results & Quick Discovery Container */}
+              <div className="mt-6 max-h-[55vh] overflow-y-auto pr-2 custom-scrollbar">
                 {searchQuery ? (
                   (() => {
-                    const filtered = PRODUCTS.filter(p =>
-                      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      p.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      p.model.toLowerCase().includes(searchQuery.toLowerCase())
-                    )
+                    const qNormalized = searchQuery
+                      .toLowerCase()
+                      .normalize('NFD')
+                      .replace(/[\u0300-\u036f]/g, '')
+                      .replace(/[-_]/g, ' ')
+                      .trim()
+                    const qWords = qNormalized.split(/\s+/).filter(Boolean)
+
+                    const filtered = PRODUCTS.filter((p) => {
+                      const name = p.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[-_]/g, ' ')
+                      const code = p.code.toLowerCase().replace(/[-_]/g, ' ')
+                      const model = p.model.toLowerCase()
+                      const slug = p.slug.toLowerCase().replace(/[-_]/g, ' ')
+                      const material = (p.material || '').toLowerCase()
+                      const colors = p.colors.map((c) => c.label.toLowerCase()).join(' ')
+                      const aliases = (MODEL_ALIASES[p.id] || []).join(' ').toLowerCase()
+
+                      const searchable = `${name} ${code} ${model} ${slug} ${material} ${colors} ${aliases}`
+                      return qWords.every((word) => searchable.includes(word))
+                    })
+
                     if (filtered.length > 0) {
                       return (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {filtered.map(p => (
-                            <Link
-                              key={p.id}
-                              href={`/producto/${p.slug}`}
-                              className="flex items-center gap-4 bg-white/[0.03] border border-white/[0.06] p-3 rounded-lg hover:border-white/20 hover:bg-white/[0.05] transition-all group"
-                            >
-                              <div className="relative w-16 h-16 bg-[#121212] rounded-md overflow-hidden flex items-center justify-center p-2 flex-shrink-0">
-                                <Image src={p.image} alt={p.name} fill className="object-contain p-1 group-hover:scale-110 transition-transform" />
-                              </div>
-                              <div>
-                                <p className="font-code text-[8px] tracking-widest text-white/40 uppercase leading-none mb-1">{p.code}</p>
-                                <h4 className="font-code text-[11px] tracking-wider text-white uppercase font-bold leading-none mb-1">{p.name}</h4>
-                                <p className="font-display text-[12px] text-[#C4822A] font-bold">{p.price.toFixed(2)} EUR</p>
-                              </div>
-                            </Link>
-                          ))}
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between text-[9px] font-code text-white/40 uppercase">
+                            <span>{filtered.length} {filtered.length === 1 ? 'MODELO ENCONTRADO' : 'MODELOS ENCONTRADOS'}</span>
+                            <span className="text-[#C4822A]">COLECCIÓN OFICIAL</span>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            {filtered.map((p) => (
+                              <Link
+                                key={p.id}
+                                href={`/producto/${p.slug}`}
+                                className="flex items-center gap-3.5 bg-white/[0.03] border border-white/[0.08] hover:border-[#C4822A]/50 p-3 rounded-xl hover:bg-white/[0.06] transition-all group"
+                              >
+                                <div className="relative w-16 h-16 bg-[#121212] rounded-lg overflow-hidden flex items-center justify-center p-2 flex-shrink-0 border border-white/[0.05]">
+                                  <Image
+                                    src={p.image}
+                                    alt={p.name}
+                                    fill
+                                    className="object-contain p-1 group-hover:scale-110 transition-transform duration-300"
+                                  />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-1.5 mb-1">
+                                    <span className="font-code text-[8px] tracking-wider text-[#C4822A] uppercase font-bold">
+                                      {p.model}
+                                    </span>
+                                    <span className="text-white/20 text-[8px]">·</span>
+                                    <span className="font-code text-[8px] tracking-wider text-white/40 uppercase truncate">
+                                      {p.code}
+                                    </span>
+                                  </div>
+                                  <h4 className="font-code text-xs tracking-wider text-white uppercase font-bold truncate group-hover:text-white transition-colors">
+                                    {p.name}
+                                  </h4>
+                                  <div className="flex items-center justify-between mt-1.5">
+                                    <span className="font-display text-xs text-white/90 font-bold">
+                                      {p.price.toFixed(2)} EUR
+                                    </span>
+                                    <span className="font-code text-[8px] text-white/30 uppercase group-hover:text-white group-hover:translate-x-0.5 transition-all">
+                                      VER MODELO →
+                                    </span>
+                                  </div>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
                         </div>
                       )
                     } else {
                       return (
-                        <p className="font-code text-xs text-white/30 uppercase text-center py-8">
-                          No se encontraron resultados para &quot;{searchQuery}&quot;
-                        </p>
+                        <div className="text-center py-8 space-y-4">
+                          <p className="font-code text-xs text-white/40 uppercase">
+                            No se encontraron resultados para &quot;{searchQuery}&quot;
+                          </p>
+                          <p className="font-code text-[9px] text-[#C4822A] uppercase tracking-wider">
+                            PRUEBA A BUSCAR POR NUESTROS MODELOS DISPONIBLES:
+                          </p>
+                          <div className="flex flex-wrap gap-2 justify-center pt-1">
+                            {POPULAR_SEARCH_MODELS.map(({ label, query }) => (
+                              <button
+                                key={label}
+                                onClick={() => setSearchQuery(query)}
+                                className="font-code text-[9px] tracking-widest px-3.5 py-2 border border-white/15 rounded-full text-white/70 hover:text-white hover:border-[#C4822A] hover:bg-white/[0.05] transition-all uppercase"
+                              >
+                                {label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       )
                     }
                   })()
                 ) : (
-                  <div>
-                    <p className="font-code text-[9px] tracking-[0.2em] text-white/30 uppercase mb-4">
-                      BÚSQUEDAS POPULARES
-                    </p>
-                    <div className="flex flex-wrap gap-2.5">
-                      {['KSO-KC', 'IBZEN-SOIRES NAES', 'MAGMAFLOW', 'SMOKE GREY'].map(term => (
-                        <button
-                          key={term}
-                          onClick={() => setSearchQuery(term)}
-                          className="font-code text-[9px] tracking-widest px-4 py-2.5 border border-white/10 rounded-full text-white/40 hover:text-white hover:border-white/30 transition-all bg-white/[0.01] focus:outline-none"
-                        >
-                          {term}
-                        </button>
-                      ))}
+                  /* Initial State: Popular searches & Quick models catalog */
+                  <div className="space-y-6">
+                    {/* Model Pills */}
+                    <div>
+                      <p className="font-code text-[9px] tracking-[0.25em] text-white/40 uppercase mb-3">
+                        BÚSQUEDAS POPULARES · MODELOS
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {POPULAR_SEARCH_MODELS.map(({ label, query }) => (
+                          <button
+                            key={label}
+                            onClick={() => setSearchQuery(query)}
+                            className="font-code text-[9px] tracking-widest px-4 py-2 border border-white/10 rounded-full text-white/60 hover:text-white hover:border-[#C4822A]/60 hover:bg-[#C4822A]/10 transition-all bg-white/[0.01] focus:outline-none uppercase"
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Styles Pills */}
+                    <div>
+                      <p className="font-code text-[9px] tracking-[0.25em] text-white/30 uppercase mb-3">
+                        FILTRAR POR ESTILO
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {POPULAR_SEARCH_STYLES.map(({ label, query }) => (
+                          <button
+                            key={label}
+                            onClick={() => setSearchQuery(query)}
+                            className="font-code text-[9px] tracking-widest px-3.5 py-1.5 border border-white/10 rounded-full text-white/40 hover:text-white hover:border-white/30 transition-all bg-white/[0.01] focus:outline-none uppercase"
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Quick Catalog Overview */}
+                    <div className="pt-2 border-t border-white/[0.06]">
+                      <p className="font-code text-[9px] tracking-[0.25em] text-[#C4822A] uppercase mb-3 font-semibold">
+                        CATÁLOGO ACTUAL EN LA WEB ({PRODUCTS.length} MODELOS)
+                      </p>
+                      <div className="grid grid-cols-2 gap-2.5">
+                        {PRODUCTS.map((p) => (
+                          <Link
+                            key={p.id}
+                            href={`/producto/${p.slug}`}
+                            className="flex items-center gap-3 bg-white/[0.02] border border-white/[0.06] hover:border-white/20 p-2.5 rounded-lg hover:bg-white/[0.04] transition-all group"
+                          >
+                            <div className="relative w-12 h-12 bg-black/60 rounded-md overflow-hidden flex items-center justify-center p-1 flex-shrink-0">
+                              <Image
+                                src={p.image}
+                                alt={p.name}
+                                fill
+                                className="object-contain p-0.5 group-hover:scale-110 transition-transform"
+                              />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-code text-[8px] text-[#C4822A] tracking-wider uppercase leading-none mb-1">
+                                {p.model}
+                              </p>
+                              <h5 className="font-code text-[10px] text-white font-bold tracking-wide uppercase truncate leading-tight">
+                                {p.name}
+                              </h5>
+                              <p className="font-code text-[8px] text-white/40 uppercase mt-0.5">
+                                {p.code}
+                              </p>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}

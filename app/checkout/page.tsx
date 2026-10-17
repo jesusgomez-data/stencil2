@@ -25,6 +25,7 @@ export default function CheckoutPage() {
   const [formCity, setFormCity] = useState('')
   const [formPostalCode, setFormPostalCode] = useState('')
   const [formPhone, setFormPhone] = useState('')
+  const [formAcceptTerms, setFormAcceptTerms] = useState(false)
   const [formErrors, setFormErrors] = useState<Record<string, string>>({})
 
   // Stripe Integration States
@@ -52,6 +53,7 @@ export default function CheckoutPage() {
     if (!formCity.trim()) errors.city = 'La ciudad es obligatoria'
     if (!/^\d{5}$/.test(formPostalCode)) errors.postalCode = 'Código postal debe ser de 5 dígitos'
     if (!/^\+?\d{9,12}$/.test(formPhone.replace(/\s/g, ''))) errors.phone = 'Teléfono inválido'
+    if (!formAcceptTerms) errors.terms = 'Debes aceptar los Términos y la Política de Privacidad'
 
     setFormErrors(errors)
     return Object.keys(errors).length === 0
@@ -382,6 +384,31 @@ export default function CheckoutPage() {
                       className={`w-full bg-black border ${formErrors.phone ? 'border-[#CC0000]' : 'border-white/15'} text-white font-code text-[10px] tracking-widest px-4 py-3 focus:outline-none focus:border-white/30 transition-colors rounded-sm`}
                     />
                     {formErrors.phone && <p className="font-code text-[8px] text-[#CC0000] uppercase mt-1.5">{formErrors.phone}</p>}
+                  </div>
+
+                  <div className="pt-2">
+                    <label className="flex items-start gap-2.5 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formAcceptTerms}
+                        onChange={(e) => setFormAcceptTerms(e.target.checked)}
+                        className="mt-0.5 w-3.5 h-3.5 rounded border border-white/20 bg-black accent-[#C4822A] cursor-pointer"
+                        required
+                      />
+                      <span className="font-code text-[9px] text-white/50 leading-tight uppercase select-none">
+                        He leído y acepto los{' '}
+                        <Link href="/terminos" target="_blank" className="text-white underline hover:text-[#C4822A]">
+                          Términos y Condiciones
+                        </Link>{' '}
+                        y la{' '}
+                        <Link href="/privacidad" target="_blank" className="text-white underline hover:text-[#C4822A]">
+                          Política de Privacidad
+                        </Link>
+                      </span>
+                    </label>
+                    {formErrors.terms && (
+                      <p className="font-code text-[8px] text-[#CC0000] uppercase mt-1.5">{formErrors.terms}</p>
+                    )}
                   </div>
 
                   <div className="pt-4 border-t border-white/[0.05]">

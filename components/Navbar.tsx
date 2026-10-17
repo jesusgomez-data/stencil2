@@ -70,6 +70,14 @@ export default function Navbar() {
     }
   }, [menuOpen])
 
+  const handleSearchClick = () => {
+    if (pathname === '/') {
+      window.dispatchEvent(new CustomEvent('stencil2_open_search'))
+    } else {
+      window.location.href = '/tienda'
+    }
+  }
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-black border-b border-white/[0.05]">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
@@ -116,7 +124,11 @@ export default function Navbar() {
 
           {/* Icons — RIGHT */}
           <div className="flex items-center gap-4.5 z-50">
-            <button aria-label="Buscar" className="text-white/40 hover:text-white hover:scale-105 transition-all p-1.5 group">
+            <button
+              onClick={handleSearchClick}
+              aria-label="Buscar en el catálogo"
+              className="text-white/40 hover:text-white hover:scale-105 transition-all p-1.5 group"
+            >
               <SearchIcon />
             </button>
 

@@ -4,6 +4,7 @@ import './globals.css'
 import { CartProvider } from '@/context/CartContext'
 import { Analytics } from '@vercel/analytics/react'
 import Script from 'next/script'
+import CookieBanner from '@/components/CookieBanner'
 
 const playfairDisplay = Playfair_Display({
   subsets: ['latin'],
@@ -106,6 +107,7 @@ export default function RootLayout({
         </Script>
         <CartProvider>
           {children}
+          <CookieBanner />
         </CartProvider>
         <Analytics />
       </body>
