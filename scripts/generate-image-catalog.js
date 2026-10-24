@@ -19,7 +19,7 @@ const OUTPUT = path.join(IMAGES_DIR, 'image-catalog.json')
 // Nomenclatura: letra (1) + número OPCIONAL (2) + extensión
 //   A1.png, A2.png, A10.png  -> tomas numeradas
 //   x.png                     -> toma única (letra sin número) → se trata como número 0/1
-const FILE_RE = /^([a-zA-Z])(\d*)\.(png|jpe?g|webp)$/i
+const FILE_RE = /^([a-zA-Z])(\d*)\.(png|jpe?g|webp|mp4)$/i
 
 /**
  * Orden natural: compara el número de la toma como entero, no como texto.

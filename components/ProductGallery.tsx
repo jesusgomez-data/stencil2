@@ -95,9 +95,11 @@ export default function ProductGallery({
     touchX.current = null
   }
 
-  if (!open || !mounted) return null
+  if (!open || !mounted || !images || images.length === 0) return null
 
-  const current = images[index]
+  const safeIndex = Math.min(Math.max(0, index), images.length - 1)
+  const current = images[safeIndex]
+  if (!current) return null
   const label = getShotLabel(current)
 
   return createPortal(
@@ -186,7 +188,7 @@ export default function ProductGallery({
         </AnimatePresence>
 
         {/* Flechas — nunca salen del modelo (ocultas en los extremos) */}
-        {index > 0 && (
+        {safeIndex > 0 && (
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); prev() }}
@@ -196,7 +198,7 @@ export default function ProductGallery({
             <ChevronLeft size={20} strokeWidth={1.5} />
           </button>
         )}
-        {index < total - 1 && (
+        {safeIndex < total - 1 && (
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); next() }}
@@ -218,7 +220,7 @@ export default function ProductGallery({
             style={{ scrollbarWidth: 'thin' }}
           >
             {images.map((img, i) => {
-              const active = i === index
+              const active = i === safeIndex
               return (
                 <button
                   key={img}

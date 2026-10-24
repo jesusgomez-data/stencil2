@@ -34,14 +34,16 @@ export function getModelMainImage(letter: string): string {
 }
 
 /** Devuelve la letra de un archivo de imagen (p. ej. "a01.png" → "A"). */
-export function getLetterFromFile(file: string): string {
+export function getLetterFromFile(file?: string): string {
+  if (!file || typeof file !== 'string') return ''
   const base = file.split('/').pop() ?? file
   const m = base.match(/^([a-zA-Z])/)
   return m ? m[1].toUpperCase() : ''
 }
 
 /** Devuelve el número de toma de un archivo (p. ej. "a02.png" → 2, "x.png" → 0). */
-export function getShotNumberFromFile(file: string): number {
+export function getShotNumberFromFile(file?: string): number {
+  if (!file || typeof file !== 'string') return 0
   const base = file.split('/').pop() ?? file
   const m = base.match(/^[a-zA-Z](\d*)\./i)
   if (!m) return 0
@@ -49,7 +51,8 @@ export function getShotNumberFromFile(file: string): number {
 }
 
 /** Etiqueta legible de una toma (p. ej. "/a01.png" → "A1", "/x.png" → "X"). */
-export function getShotLabel(file: string): string {
+export function getShotLabel(file?: string): string {
+  if (!file || typeof file !== 'string') return ''
   const letter = getLetterFromFile(file)
   const num = getShotNumberFromFile(file)
   return num === 0 ? letter : `${letter}${num}`
