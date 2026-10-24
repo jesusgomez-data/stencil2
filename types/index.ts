@@ -11,6 +11,8 @@ export interface Product {
   code: string
   name: string
   price: number
+  /** Precio anterior tachado. Si existe y es mayor que `price`, se muestra la promo. */
+  compareAtPrice?: number
   gender: 'men' | 'women' | 'unisex'
   model: GlassesModel
   slug: string

@@ -10,6 +10,8 @@ export interface ShareButtonProps {
   title: string
   url: string
   className?: string
+  /** Dirección en la que se despliega el menú: 'up' (por defecto) o 'down' si el botón está arriba. */
+  menuPlacement?: 'up' | 'down'
 }
 
 interface ShareOption {
@@ -28,7 +30,7 @@ interface ShareOption {
  * - Si no está disponible, despliega un menú minimalista con los enlaces
  *   directos a cada plataforma + "copiar enlace".
  */
-export default function ShareButton({ title, url, className = '' }: ShareButtonProps) {
+export default function ShareButton({ title, url, className = '', menuPlacement = 'up' }: ShareButtonProps) {
   const [open, setOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -108,7 +110,7 @@ export default function ShareButton({ title, url, className = '' }: ShareButtonP
       {/* Menú de plataformas */}
       {open && (
         <div
-          className="absolute bottom-9 right-0 z-[80] w-[210px] rounded-2xl border border-white/[0.08] bg-[#0a0a0a]/95 backdrop-blur-xl shadow-2xl shadow-black/60 p-2"
+          className={`absolute ${menuPlacement === 'down' ? 'top-9' : 'bottom-9'} right-0 z-[80] w-[210px] rounded-2xl border border-white/[0.08] bg-[#0a0a0a]/95 backdrop-blur-xl shadow-2xl shadow-black/60 p-2`}
           onClick={(e) => e.stopPropagation()}
         >
           <p className="font-code text-[7px] tracking-[0.3em] text-white/30 uppercase px-3 pt-1.5 pb-2">

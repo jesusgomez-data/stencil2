@@ -4,11 +4,12 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   ArrowRight, Truck, Shield, Award, Headphones,
   ChevronLeft, ChevronRight, Plus, ChevronUp, ChevronDown,
   Home, Search, Compass, LayoutGrid, Play, AlignJustify, Grid3x3,
-  Volume2, VolumeX, Pause, X, Maximize2, Check
+  Volume2, VolumeX, Pause, X, Maximize2, Check, ShoppingBag
 } from 'lucide-react'
 
 import Navbar from '@/components/Navbar'
@@ -17,7 +18,7 @@ import Viewer3D, { FRAME_COLORS } from '@/components/Viewer3D'
 import ProductGallery from '@/components/ProductGallery'
 import ShareButton from '@/components/ShareButton'
 import FavoriteButton from '@/components/FavoriteButton'
-import { PRODUCTS } from '@/lib/products'
+import { PRODUCTS, getSavingsPercent } from '@/lib/products'
 import { useCart } from '@/context/CartContext'
 import IntroAnimation from '@/components/IntroAnimation'
 import EditorialHeroBanner from '@/components/EditorialHeroBanner'
@@ -45,7 +46,7 @@ const COLLECTION_PRODUCTS = [
   {
     id:              'onyx-black',
     name:            'IBSEN SOIRES NAES',
-    price:           '29.00',
+    price:           '49.00',
     frameColor:      '#111111',
     bgColor:         '#030303',
     isNew:           false,
@@ -54,7 +55,7 @@ const COLLECTION_PRODUCTS = [
   {
     id:              'classic-blue',
     name:            'KSO-KC',
-    price:           '29.00',
+    price:           '49.00',
     frameColor:      '#C4822A',
     bgColor:         '#040404',
     isNew:           false,
@@ -63,7 +64,7 @@ const COLLECTION_PRODUCTS = [
   {
     id:              'olive-crystal',
     name:            'TROPICAL SMOKE',
-    price:           '29.00',
+    price:           '39.00',
     frameColor:      '#3A5A28',
     bgColor:         '#050505',
     isNew:           false,
@@ -72,7 +73,7 @@ const COLLECTION_PRODUCTS = [
   {
     id:              'smoke-grey',
     name:            'SPICE FLER',
-    price:           '29.00',
+    price:           '39.00',
     frameColor:      '#555555',
     bgColor:         '#080808',
     isNew:           false,
@@ -189,7 +190,7 @@ function HeroSection() {
   }
 
   return (
-    <section className="w-full h-[52vh] md:h-[65vh] lg:h-screen bg-black flex overflow-hidden relative">
+    <section className="w-full h-[52vh] md:h-[65vh] lg:h-[calc(100vh-74px)] min-[1100px]:h-[calc(100vh-65px)] lg:min-h-[520px] bg-black flex overflow-hidden relative">
 
       {/* ── LEFT SIDEBAR — columna sólida negra ── */}
       <div
@@ -657,19 +658,6 @@ function HeroSection() {
             <ChevronUp size={13} strokeWidth={1.5} />
           </button>
           
-          <div className="flex flex-col items-center gap-[3px] py-1">
-            <div style={{ width: '1px', height: '28px', background: 'rgba(255,255,255,0.10)' }} />
-            <div
-              style={{
-                width: '7px', height: '7px', borderRadius: '50%',
-                background: '#C4822A',
-                boxShadow: '0 0 6px rgba(196,130,42,0.7)',
-              }}
-              title={activeTab === 'explorar' ? `Vista 3D: ${active3dView}` : 'Sección Activa'}
-            />
-            <div style={{ width: '1px', height: '28px', background: 'rgba(255,255,255,0.10)' }} />
-          </div>
-
           <button
             onClick={() => handleRightSidebarChevron('down')}
             className="text-white/25 hover:text-white/60 transition-colors p-1 focus:outline-none"
@@ -867,6 +855,7 @@ function CollectionsSection() {
   } | null>(null)
   const [addedId, setAddedId] = useState<string | null>(null)
   const { addToCart } = useCart()
+  const router = useRouter()
 
   useEffect(() => {
     if (galleryProduct) {
@@ -903,14 +892,14 @@ function CollectionsSection() {
     <section id="collections-section" className="bg-black pt-10 pb-14">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
 
-        <div id="featured-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div id="featured-grid" className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
 
           {/* Editorial banner animado (Column 1, spans both rows on large screens) */}
           <EditorialHeroBanner />
 
 
           {/* Header row (spans columns 2 to 5, Row 1 on large screens) */}
-          <div className="sm:col-span-2 lg:col-span-4 lg:row-start-1 lg:col-start-2 flex items-center justify-between pb-3 mt-1 mb-2 lg:mb-0">
+          <div className="sm:col-span-2 xl:col-span-4 xl:row-start-1 xl:col-start-2 flex items-center justify-between pb-3 mt-1 mb-2 xl:mb-0">
             <h3 className="font-code text-[10px] tracking-[0.28em] text-white/42 uppercase">
               COLECCIONES DESTACADAS
             </h3>
@@ -932,13 +921,15 @@ function CollectionsSection() {
             const letter = product?.letter ?? ''
             const code = product?.code ?? ''
             const isThisAdded = addedId === p.id
+            const compareAtPrice = product?.compareAtPrice
+            const savings = getSavingsPercent(parseFloat(p.price), compareAtPrice)
 
             return (
               <Link
                 key={p.id}
                 href={`/producto/${product?.slug || p.id}`}
                 style={{ background: p.bgColor }}
-                className="relative flex flex-col text-left overflow-hidden rounded-2xl transition-all duration-300 lg:h-[390px] aspect-[3/4] lg:aspect-auto group border border-white/[0.06] hover:border-white/20 hover:shadow-2xl"
+                className="relative flex flex-col text-left overflow-hidden rounded-2xl transition-all duration-300 aspect-[3/4] sm:aspect-auto sm:h-[460px] group border border-white/[0.06] hover:border-white/20 hover:shadow-2xl"
               >
                 {p.isNew && (
                   <span
@@ -980,60 +971,84 @@ function CollectionsSection() {
                     )}
                   </div>
 
-                  {/* Expand hint icon */}
-                  <div className="absolute top-3 right-3 z-20 w-7 h-7 rounded-full bg-black/40 border border-white/20 text-white/70 flex items-center justify-center">
-                    <Maximize2 size={11} strokeWidth={2} />
-                  </div>
-
-                  {/* Like button — arriba a la izquierda */}
-                  <div className="absolute top-3 left-3 z-30">
+                  {/* Barra superior: favorito, nombre y acciones pequeñas */}
+                  <div className="absolute top-3 left-3 right-3 z-30 flex items-start justify-between gap-2">
                     <FavoriteButton slug={product?.slug || p.id} />
-                  </div>
-
-                  {/* Name tag replacing Model letter tag */}
-                  {letter && (
-                    <div className="absolute top-12 left-3 z-20">
-                      <span className="font-code text-[10px] font-bold tracking-[0.2em] text-white/90 uppercase drop-shadow-md">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="font-code text-[10px] font-bold tracking-[0.16em] text-white uppercase leading-tight text-right drop-shadow-md">
                         {p.name}
                       </span>
+                      <div
+                        title="Ver en 360°"
+                        className="w-7 h-7 rounded-full border border-white/20 bg-black/40 text-white/70 flex items-center justify-center flex-shrink-0"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
+                      </div>
+                      <ShareButton
+                        title={`${product?.name ?? p.name} — STENCIL2`}
+                        url={`${typeof window !== 'undefined' ? window.location.origin : ''}/producto/${product?.slug || p.id}`}
+                        menuPlacement="down"
+                      />
                     </div>
-                  )}
+                  </div>
+
+                  {/* Promo y ampliar, en la misma fila */}
+                  <div className="absolute top-16 left-4 right-3 z-20 flex items-center justify-between pointer-events-none">
+                    {savings !== null ? (
+                      <span className="font-code text-[9px] tracking-[0.2em] text-white/90 uppercase drop-shadow-md">
+                        TE AHORRAS {savings}%
+                      </span>
+                    ) : <span />}
+                    <div className="w-7 h-7 rounded-full bg-black/40 border border-white/20 text-white/70 flex items-center justify-center">
+                      <Maximize2 size={11} strokeWidth={2} />
+                    </div>
+                  </div>
                 </div>
 
-                {/* Details Footer */}
+                {/* Pie: precio con IVA y botones en la misma fila; envío a todo el ancho */}
                 <div
                   style={{ background: p.bgColor }}
-                  className="flex items-center justify-between px-5 pb-5 w-full pt-3 border-t border-white/[0.04] z-10"
+                  className="relative z-10 flex flex-col gap-2.5 w-full px-4 pb-4 pt-3 border-t border-white/[0.04]"
                 >
-                  <div>
-                    <p className="font-display text-[13px] font-bold text-white mt-1">
-                      {p.price} <span className="font-code text-[8px] font-normal tracking-widest text-white/40">EUR</span>
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    {/* 3D View Link Button */}
-                    <div
-                      title="Ver en 360°"
-                      className="w-7 h-7 rounded-full border border-white/[0.12] text-white/40 hover:border-white/60 hover:text-white hover:bg-white/10 flex items-center justify-center flex-shrink-0 transition-all"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0 flex flex-col gap-1.5">
+                      <p className="font-display text-lg font-bold text-white leading-none">{p.price}</p>
+                      <p className="font-code text-[11px] text-white/35 line-through leading-none h-[11px]">
+                        {compareAtPrice ? compareAtPrice.toFixed(2) : ''}
+                      </p>
                     </div>
 
-                    <ShareButton
-                      title={`${product?.name ?? p.name} — STENCIL2`}
-                      url={`${typeof window !== 'undefined' ? window.location.origin : ''}/producto/${product?.slug || p.id}`}
-                    />
-                    <button
-                      onClick={(e) => handleQuickAddCollection(e, p)}
-                      title="Añadir al carrito"
-                      className={`w-7 h-7 rounded-full border flex items-center justify-center flex-shrink-0 transition-all ${
-                        isThisAdded
-                          ? 'bg-[#1C3B1C] border-[#2c5c2c] text-white scale-110'
-                          : 'border-white/[0.12] text-white/40 hover:border-white/60 hover:text-white hover:bg-white/10'
-                      }`}
-                    >
-                      {isThisAdded ? <Check size={11} strokeWidth={2.5} /> : <Plus size={11} strokeWidth={2.2} />}
-                    </button>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <button
+                        type="button"
+                        onClick={(e) => handleQuickAddCollection(e, p)}
+                        title="Añadir al carrito"
+                        aria-label="Añadir al carrito"
+                        className={`w-10 h-10 rounded-sm border flex items-center justify-center transition-colors duration-300 ${
+                          isThisAdded
+                            ? 'border-[#2c5c2c] text-white'
+                            : 'border-white/30 text-white/80 hover:border-white hover:text-white'
+                        }`}
+                      >
+                        {isThisAdded ? <Check size={14} strokeWidth={2.5} /> : <ShoppingBag size={14} strokeWidth={1.6} />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          handleQuickAddCollection(e, p)
+                          router.push('/carrito')
+                        }}
+                        className="inline-flex items-center gap-1.5 h-10 px-3 rounded-sm bg-black border border-white/40 text-white font-code text-[9px] font-bold tracking-[0.14em] uppercase transition-colors duration-300 group-hover:bg-white group-hover:text-black group-hover:border-white"
+                      >
+                        COMPRAR
+                        <ArrowRight size={12} strokeWidth={2.2} className="transition-transform duration-300 group-hover:translate-x-0.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-0.5">
+                    <p className="font-code text-[9px] tracking-wider text-white/50 leading-snug">EUR · IVA incluido</p>
+                    <p className="font-code text-[9px] tracking-wider text-white font-bold leading-snug">Envío gratis en tu primer pedido</p>
                   </div>
                 </div>
               </Link>

@@ -23,6 +23,7 @@ interface ProductSeed {
   code: string
   name: string
   price: number
+  compareAtPrice?: number
   gender: 'men' | 'women' | 'unisex'
   model: GlassesModel
   slug: string
@@ -50,7 +51,8 @@ const SEEDS: ProductSeed[] = [
     letter: 'B',
     code: 'GLT6642-C1',
     name: 'Ibsen Soires Naes',
-    price: 1.00,
+    price: 49.00,
+    compareAtPrice: 59.00,
     gender: 'unisex',
     model: 'wayfarer',
     slug: 'ibsen-soires-naes',
@@ -75,7 +77,7 @@ const SEEDS: ProductSeed[] = [
     letter: 'A',
     code: 'GLT6652-C4',
     name: 'Kso -KC',
-    price: 1.00,
+    price: 49.00,
     gender: 'unisex',
     model: 'wayfarer',
     slug: 'kso-kc',
@@ -101,7 +103,7 @@ const SEEDS: ProductSeed[] = [
     letter: 'C',
     code: 'GLT96153S-C4',
     name: 'Tropical Smoke',
-    price: 1.00,
+    price: 39.00,
     gender: 'unisex',
     model: 'round',
     slug: 'tropical-smoke',
@@ -126,7 +128,7 @@ const SEEDS: ProductSeed[] = [
     letter: 'D',
     code: 'GLT6630-C3',
     name: 'Spice Fler',
-    price: 1.00,
+    price: 39.00,
     gender: 'unisex',
     model: 'sport',
     slug: 'spice-fler',
@@ -174,6 +176,7 @@ function buildProduct(seed: ProductSeed): Product {
     code: seed.code,
     name: seed.name,
     price: seed.price,
+    compareAtPrice: seed.compareAtPrice,
     gender: seed.gender,
     model: seed.model,
     slug: seed.slug,
@@ -205,6 +208,12 @@ export function getProductBySlug(slug: string): Product | undefined {
 /** Busca un producto por su ID. */
 export function getProductById(id: string): Product | undefined {
   return PRODUCTS.find((p) => p.id === id)
+}
+
+/** Porcentaje de ahorro frente al precio anterior, o null si no hay promo. */
+export function getSavingsPercent(price: number, compareAtPrice?: number): number | null {
+  if (!compareAtPrice || compareAtPrice <= price) return null
+  return Math.round((1 - price / compareAtPrice) * 100)
 }
 
 /** Devuelve los productos destacados para la home. */
