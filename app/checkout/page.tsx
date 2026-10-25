@@ -576,14 +576,14 @@ export default function CheckoutPage() {
                 {cartItems.map((item) => (
                   <div key={`${item.id}-${item.color}`} className="flex justify-between items-center text-left gap-4">
                     <div>
-                      <p className="font-display text-xs font-semibold text-white uppercase tracking-wide">
+                      <p className="font-bebas text-sm tracking-wide text-white uppercase">
                         {item.name} <span className="font-code text-[9px] text-white/30 lowercase">x{item.quantity}</span>
                       </p>
                       <span className="font-code text-[8px] text-[#C4822A] uppercase block">
                         COLOR: {item.colorLabel}
                       </span>
                     </div>
-                    <span className="font-display text-xs text-white/80 font-bold whitespace-nowrap">
+                    <span className="font-bebas text-sm tracking-wide text-white/90 whitespace-nowrap">
                       {(item.price * item.quantity).toFixed(2)} EUR
                     </span>
                   </div>
@@ -618,7 +618,7 @@ export default function CheckoutPage() {
               <div className="border-t border-white/[0.06] pt-4 flex justify-between items-baseline">
                 <span className="font-code text-xs text-white uppercase font-bold">TOTAL COMPRA</span>
                 <div className="text-right">
-                  <span className="font-display text-xl font-bold text-white block">
+                  <span className="font-bebas text-2xl tracking-wide text-white block">
                     {total.toFixed(2)} EUR
                   </span>
                   <span className="font-code text-[7px] tracking-wider text-white/30 block uppercase mt-0.5">

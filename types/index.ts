@@ -10,6 +10,7 @@ export interface Product {
   letter: string
   code: string
   name: string
+  subtitle?: string
   price: number
   /** Precio anterior tachado. Si existe y es mayor que `price`, se muestra la promo. */
   compareAtPrice?: number

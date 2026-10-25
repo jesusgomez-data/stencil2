@@ -142,8 +142,13 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
             {/* Title & Price */}
             <div className="border-b border-white/[0.08] pb-6 mb-6">
               <h1 className="font-bebas text-5xl tracking-wide text-white mb-2 leading-none uppercase">{product.name}</h1>
+              {product.subtitle && (
+                <p className="font-code text-[10px] tracking-[0.2em] text-[#ff4d4d] font-bold uppercase mb-2">
+                  {product.subtitle}
+                </p>
+              )}
               <div className="flex items-baseline gap-2 mt-1">
-                <span className="font-display text-2xl font-bold text-white">{product.price.toFixed(2)}</span>
+                <span className="font-bebas text-3xl tracking-wide text-white">{product.price.toFixed(2)}</span>
                 <span className="font-code text-[10px] tracking-widest text-white/40">EUR</span>
                 <span className="font-code text-[8px] tracking-wider text-white/20 ml-2 uppercase">IVA Incluido</span>
               </div>

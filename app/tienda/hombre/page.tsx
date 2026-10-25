@@ -139,6 +139,7 @@ export default function TiendaHombrePage() {
                   code={p.code}
                   letter={p.letter}
                   name={p.name}
+                  subtitle={p.subtitle}
                   price={p.price.toFixed(2)}
                   gender={p.gender.toUpperCase() as 'MEN' | 'WOMEN' | 'UNISEX'}
                   model={p.model}

@@ -136,7 +136,7 @@ export default function CarritoPage() {
                           <span className="font-code text-[9px] tracking-widest text-white/30 uppercase block">
                             {item.code}
                           </span>
-                          <Link href={`/producto/${item.slug}`} className="font-display text-sm font-semibold text-white hover:text-white/80 transition-colors uppercase tracking-wide truncate block">
+                          <Link href={`/producto/${item.slug}`} className="font-bebas text-lg tracking-wide text-white hover:text-white/80 transition-colors uppercase truncate block">
                             {item.name}
                           </Link>
                           <div className="flex items-center gap-1.5 mt-0.5">
@@ -174,7 +174,7 @@ export default function CarritoPage() {
 
                         {/* Pricing */}
                         <div className="text-right w-24 flex-shrink-0">
-                          <span className="font-display text-base font-bold text-white block">
+                          <span className="font-bebas text-xl tracking-wide text-white block">
                             {(item.price * item.quantity).toFixed(2)}
                           </span>
                           <span className="font-code text-[8px] tracking-widest text-white/30 uppercase">
@@ -271,7 +271,7 @@ export default function CarritoPage() {
                 <div className="flex justify-between items-baseline mb-6">
                   <span className="font-code text-xs text-white uppercase font-bold">TOTAL</span>
                   <div className="text-right">
-                    <span className="font-display text-2xl font-bold text-white block">
+                    <span className="font-bebas text-3xl tracking-wide text-white block">
                       {total.toFixed(2)} <span className="text-sm font-code text-white/40 ml-1">EUR</span>
                     </span>
                     <span className="font-code text-[8px] tracking-wider text-white/40 block uppercase mt-0.5">

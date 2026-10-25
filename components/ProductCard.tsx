@@ -45,6 +45,7 @@ export interface ProductCardProps {
   code:     string
   letter:   string
   name:     string
+  subtitle?: string
   price:    string
   compareAtPrice?: number
   gender:   'MEN' | 'WOMEN' | 'UNISEX'
@@ -56,7 +57,7 @@ export interface ProductCardProps {
 }
 
 export default function ProductCard({
-  code, letter, name, price, compareAtPrice, model, slug, image, gallery, isLarge,
+  code, letter, name, subtitle, price, compareAtPrice, model, slug, image, gallery, isLarge,
 }: ProductCardProps) {
   const Illustration = ILLUSTRATIONS[model]
   const bg = BG_COLORS[model]
@@ -150,16 +151,30 @@ export default function ProductCard({
         {/* Barra superior: favorito, nombre y acciones pequeñas */}
         <div className="absolute top-3 left-3 right-3 z-20 flex items-start justify-between gap-2">
           <FavoriteButton slug={slug} />
-          <div className="flex items-center gap-1.5 min-w-0">
-            <span className="font-code text-[10px] font-bold tracking-[0.16em] text-white uppercase leading-tight text-right drop-shadow-md">
-              {name}
-            </span>
-            <div
+          <div className="flex items-start gap-1.5 min-w-0">
+            <div className="flex flex-col items-end">
+              <span className="font-code text-[10px] font-bold tracking-[0.16em] text-white uppercase leading-tight text-right drop-shadow-md">
+                {name}
+              </span>
+              {subtitle && (
+                <span className="font-code text-[7.5px] font-bold tracking-[0.16em] text-[#ff4d4d] uppercase leading-tight text-right drop-shadow-md mt-0.5">
+                  {subtitle}
+                </span>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                router.push(`/producto/${slug}`)
+              }}
               title="Ver en 360°"
-              className="w-7 h-7 rounded-full border border-white/20 bg-black/40 text-white/70 flex items-center justify-center flex-shrink-0"
+              aria-label={`Ver ${name} en 360°`}
+              className="w-7 h-7 rounded-full border border-white/20 bg-black/40 text-white/70 hover:text-white hover:border-white/50 flex items-center justify-center flex-shrink-0 transition-colors"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
-            </div>
+            </button>
             <ShareButton
               title={`${name} — STENCIL2`}
               url={`${typeof window !== 'undefined' ? window.location.origin : ''}/producto/${slug}`}
@@ -185,7 +200,7 @@ export default function ProductCard({
       <div className="relative z-10 flex flex-col gap-2.5 w-full px-4 pb-4 pt-3 border-t border-white/[0.06] bg-black/80">
         <div className="flex items-center justify-between gap-2">
           <div className="min-w-0 flex flex-col gap-1.5">
-            <p className="font-display text-lg font-bold text-white leading-none">{price}</p>
+            <p className="font-bebas text-2xl tracking-wide text-white leading-none">{price}</p>
             <p className="font-code text-[11px] text-white/35 line-through leading-none h-[11px]">
               {compareAtPrice ? compareAtPrice.toFixed(2) : ''}
             </p>

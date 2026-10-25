@@ -18,11 +18,13 @@ const config: Config = {
         cream: '#C8B89A',
       },
       fontFamily: {
-        display: ['var(--font-display)', '"Playfair Display"', 'serif'],
+        display: ['var(--font-bebas)', '"Bebas Neue"', 'sans-serif'],
         code: ['var(--font-code)', '"Source Code Pro"', 'monospace'],
         bebas: ['var(--font-bebas)', '"Bebas Neue"', 'sans-serif'],
-        gabinet: ['var(--font-gabinet)', '"Space Grotesk"', 'sans-serif'],
-        signature: ['var(--font-signature)', '"Caveat"', 'cursive'],
+        sans: ['var(--font-code)', '"Source Code Pro"', 'monospace'],
+        mono: ['var(--font-code)', '"Source Code Pro"', 'monospace'],
+        gabinet: ['var(--font-bebas)', '"Bebas Neue"', 'sans-serif'],
+        signature: ['var(--font-bebas)', '"Bebas Neue"', 'sans-serif'],
       },
       borderRadius: {
         cta: '3px',

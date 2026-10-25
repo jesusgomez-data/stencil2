@@ -19,7 +19,7 @@ export default function NosotrosPage() {
 
         {/* Narrative */}
         <div className="space-y-8 font-code text-xs text-white/50 leading-relaxed uppercase">
-          <p className="font-display text-lg font-semibold text-white/90 normal-case leading-normal">
+          <p className="font-code text-sm text-white/90 leading-relaxed uppercase">
             Nacidos en las calles, diseñados para los días de sol. STENCIL2 representa la unión de la ingeniería óptica con la cultura urbana y el streetwear de vanguardia.
           </p>
 

@@ -1,21 +1,14 @@
 import type { Metadata, Viewport } from 'next'
-import { Playfair_Display, Source_Code_Pro, Bebas_Neue, Space_Grotesk, Caveat } from 'next/font/google'
+import { Source_Code_Pro, Bebas_Neue } from 'next/font/google'
 import './globals.css'
 import { CartProvider } from '@/context/CartContext'
 import { Analytics } from '@vercel/analytics/react'
 import Script from 'next/script'
 import CookieBanner from '@/components/CookieBanner'
 
-const playfairDisplay = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['600', '700'],
-  variable: '--font-display',
-  display: 'swap',
-})
-
 const sourceCodePro = Source_Code_Pro({
   subsets: ['latin'],
-  weight: ['300', '400'],
+  weight: ['300', '400', '500', '600', '700'],
   variable: '--font-code',
   display: 'swap',
 })
@@ -24,20 +17,6 @@ const bebasNeue = Bebas_Neue({
   subsets: ['latin'],
   weight: ['400'],
   variable: '--font-bebas',
-  display: 'swap',
-})
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  weight: ['500', '700'],
-  variable: '--font-gabinet',
-  display: 'swap',
-})
-
-const caveat = Caveat({
-  subsets: ['latin'],
-  weight: ['600', '700'],
-  variable: '--font-signature',
   display: 'swap',
 })
 
@@ -75,8 +54,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="es" className={`${playfairDisplay.variable} ${sourceCodePro.variable} ${bebasNeue.variable} ${spaceGrotesk.variable} ${caveat.variable}`}>
-      <body className="bg-black text-white antialiased">
+    <html lang="es" className={`${bebasNeue.variable} ${sourceCodePro.variable}`}>
+      <body className="bg-black text-white antialiased font-code">
         <Script id="registrar-visita" strategy="afterInteractive">
           {`
             (async function registrarVisita() {

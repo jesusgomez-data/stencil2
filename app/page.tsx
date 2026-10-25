@@ -42,10 +42,22 @@ const TRUST_BADGES = [
   { Icon: Headphones, title: 'ATENCIÓN 24/7', desc: 'Estamos para ayudarte'         },
 ]
 
-const COLLECTION_PRODUCTS = [
+interface CollectionProduct {
+  id: string
+  name: string
+  subtitle?: string
+  price: string
+  frameColor: string
+  bgColor: string
+  isNew: boolean
+  whiteBg: boolean
+}
+
+const COLLECTION_PRODUCTS: CollectionProduct[] = [
   {
     id:              'onyx-black',
     name:            'IBSEN SOIRES NAES',
+    subtitle:        'EDICIÓN LIMITADA',
     price:           '49.00',
     frameColor:      '#111111',
     bgColor:         '#030303',
@@ -463,7 +475,7 @@ function HeroSection() {
                                     {p.name}
                                   </h4>
                                   <div className="flex items-center justify-between mt-1.5">
-                                    <span className="font-display text-xs text-white/90 font-bold">
+                                    <span className="font-bebas text-base text-white/90 tracking-wide">
                                       {p.price.toFixed(2)} EUR
                                     </span>
                                     <span className="font-code text-[8px] text-white/30 uppercase group-hover:text-white group-hover:translate-x-0.5 transition-all">
@@ -974,16 +986,30 @@ function CollectionsSection() {
                   {/* Barra superior: favorito, nombre y acciones pequeñas */}
                   <div className="absolute top-3 left-3 right-3 z-30 flex items-start justify-between gap-2">
                     <FavoriteButton slug={product?.slug || p.id} />
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="font-code text-[10px] font-bold tracking-[0.16em] text-white uppercase leading-tight text-right drop-shadow-md">
-                        {p.name}
-                      </span>
-                      <div
+                    <div className="flex items-start gap-1.5 min-w-0">
+                      <div className="flex flex-col items-end">
+                        <span className="font-code text-[10px] font-bold tracking-[0.16em] text-white uppercase leading-tight text-right drop-shadow-md">
+                          {p.name}
+                        </span>
+                        {(p.subtitle || product?.subtitle) && (
+                          <span className="font-code text-[7.5px] font-bold tracking-[0.16em] text-[#ff4d4d] uppercase leading-tight text-right drop-shadow-md mt-0.5">
+                            {p.subtitle || product?.subtitle}
+                          </span>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          router.push(`/producto/${product?.slug || p.id}`)
+                        }}
                         title="Ver en 360°"
-                        className="w-7 h-7 rounded-full border border-white/20 bg-black/40 text-white/70 flex items-center justify-center flex-shrink-0"
+                        aria-label={`Ver ${product?.name ?? p.name} en 360°`}
+                        className="w-7 h-7 rounded-full border border-white/20 bg-black/40 text-white/70 hover:text-white hover:border-white/50 flex items-center justify-center flex-shrink-0 transition-colors"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
-                      </div>
+                      </button>
                       <ShareButton
                         title={`${product?.name ?? p.name} — STENCIL2`}
                         url={`${typeof window !== 'undefined' ? window.location.origin : ''}/producto/${product?.slug || p.id}`}
@@ -1012,7 +1038,7 @@ function CollectionsSection() {
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0 flex flex-col gap-1.5">
-                      <p className="font-display text-lg font-bold text-white leading-none">{p.price}</p>
+                      <p className="font-bebas text-2xl tracking-wide text-white leading-none">{p.price}</p>
                       <p className="font-code text-[11px] text-white/35 line-through leading-none h-[11px]">
                         {compareAtPrice ? compareAtPrice.toFixed(2) : ''}
                       </p>

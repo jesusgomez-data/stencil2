@@ -296,11 +296,11 @@ export default function CuentaPage() {
                                         <Illustration color={item.color} className="w-full h-full opacity-80" />
                                       </div>
                                       <div className="flex-1 min-w-0 font-code text-[9px] uppercase">
-                                        <p className="font-display text-xs font-semibold text-white truncate">{item.name}</p>
+                                        <p className="font-bebas text-sm text-white tracking-wide truncate">{item.name}</p>
                                         <span className="text-[#C4822A]">COLOR: {item.colorLabel}</span>
                                         <span className="text-white/30 ml-3">CANTIDAD: {item.quantity}</span>
                                       </div>
-                                      <span className="font-display text-xs font-bold text-white whitespace-nowrap">
+                                      <span className="font-bebas text-sm text-white tracking-wide whitespace-nowrap">
                                         {(item.price * item.quantity).toFixed(2)} EUR
                                       </span>
                                     </div>
@@ -371,7 +371,7 @@ export default function CuentaPage() {
 
                     <div className="border border-white/10 bg-black/60 rounded-xl px-8 py-5 text-center flex-shrink-0 relative z-10 shadow-lg">
                       <Sparkles size={16} className="text-[#C4822A] mx-auto mb-1 animate-pulse" />
-                      <span className="font-display text-4xl font-extrabold text-white block leading-none">
+                      <span className="font-bebas text-5xl text-white block leading-none">
                         {loyaltyPoints}
                       </span>
                       <span className="font-code text-[9px] tracking-widest text-white/40 block mt-1 uppercase">

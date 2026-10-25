@@ -123,7 +123,7 @@ export default function ProductGallery({
           <span className="font-code text-[9px] tracking-[0.3em] text-white/30 uppercase shrink-0">
             MODELO
           </span>
-          <h2 className="font-display text-sm md:text-lg font-semibold text-white uppercase truncate">
+          <h2 className="font-bebas text-lg md:text-2xl text-white tracking-wide uppercase truncate">
             {productName}
           </h2>
           <span className="font-code text-[9px] tracking-[0.2em] text-white/30 uppercase hidden sm:inline">

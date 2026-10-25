@@ -22,6 +22,7 @@ interface ProductSeed {
   letter: string
   code: string
   name: string
+  subtitle?: string
   price: number
   compareAtPrice?: number
   gender: 'men' | 'women' | 'unisex'
@@ -51,6 +52,7 @@ const SEEDS: ProductSeed[] = [
     letter: 'B',
     code: 'GLT6642-C1',
     name: 'Ibsen Soires Naes',
+    subtitle: 'Edición Limitada',
     price: 49.00,
     compareAtPrice: 59.00,
     gender: 'unisex',
@@ -175,6 +177,7 @@ function buildProduct(seed: ProductSeed): Product {
     letter: seed.letter,
     code: seed.code,
     name: seed.name,
+    subtitle: seed.subtitle,
     price: seed.price,
     compareAtPrice: seed.compareAtPrice,
     gender: seed.gender,
