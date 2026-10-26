@@ -6,7 +6,7 @@ import Image from 'next/image'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { useCart } from '@/context/CartContext'
-import { Trash2, Plus, Minus, ArrowRight, ShieldCheck, Tag, X } from 'lucide-react'
+import { Trash2, Plus, Minus, ArrowRight, Tag, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   WayfarerSVG,
@@ -61,10 +61,6 @@ export default function CarritoPage() {
     }
   }
 
-  // Calculate remaining for free shipping (limit 50 EUR)
-  const freeShippingLimit = 50
-  const remainingForFreeShipping = Math.max(0, freeShippingLimit - (subtotal - discount))
-  const progressPercent = Math.min(100, ((subtotal - discount) / freeShippingLimit) * 100)
 
   return (
     <div className="bg-black min-h-screen flex flex-col">
@@ -201,35 +197,6 @@ export default function CarritoPage() {
             {/* RIGHT COLUMN: Order Summary */}
             <div className="space-y-6">
               
-              {/* Shipping Progress Bar */}
-              {remainingForFreeShipping > 0 ? (
-                <div className="border border-white/[0.06] bg-[#0c0c0c] p-5 rounded-xl text-left">
-                  <p className="font-code text-[9px] tracking-widest text-white/40 uppercase mb-2.5">
-                    ENVÍO GRATUITO
-                  </p>
-                  <p className="font-code text-[10px] text-white/70 uppercase mb-3 leading-tight">
-                    ¡TE FALTAN <span className="text-[#C4822A] font-bold">{remainingForFreeShipping.toFixed(2)} EUR</span> PARA OBTENER ENVÍO GRATIS!
-                  </p>
-                  <div className="w-full bg-white/10 h-1 rounded-full overflow-hidden">
-                    <div
-                      className="bg-[#C4822A] h-full transition-all duration-500"
-                      style={{ width: `${progressPercent}%` }}
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="border border-[#1C3B1C] bg-[#0c0c0c]/80 p-5 rounded-xl text-left flex items-start gap-3">
-                  <ShieldCheck size={16} className="text-[#4caf50] mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="font-code text-[9px] tracking-widest text-[#4caf50] uppercase font-bold mb-1">
-                      ¡ENVÍO GRATUITO CONSEGUIDO!
-                    </p>
-                    <p className="font-code text-[9px] text-white/40 uppercase leading-normal">
-                      TU PEDIDO CUMPLE LAS CONDICIONES PARA EL ENVÍO ESTÁNDAR GRATUITO EN ESPAÑA.
-                    </p>
-                  </div>
-                </div>
-              )}
 
               {/* Order Summary Calculations Card */}
               <div className="border border-white/[0.06] bg-[#0c0c0c] p-6 rounded-xl text-left">

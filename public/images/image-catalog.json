@@ -4,7 +4,9 @@
     "/images/a02.png",
     "/images/a03.png",
     "/images/a04.png",
-    "/images/a05.png"
+    "/images/a05.png",
+    "/images/a06.png",
+    "/images/a07.png"
   ],
   "B": [
     "/images/b01.png",
@@ -20,8 +22,7 @@
     "/images/c02.png",
     "/images/c03.png",
     "/images/c04.png",
-    "/images/c05.png",
-    "/images/c06.png"
+    "/images/c05.png"
   ],
   "D": [
     "/images/d01.png",

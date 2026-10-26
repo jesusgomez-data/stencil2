@@ -143,7 +143,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
             <div className="border-b border-white/[0.08] pb-6 mb-6">
               <h1 className="font-bebas text-5xl tracking-wide text-white mb-2 leading-none uppercase">{product.name}</h1>
               {product.subtitle && (
-                <p className="font-code text-[10px] tracking-[0.2em] text-[#ff4d4d] font-bold uppercase mb-2">
+                <p className="font-code text-[10px] tracking-[0.2em] text-[#00E575] font-bold uppercase mb-2 whitespace-nowrap">
                   {product.subtitle}
                 </p>
               )}

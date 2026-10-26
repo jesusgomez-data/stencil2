@@ -983,20 +983,20 @@ function CollectionsSection() {
                     )}
                   </div>
 
-                  {/* Barra superior: favorito, nombre y acciones pequeñas */}
+                  {/* Barra superior: nombre en esquina izquierda, acciones a la derecha */}
                   <div className="absolute top-3 left-3 right-3 z-30 flex items-start justify-between gap-2">
-                    <FavoriteButton slug={product?.slug || p.id} />
-                    <div className="flex items-start gap-1.5 min-w-0">
-                      <div className="flex flex-col items-end">
-                        <span className="font-code text-[10px] font-bold tracking-[0.16em] text-white uppercase leading-tight text-right drop-shadow-md">
-                          {p.name}
+                    <div className="flex flex-col items-start min-w-0 pr-1">
+                      <span className="font-code text-[10px] font-bold tracking-[0.16em] text-white uppercase leading-tight text-left drop-shadow-md">
+                        {p.name}
+                      </span>
+                      {(p.subtitle || product?.subtitle) && (
+                        <span className="font-code text-[7.5px] font-bold tracking-[0.16em] text-[#00E575] uppercase leading-tight text-left drop-shadow-md mt-0.5 whitespace-nowrap">
+                          {p.subtitle || product?.subtitle}
                         </span>
-                        {(p.subtitle || product?.subtitle) && (
-                          <span className="font-code text-[7.5px] font-bold tracking-[0.16em] text-[#ff4d4d] uppercase leading-tight text-right drop-shadow-md mt-0.5">
-                            {p.subtitle || product?.subtitle}
-                          </span>
-                        )}
-                      </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <FavoriteButton slug={product?.slug || p.id} />
                       <button
                         type="button"
                         onClick={(e) => {

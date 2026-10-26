@@ -148,20 +148,20 @@ export default function ProductCard({
           </motion.div>
         )}
 
-        {/* Barra superior: favorito, nombre y acciones pequeñas */}
+        {/* Barra superior: nombre en esquina izquierda, acciones a la derecha */}
         <div className="absolute top-3 left-3 right-3 z-20 flex items-start justify-between gap-2">
-          <FavoriteButton slug={slug} />
-          <div className="flex items-start gap-1.5 min-w-0">
-            <div className="flex flex-col items-end">
-              <span className="font-code text-[10px] font-bold tracking-[0.16em] text-white uppercase leading-tight text-right drop-shadow-md">
-                {name}
+          <div className="flex flex-col items-start min-w-0 pr-1">
+            <span className="font-code text-[10px] font-bold tracking-[0.16em] text-white uppercase leading-tight text-left drop-shadow-md">
+              {name}
+            </span>
+            {subtitle && (
+              <span className="font-code text-[7.5px] font-bold tracking-[0.16em] text-[#00E575] uppercase leading-tight text-left drop-shadow-md mt-0.5 whitespace-nowrap">
+                {subtitle}
               </span>
-              {subtitle && (
-                <span className="font-code text-[7.5px] font-bold tracking-[0.16em] text-[#ff4d4d] uppercase leading-tight text-right drop-shadow-md mt-0.5">
-                  {subtitle}
-                </span>
-              )}
-            </div>
+            )}
+          </div>
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <FavoriteButton slug={slug} />
             <button
               type="button"
               onClick={(e) => {
