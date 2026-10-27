@@ -105,7 +105,7 @@ export default function ProductCard({
       {/* ── 1. CABECERA: Título, subtítulo y botones de acción ── */}
       <div className="relative z-20 pt-3.5 px-3.5 pb-1 flex items-start justify-between gap-2">
         <div className="flex flex-col min-w-0 flex-1 pr-1">
-          <span className="font-sans text-[11px] sm:text-[11.5px] font-bold tracking-tight sm:tracking-normal text-white uppercase leading-tight truncate drop-shadow-md">
+          <span className="font-sans text-[10.5px] sm:text-[11.5px] font-bold tracking-tight sm:tracking-normal text-white uppercase leading-tight line-clamp-2 drop-shadow-md" title={name}>
             {name}
           </span>
           {subtitle && (
@@ -217,16 +217,9 @@ export default function ProductCard({
             <p className="font-bebas text-2xl tracking-wide text-white leading-none">
               {price.includes('€') ? price : `${price} €`}
             </p>
-            <div className="flex items-baseline gap-1.5 h-[11px]">
-              <span className="font-code text-[11px] text-white/35 line-through leading-none">
-                {compareAtPrice ? `${compareAtPrice.toFixed(2)} €` : ''}
-              </span>
-              {savings && (
-                <span className="font-code text-[9px] text-[#00E575] font-bold tracking-wider leading-none">
-                  -{savings}%
-                </span>
-              )}
-            </div>
+            <p className="font-code text-[11px] text-white/35 line-through leading-none h-[11px] whitespace-nowrap">
+              {compareAtPrice ? `${compareAtPrice.toFixed(2)} €` : ''}
+            </p>
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
