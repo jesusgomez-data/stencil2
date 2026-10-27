@@ -752,18 +752,18 @@ function HeroSection() {
                     CATÁLOGO COMPLETO
                   </Link>
                   <Link
-                    href="/tienda?gender=men"
+                    href="/tienda"
                     onClick={() => setDrawerOpen(false)}
                     className="font-bebas text-3xl tracking-wide text-white hover:text-[#C4822A] hover:pl-2 transition-all duration-300"
                   >
-                    COLECCIÓN HOMBRE
+                    COLECCIÓN UNISEX
                   </Link>
                   <Link
-                    href="/tienda?gender=women"
+                    href="/#coleccion"
                     onClick={() => setDrawerOpen(false)}
                     className="font-bebas text-3xl tracking-wide text-white hover:text-[#C4822A] hover:pl-2 transition-all duration-300"
                   >
-                    COLECCIÓN MUJER
+                    EDICIÓN LIMITADA
                   </Link>
                 </nav>
 
