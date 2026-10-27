@@ -66,7 +66,7 @@ const COLLECTION_PRODUCTS: CollectionProduct[] = [
   },
   {
     id:              'classic-blue',
-    name:            'KSO-KC',
+    name:            'FLERSY - SOIRES',
     subtitle:        'Edición limitada',
     price:           '49.00',
     frameColor:      '#C4822A',
@@ -86,7 +86,7 @@ const COLLECTION_PRODUCTS: CollectionProduct[] = [
   },
   {
     id:              'smoke-grey',
-    name:            'RUBEL SMOKE TROPICAL',
+    name:            'RUBEN SMOKE TROPICAL',
     subtitle:        'Edición limitada',
     price:           '39.00',
     frameColor:      '#555555',
@@ -97,17 +97,17 @@ const COLLECTION_PRODUCTS: CollectionProduct[] = [
 ]
 
 const MODEL_ALIASES: Record<string, string[]> = {
-  'classic-blue': ['kso-kc', 'kso kc', 'kso', 'kc', 'wayfarer', 'glt6652', 'glt6652-c4', 'azul', 'negro', 'havana', 'verde', 'classic blue'],
+  'classic-blue': ['flersy', 'soires', 'flersy - soires', 'flersy soires', 'kso-kc', 'kso kc', 'kso', 'kc', 'wayfarer', 'glt6652', 'glt6652-c4', 'azul', 'negro', 'havana', 'verde', 'classic blue'],
   'onyx-black': ['ibsen', 'ibzen', 'soires', 'naes', 'ibsen soires naes', 'ibzen-soires naes', 'ibzen - soires naes', 'wayfarer', 'glt6642', 'glt6642-c1', 'carey', 'ambar', 'negro', 'onyx black', 'camaleon'],
   'olive-crystal': ['blackeye', 'utk', 'blackeye - utk', 'tropical', 'smoke', 'tropical smoke', 'magmaflow', 'magma', 'round', 'redonda', 'glt96153', 'glt96153s-c4', 'habana', 'verde', 'olive crystal'],
-  'smoke-grey': ['rubel', 'ruben', 'rubel smoke tropical', 'spice', 'fler', 'spice fler', 'smoke grey', 'smoke', 'grey', 'gris', 'sport', 'deportiva', 'glt6630', 'glt6630-c3', 'tr90', 'negro', 'smoke tropical']
+  'smoke-grey': ['ruben', 'rubel', 'ruben smoke tropical', 'rubel smoke tropical', 'spice', 'fler', 'spice fler', 'smoke grey', 'smoke', 'grey', 'gris', 'sport', 'deportiva', 'glt6630', 'glt6630-c3', 'tr90', 'negro', 'smoke tropical']
 }
 
 const POPULAR_SEARCH_MODELS = [
-  { label: 'KSO-KC', query: 'KSO-KC' },
+  { label: 'FLERSY - SOIRES', query: 'FLERSY - SOIRES' },
   { label: 'IBZEN - SOIRES NAES', query: 'IBZEN - SOIRES NAES' },
   { label: 'BLACKEYE - UTK', query: 'BLACKEYE - UTK' },
-  { label: 'RUBEL SMOKE TROPICAL', query: 'RUBEL SMOKE TROPICAL' },
+  { label: 'RUBEN SMOKE TROPICAL', query: 'RUBEN SMOKE TROPICAL' },
 ]
 
 const POPULAR_SEARCH_STYLES = [
@@ -399,7 +399,7 @@ function HeroSection() {
                 <Search size={18} className="text-white/40 mr-3 flex-shrink-0" />
                 <input
                   type="text"
-                  placeholder="ESCRIBE PARA BUSCAR (EJ. KSO-KC, TROPICAL, WAYFARER)..."
+                  placeholder="ESCRIBE PARA BUSCAR (EJ. FLERSY - SOIRES, TROPICAL, WAYFARER)..."
                   autoFocus
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}

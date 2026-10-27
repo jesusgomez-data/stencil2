@@ -297,7 +297,7 @@ export default function Scroll3DViewer({ frames }: Scroll3DViewerProps) {
           
           <div className={`transition-opacity duration-700 absolute top-[15%] md:top-auto md:left-32 ${activeTextIndex === 0 ? 'opacity-100' : 'opacity-0 translate-y-4'}`}>
             <span className="font-code text-[9px] md:text-[10px] tracking-[0.4em] text-[#C4822A] uppercase drop-shadow-md">Vista 360°</span>
-            <h2 className="font-bebas text-4xl md:text-7xl text-white tracking-wide mt-2 drop-shadow-lg">KSO-KC CLASSIC</h2>
+            <h2 className="font-bebas text-4xl md:text-7xl text-white tracking-wide mt-2 drop-shadow-lg">FLERSY - SOIRES</h2>
             <p className="font-code text-[10px] md:text-xs text-white/70 max-w-[280px] md:max-w-sm mt-3 md:mt-4 leading-relaxed drop-shadow-md">
               Desliza suavemente para explorar cada ángulo. Diseñado en acetato premium con núcleo reforzado.
             </p>

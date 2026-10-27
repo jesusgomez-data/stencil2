@@ -6,7 +6,7 @@ import { getModelGallery, getModelMainImage } from '@/lib/imageCatalog'
  *
  * Cada producto se identifica por una LETRA (modelo de gafa). Las imágenes se
  * asignan AUTOMÁTICAMENTE desde el catálogo de imágenes (image-catalog.json):
- *   - A → KSO-KC  (a01, a02, a03...)
+ *   - A → FLERSY - SOIRES  (a01, a02, a03...)
  *   - B → IBZEN-SOIRES NAES    (b01, b02, b03...)
  *   - C → MAGMAFLOW  (c01, c02, c03...)
  *   - D → SMOKE GREY     (d01, d02, d03...)
@@ -80,13 +80,14 @@ const SEEDS: ProductSeed[] = [
     id: 'classic-blue',
     letter: 'A',
     code: 'GLT6652-C4',
-    name: 'KSO-KC',
+    name: 'FLERSY - SOIRES',
     subtitle: 'Edición limitada',
     price: 49.00,
     gender: 'unisex',
     model: 'wayfarer',
-    slug: 'kso-kc',
-    description: 'La montura KSO-KC combina nuestra icónica forma Wayfarer. Lentes polarizadas de alta resistencia con protección total UV400. Diseñadas para destacar en cualquier escenario urbano.',
+    slug: 'flersy-soires',
+    aliases: ['kso-kc'],
+    description: 'La montura FLERSY - SOIRES combina nuestra icónica forma Wayfarer. Lentes polarizadas de alta resistencia con protección total UV400. Diseñadas para destacar en cualquier escenario urbano.',
     composition: '100% Acetato premium, bisagras de 5 dientes reforzadas',
     isFeatured: true,
     frameColor: '#1a1a1a',
@@ -134,13 +135,13 @@ const SEEDS: ProductSeed[] = [
     id: 'smoke-grey',
     letter: 'D',
     code: 'GLT6630-C3',
-    name: 'RUBEL SMOKE TROPICAL',
+    name: 'RUBEN SMOKE TROPICAL',
     subtitle: 'Edición limitada',
     price: 39.00,
     gender: 'unisex',
     model: 'sport',
-    slug: 'rubel-smoke-tropical',
-    aliases: ['ruben', 'spice-fler', 'smoke-tropical'],
+    slug: 'ruben-smoke-tropical',
+    aliases: ['rubel-smoke-tropical', 'rubel', 'ruben', 'spice-fler', 'smoke-tropical'],
     description: 'Diseño geométrico y moderno optimizado para el día a día. Estructura envolvente ultra ligera que garantiza un ajuste perfecto.',
     composition: 'TR90 (polímero termoplástico de memoria de forma de alta flexibilidad)',
     isFeatured: true,
