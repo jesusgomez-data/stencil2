@@ -19,7 +19,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
   const router = useRouter()
   const { addToCart } = useCart()
 
-  const product = PRODUCTS.find((p) => p.slug === params.slug)
+  const product = PRODUCTS.find((p) => p.slug === params.slug || p.aliases?.includes(params.slug))
 
   const [selectedColor, setSelectedColor] = useState('')
   const [selectedColorLabel, setSelectedColorLabel] = useState('')

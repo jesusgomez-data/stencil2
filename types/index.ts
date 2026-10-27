@@ -17,6 +17,7 @@ export interface Product {
   gender: 'men' | 'women' | 'unisex'
   model: GlassesModel
   slug: string
+  aliases?: string[]
   description: string
   composition: string
   isFeatured?: boolean

@@ -8,6 +8,7 @@ const STORAGE_KEY = 'stencil2:favorites'
 export interface FavoriteButtonProps {
   slug: string
   className?: string
+  showCount?: boolean
 }
 
 function loadFavorites(): string[] {
@@ -20,9 +21,8 @@ function loadFavorites(): string[] {
   }
 }
 
-export default function FavoriteButton({ slug, className = '' }: FavoriteButtonProps) {
+export default function FavoriteButton({ slug, className = '', showCount = false }: FavoriteButtonProps) {
   const [liked, setLiked] = useState(false)
-  const [showCount, setShowCount] = useState(false)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => setMounted(true), [])
@@ -30,14 +30,12 @@ export default function FavoriteButton({ slug, className = '' }: FavoriteButtonP
   useEffect(() => {
     const isLiked = loadFavorites().includes(slug)
     setLiked(isLiked)
-    setShowCount(isLiked)
   }, [slug])
 
   const toggle = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault()
       e.stopPropagation()
-      setShowCount(true)
       setLiked((prev) => {
         const favs = loadFavorites()
         const next = prev ? favs.filter((s) => s !== slug) : [...favs, slug]
@@ -52,7 +50,6 @@ export default function FavoriteButton({ slug, className = '' }: FavoriteButtonP
     [slug]
   )
 
-  // Real count of likes (local storage based logic in this mock implementation)
   const count = liked ? 1 : 0
   
   const stopCardNavigation = (e: React.MouseEvent) => {
@@ -62,7 +59,7 @@ export default function FavoriteButton({ slug, className = '' }: FavoriteButtonP
 
   return (
     <div
-      className={`flex items-center gap-2 ${className}`}
+      className={`flex items-center gap-1.5 ${className}`}
       onClick={stopCardNavigation}
     >
       <button
@@ -70,8 +67,8 @@ export default function FavoriteButton({ slug, className = '' }: FavoriteButtonP
         onClick={toggle}
         aria-label={
           liked
-            ? `Quitar de favoritos. ${count} usuarios dieron like.`
-            : `Añadir a favoritos. ${count} usuarios dieron like.`
+            ? `Quitar de favoritos`
+            : `Añadir a favoritos`
         }
         aria-pressed={liked}
         className={`w-7 h-7 rounded-full border flex items-center justify-center transition-all active:scale-90 ${
@@ -87,7 +84,7 @@ export default function FavoriteButton({ slug, className = '' }: FavoriteButtonP
           className={liked ? 'fill-current' : ''}
         />
       </button>
-      {mounted && (
+      {showCount && mounted && count > 0 && (
         <span
           className="rounded-full border border-white/[0.12] bg-black/35 px-2 py-1 font-code text-[9px] leading-none tracking-[0.14em] text-white/60"
           style={{ backdropFilter: 'blur(4px)' }}

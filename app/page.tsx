@@ -56,8 +56,8 @@ interface CollectionProduct {
 const COLLECTION_PRODUCTS: CollectionProduct[] = [
   {
     id:              'onyx-black',
-    name:            'IBSEN SOIRES NAES',
-    subtitle:        'EDICIÓN LIMITADA',
+    name:            'IBZEN - SOIRES NAES',
+    subtitle:        'Edición limitada',
     price:           '49.00',
     frameColor:      '#111111',
     bgColor:         '#030303',
@@ -67,6 +67,7 @@ const COLLECTION_PRODUCTS: CollectionProduct[] = [
   {
     id:              'classic-blue',
     name:            'KSO-KC',
+    subtitle:        'Edición limitada',
     price:           '49.00',
     frameColor:      '#C4822A',
     bgColor:         '#040404',
@@ -75,7 +76,8 @@ const COLLECTION_PRODUCTS: CollectionProduct[] = [
   },
   {
     id:              'olive-crystal',
-    name:            'TROPICAL SMOKE',
+    name:            'BLACKEYE - UTK',
+    subtitle:        'Edición limitada',
     price:           '39.00',
     frameColor:      '#3A5A28',
     bgColor:         '#050505',
@@ -84,7 +86,8 @@ const COLLECTION_PRODUCTS: CollectionProduct[] = [
   },
   {
     id:              'smoke-grey',
-    name:            'SPICE FLER',
+    name:            'RUBEL SMOKE TROPICAL',
+    subtitle:        'Edición limitada',
     price:           '39.00',
     frameColor:      '#555555',
     bgColor:         '#080808',
@@ -95,16 +98,16 @@ const COLLECTION_PRODUCTS: CollectionProduct[] = [
 
 const MODEL_ALIASES: Record<string, string[]> = {
   'classic-blue': ['kso-kc', 'kso kc', 'kso', 'kc', 'wayfarer', 'glt6652', 'glt6652-c4', 'azul', 'negro', 'havana', 'verde', 'classic blue'],
-  'onyx-black': ['ibsen', 'ibzen', 'soires', 'naes', 'ibsen soires naes', 'ibzen-soires naes', 'wayfarer', 'glt6642', 'glt6642-c1', 'carey', 'ambar', 'negro', 'onyx black'],
-  'olive-crystal': ['tropical', 'smoke', 'tropical smoke', 'magmaflow', 'magma', 'round', 'redonda', 'glt96153', 'glt96153s-c4', 'habana', 'verde', 'olive crystal'],
-  'smoke-grey': ['spice', 'fler', 'spice fler', 'smoke grey', 'smoke', 'grey', 'gris', 'sport', 'deportiva', 'glt6630', 'glt6630-c3', 'tr90', 'negro', 'smoke grey']
+  'onyx-black': ['ibsen', 'ibzen', 'soires', 'naes', 'ibsen soires naes', 'ibzen-soires naes', 'ibzen - soires naes', 'wayfarer', 'glt6642', 'glt6642-c1', 'carey', 'ambar', 'negro', 'onyx black', 'camaleon'],
+  'olive-crystal': ['blackeye', 'utk', 'blackeye - utk', 'tropical', 'smoke', 'tropical smoke', 'magmaflow', 'magma', 'round', 'redonda', 'glt96153', 'glt96153s-c4', 'habana', 'verde', 'olive crystal'],
+  'smoke-grey': ['rubel', 'ruben', 'rubel smoke tropical', 'spice', 'fler', 'spice fler', 'smoke grey', 'smoke', 'grey', 'gris', 'sport', 'deportiva', 'glt6630', 'glt6630-c3', 'tr90', 'negro', 'smoke tropical']
 }
 
 const POPULAR_SEARCH_MODELS = [
   { label: 'KSO-KC', query: 'KSO-KC' },
-  { label: 'IBZEN-SOIRES NAES', query: 'Ibsen Soires Naes' },
-  { label: 'TROPICAL SMOKE', query: 'Tropical Smoke' },
-  { label: 'SPICE FLER', query: 'Spice Fler' },
+  { label: 'IBZEN - SOIRES NAES', query: 'IBZEN - SOIRES NAES' },
+  { label: 'BLACKEYE - UTK', query: 'BLACKEYE - UTK' },
+  { label: 'RUBEL SMOKE TROPICAL', query: 'RUBEL SMOKE TROPICAL' },
 ]
 
 const POPULAR_SEARCH_STYLES = [
@@ -946,14 +949,61 @@ function CollectionsSection() {
               >
                 {p.isNew && (
                   <span
-                    className="absolute top-3 left-3 font-code text-[8px] tracking-[0.12em] uppercase px-2 py-1 z-10 font-bold"
+                    className="absolute top-3 left-3 font-code text-[8px] tracking-[0.12em] uppercase px-2 py-1 z-30 font-bold"
                     style={{ background: '#CC0000', color: '#fff', borderRadius: '2px' }}
                   >
                     NUEVO
                   </span>
                 )}
 
-                {/* Real fotorrealistic sunglasses image — click opens the model gallery */}
+                {/* 1. Cabecera: Nombre y subtítulo a la izquierda, acciones a la derecha */}
+                <div className="relative z-20 pt-3.5 px-3.5 pb-1 flex items-start justify-between gap-2">
+                  <div className="flex flex-col min-w-0 flex-1 pr-1">
+                    <span className="font-sans text-[11px] sm:text-[11.5px] font-bold tracking-tight sm:tracking-normal text-white uppercase leading-tight truncate drop-shadow-md">
+                      {p.name}
+                    </span>
+                    {(p.subtitle || product?.subtitle) && (
+                      <span className="font-sans text-[8px] sm:text-[8.5px] font-medium tracking-wide text-[#00E575] leading-tight mt-0.5 truncate drop-shadow-md">
+                        {p.subtitle || product?.subtitle}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <FavoriteButton slug={product?.slug || p.id} />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        router.push(`/producto/${product?.slug || p.id}`)
+                      }}
+                      title="Ver en 360°"
+                      aria-label={`Ver ${product?.name ?? p.name} en 360°`}
+                      className="w-7 h-7 rounded-full border border-white/20 bg-black/40 text-white/70 hover:text-white hover:border-white/50 flex items-center justify-center flex-shrink-0 transition-colors"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
+                    </button>
+                    <ShareButton
+                      title={`${product?.name ?? p.name} — STENCIL2`}
+                      url={`${typeof window !== 'undefined' ? window.location.origin : ''}/producto/${product?.slug || p.id}`}
+                      menuPlacement="down"
+                    />
+                  </div>
+                </div>
+
+                {/* 2. Promo row: Ahorro y botón de ampliar en flujo natural (¡NUNCA colisiona!) */}
+                <div className="relative z-20 px-3.5 pt-1.5 pb-0.5 flex items-center justify-between">
+                  {savings !== null ? (
+                    <span className="font-code text-[8.5px] tracking-[0.16em] text-white/80 uppercase drop-shadow-md">
+                      TE AHORRAS {savings}%
+                    </span>
+                  ) : <span />}
+                  <div className="w-6 h-6 rounded-full bg-black/40 border border-white/20 text-white/70 flex items-center justify-center pointer-events-none">
+                    <Maximize2 size={10} strokeWidth={2} />
+                  </div>
+                </div>
+
+                {/* 3. Área central de imagen */}
                 <div
                   role="button"
                   tabIndex={0}
@@ -969,7 +1019,7 @@ function CollectionsSection() {
                       images: galleryImages,
                     })
                   }}
-                  className="relative flex-1 min-h-[230px] overflow-hidden cursor-zoom-in"
+                  className="relative flex-1 min-h-[190px] w-full overflow-hidden cursor-zoom-in"
                   style={{ background: p.bgColor }}
                 >
                   <div className="absolute inset-0 transition-transform duration-500 ease-out group-hover:scale-115">
@@ -978,7 +1028,7 @@ function CollectionsSection() {
                         src={mainImage}
                         alt={product?.name ?? p.name}
                         fill
-                        className={`object-contain p-4 md:p-6 transition-opacity duration-500 ease-in-out ${
+                        className={`object-contain p-4 transition-opacity duration-500 ease-in-out ${
                           secondaryImage ? 'opacity-100 group-hover:opacity-0' : 'opacity-100'
                         }`}
                         sizes="400px"
@@ -989,70 +1039,25 @@ function CollectionsSection() {
                         src={secondaryImage}
                         alt={`${product?.name ?? p.name} — vista alternativa`}
                         fill
-                        className="object-contain p-4 md:p-6 transition-opacity duration-500 ease-in-out opacity-0 group-hover:opacity-100"
+                        className="object-contain p-4 transition-opacity duration-500 ease-in-out opacity-0 group-hover:opacity-100"
                         sizes="400px"
                       />
                     )}
                   </div>
-
-                  {/* Barra superior: nombre en esquina izquierda, acciones a la derecha */}
-                  <div className="absolute top-3 left-3 right-3 z-30 flex items-start justify-between gap-2">
-                    <div className="flex flex-col items-start min-w-0 pr-1">
-                      <span className="font-code text-[10px] font-bold tracking-[0.16em] text-white uppercase leading-tight text-left drop-shadow-md">
-                        {p.name}
-                      </span>
-                      {(p.subtitle || product?.subtitle) && (
-                        <span className="font-code text-[7.5px] font-bold tracking-[0.16em] text-[#00E575] uppercase leading-tight text-left drop-shadow-md mt-0.5 whitespace-nowrap">
-                          {p.subtitle || product?.subtitle}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <FavoriteButton slug={product?.slug || p.id} />
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          router.push(`/producto/${product?.slug || p.id}`)
-                        }}
-                        title="Ver en 360°"
-                        aria-label={`Ver ${product?.name ?? p.name} en 360°`}
-                        className="w-7 h-7 rounded-full border border-white/20 bg-black/40 text-white/70 hover:text-white hover:border-white/50 flex items-center justify-center flex-shrink-0 transition-colors"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.29 7 12 12 20.71 7"></polyline><line x1="12" y1="22" x2="12" y2="12"></line></svg>
-                      </button>
-                      <ShareButton
-                        title={`${product?.name ?? p.name} — STENCIL2`}
-                        url={`${typeof window !== 'undefined' ? window.location.origin : ''}/producto/${product?.slug || p.id}`}
-                        menuPlacement="down"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Promo y ampliar, en la misma fila */}
-                  <div className="absolute top-16 left-4 right-3 z-20 flex items-center justify-between pointer-events-none">
-                    {savings !== null ? (
-                      <span className="font-code text-[9px] tracking-[0.2em] text-white/90 uppercase drop-shadow-md">
-                        TE AHORRAS {savings}%
-                      </span>
-                    ) : <span />}
-                    <div className="w-7 h-7 rounded-full bg-black/40 border border-white/20 text-white/70 flex items-center justify-center">
-                      <Maximize2 size={11} strokeWidth={2} />
-                    </div>
-                  </div>
                 </div>
 
-                {/* Pie: precio con IVA y botones en la misma fila; envío a todo el ancho */}
+                {/* 4. Pie: precio con IVA y botones en la misma fila; envío a todo el ancho */}
                 <div
                   style={{ background: p.bgColor }}
                   className="relative z-10 flex flex-col gap-2.5 w-full px-4 pb-4 pt-3 border-t border-white/[0.04]"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0 flex flex-col gap-1.5">
-                      <p className="font-bebas text-2xl tracking-wide text-white leading-none">{p.price}</p>
+                      <p className="font-bebas text-2xl tracking-wide text-white leading-none">
+                        {p.price.includes('€') ? p.price : `${p.price} €`}
+                      </p>
                       <p className="font-code text-[11px] text-white/35 line-through leading-none h-[11px]">
-                        {compareAtPrice ? compareAtPrice.toFixed(2) : ''}
+                        {compareAtPrice ? `${compareAtPrice.toFixed(2)} €` : ''}
                       </p>
                     </div>
 
@@ -1085,8 +1090,8 @@ function CollectionsSection() {
                   </div>
 
                   <div className="flex flex-col gap-0.5">
-                    <p className="font-code text-[9px] tracking-wider text-white/50 leading-snug">EUR · IVA incluido</p>
-                    <p className="font-code text-[9px] tracking-wider text-white font-bold leading-snug">Envío gratis en tu primer pedido</p>
+                    <p className="font-code text-[9px] tracking-wider text-white/50 leading-snug">IVA incluido</p>
+                    <p className="font-code text-[9px] tracking-wider text-[#00E575] font-bold leading-snug">Envío gratis</p>
                   </div>
                 </div>
               </Link>

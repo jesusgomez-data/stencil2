@@ -28,6 +28,7 @@ interface ProductSeed {
   gender: 'men' | 'women' | 'unisex'
   model: GlassesModel
   slug: string
+  aliases?: string[]
   description: string
   composition: string
   isFeatured?: boolean
@@ -51,13 +52,14 @@ const SEEDS: ProductSeed[] = [
     id: 'onyx-black',
     letter: 'B',
     code: 'GLT6642-C1',
-    name: 'Ibsen Soires Naes',
-    subtitle: 'Edición Limitada',
+    name: 'IBZEN - SOIRES NAES',
+    subtitle: 'Edición limitada',
     price: 49.00,
     compareAtPrice: 59.00,
     gender: 'unisex',
     model: 'wayfarer',
-    slug: 'ibsen-soires-naes',
+    slug: 'ibzen-soires-naes',
+    aliases: ['ibsen-soires-naes'],
     description: 'Minimalismo y sofisticación en su forma más pura. Fabricadas con acetato pulido a mano para un acabado brillante inigualable y durabilidad extrema.',
     composition: '100% Acetato orgánico, lentes CR-39 polarizadas',
     isFeatured: true,
@@ -78,12 +80,13 @@ const SEEDS: ProductSeed[] = [
     id: 'classic-blue',
     letter: 'A',
     code: 'GLT6652-C4',
-    name: 'Kso -KC',
+    name: 'KSO-KC',
+    subtitle: 'Edición limitada',
     price: 49.00,
     gender: 'unisex',
     model: 'wayfarer',
     slug: 'kso-kc',
-    description: 'La montura Kso -KC combina nuestra icónica forma Wayfarer. Lentes polarizadas de alta resistencia con protección total UV400. Diseñadas para destacar en cualquier escenario urbano.',
+    description: 'La montura KSO-KC combina nuestra icónica forma Wayfarer. Lentes polarizadas de alta resistencia con protección total UV400. Diseñadas para destacar en cualquier escenario urbano.',
     composition: '100% Acetato premium, bisagras de 5 dientes reforzadas',
     isFeatured: true,
     frameColor: '#1a1a1a',
@@ -104,11 +107,13 @@ const SEEDS: ProductSeed[] = [
     id: 'olive-crystal',
     letter: 'C',
     code: 'GLT96153S-C4',
-    name: 'Tropical Smoke',
+    name: 'BLACKEYE - UTK',
+    subtitle: 'Edición limitada',
     price: 39.00,
     gender: 'unisex',
     model: 'round',
-    slug: 'tropical-smoke',
+    slug: 'blackeye-utk',
+    aliases: ['tropical-smoke'],
     description: 'Montura redonda de inspiración retro adaptada a la cultura urbana. Lentes oscuras polarizadas para una máxima nitidez visual.',
     composition: 'Combinación de acetato inyectado y patillas de acero inoxidable',
     isFeatured: true,
@@ -129,11 +134,13 @@ const SEEDS: ProductSeed[] = [
     id: 'smoke-grey',
     letter: 'D',
     code: 'GLT6630-C3',
-    name: 'Spice Fler',
+    name: 'RUBEL SMOKE TROPICAL',
+    subtitle: 'Edición limitada',
     price: 39.00,
     gender: 'unisex',
     model: 'sport',
-    slug: 'spice-fler',
+    slug: 'rubel-smoke-tropical',
+    aliases: ['ruben', 'spice-fler', 'smoke-tropical'],
     description: 'Diseño geométrico y moderno optimizado para el día a día. Estructura envolvente ultra ligera que garantiza un ajuste perfecto.',
     composition: 'TR90 (polímero termoplástico de memoria de forma de alta flexibilidad)',
     isFeatured: true,
@@ -183,6 +190,7 @@ function buildProduct(seed: ProductSeed): Product {
     gender: seed.gender,
     model: seed.model,
     slug: seed.slug,
+    aliases: seed.aliases,
     description: seed.description,
     composition: seed.composition,
     isFeatured: seed.isFeatured,
@@ -205,7 +213,7 @@ export const PRODUCTS: Product[] = SEEDS
 
 /** Busca un producto por su slug. */
 export function getProductBySlug(slug: string): Product | undefined {
-  return PRODUCTS.find((p) => p.slug === slug)
+  return PRODUCTS.find((p) => p.slug === slug || p.aliases?.includes(slug))
 }
 
 /** Busca un producto por su ID. */
