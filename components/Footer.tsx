@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 const SOCIAL_LINKS = [
   { label: 'Instagram', href: 'https://www.instagram.com/stencil2' },
@@ -37,13 +38,66 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[280px_1fr_160px_200px] gap-10 lg:gap-8">
 
           {/* Brand */}
-          <div className="flex flex-col items-center text-center space-y-6">
-            <Link href="/" className="flex items-center">
-              <Image src="/images/logo-grenade-white.png" alt="STENCIL2" width={36} height={58} className="h-12 w-auto object-contain hover:scale-105 transition-transform duration-300" />
+          <div className="flex flex-col items-center text-center space-y-4">
+            <Link
+              href="/"
+              className="group relative flex flex-col items-center justify-center focus:outline-none"
+              aria-label="STENCIL2 — Inicio"
+            >
+              {/* Resplandor ambiental que respira suavemente */}
+              <motion.div
+                className="absolute w-28 h-28 rounded-full pointer-events-none blur-2xl -z-10"
+                style={{
+                  background: 'radial-gradient(circle, rgba(196,130,42,0.25) 0%, rgba(255,255,255,0.1) 40%, transparent 70%)',
+                }}
+                animate={{
+                  scale: [0.85, 1.25, 0.85],
+                  opacity: [0.25, 0.65, 0.25],
+                }}
+                transition={{
+                  duration: 4.5,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              />
+
+              {/* Granada con levitación fluida y micro-interacción al interactuar */}
+              <motion.div
+                className="relative flex items-center justify-center p-2"
+                animate={{
+                  y: [0, -5, 0],
+                  rotate: [0, 0.8, -0.8, 0],
+                }}
+                transition={{
+                  duration: 4.8,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+                whileHover={{
+                  scale: 1.12,
+                  rotate: [0, -3, 3, 0],
+                  transition: { duration: 0.35, ease: 'easeOut' },
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Image
+                  src="/images/logo-grenade-white.png"
+                  alt="STENCIL2"
+                  width={42}
+                  height={68}
+                  className="h-13 w-auto object-contain transition-all duration-300 drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)] group-hover:drop-shadow-[0_0_22px_rgba(255,255,255,0.55)] group-hover:brightness-110"
+                />
+
+                {/* Destello de luz metálico (sheen) en hover */}
+                <span className="absolute inset-0 overflow-hidden rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12" />
+                </span>
+              </motion.div>
+
+              <p className="font-code text-[10px] tracking-[0.2em] group-hover:tracking-[0.28em] text-slate-400/70 group-hover:text-white transition-all duration-300 uppercase mt-2">
+                JOINING CULTURE
+              </p>
             </Link>
-            <p className="font-code text-[10px] tracking-[0.2em] text-slate-400/70 uppercase">
-              JOINING CULTURE
-            </p>
             <div className="flex items-center gap-4">
               {SOCIAL_LINKS.map(({ label, href }) => (
                 <a
