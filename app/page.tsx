@@ -930,6 +930,7 @@ function CollectionsSection() {
             const product = PRODUCTS.find((pr) => pr.id === p.id)
             const mainImage = product?.image ?? ''
             const galleryImages = product?.gallery ?? (mainImage ? [mainImage] : [])
+            const secondaryImage = galleryImages.find((img, idx) => idx > 0 && !img.endsWith('.mp4')) || ''
             const letter = product?.letter ?? ''
             const code = product?.code ?? ''
             const isThisAdded = addedId === p.id
@@ -941,7 +942,7 @@ function CollectionsSection() {
                 key={p.id}
                 href={`/producto/${product?.slug || p.id}`}
                 style={{ background: p.bgColor }}
-                className="relative flex flex-col text-left overflow-hidden rounded-2xl transition-all duration-300 aspect-[3/4] sm:aspect-auto sm:h-[460px] group border border-white/[0.06] hover:border-white/20 hover:shadow-2xl"
+                className="relative z-10 flex flex-col text-left overflow-hidden rounded-2xl transition-all duration-300 ease-out transform hover:scale-[1.08] hover:z-30 aspect-[3/4] sm:aspect-auto sm:h-[460px] group border border-white/[0.06] hover:border-white/30 hover:shadow-[0_20px_50px_rgba(0,0,0,0.85)]"
               >
                 {p.isNew && (
                   <span
@@ -971,13 +972,24 @@ function CollectionsSection() {
                   className="relative flex-1 min-h-[230px] overflow-hidden cursor-zoom-in"
                   style={{ background: p.bgColor }}
                 >
-                  <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">
+                  <div className="absolute inset-0 transition-transform duration-500 ease-out group-hover:scale-115">
                     {mainImage && (
                       <Image
                         src={mainImage}
                         alt={product?.name ?? p.name}
                         fill
-                        className="object-contain p-4 md:p-6"
+                        className={`object-contain p-4 md:p-6 transition-opacity duration-500 ease-in-out ${
+                          secondaryImage ? 'opacity-100 group-hover:opacity-0' : 'opacity-100'
+                        }`}
+                        sizes="400px"
+                      />
+                    )}
+                    {secondaryImage && (
+                      <Image
+                        src={secondaryImage}
+                        alt={`${product?.name ?? p.name} — vista alternativa`}
+                        fill
+                        className="object-contain p-4 md:p-6 transition-opacity duration-500 ease-in-out opacity-0 group-hover:opacity-100"
                         sizes="400px"
                       />
                     )}

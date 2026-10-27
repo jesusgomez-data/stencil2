@@ -91,7 +91,7 @@ function TiendaContent() {
       <Navbar />
 
       <main className="flex-1 pt-28 pb-16 px-6 lg:px-10 max-w-[1400px] mx-auto w-full">
-        {/* Portada de la colección — Camaleon */}
+        {/* Portada de la colección — Hero Video STENCIL2 */}
         <section className="relative mb-12 rounded-2xl overflow-hidden border border-white/[0.055] bg-[#050505]">
           <div className="flex flex-col-reverse md:flex-row">
             {/* Texto editorial (izquierda en desktop) */}
@@ -123,21 +123,59 @@ function TiendaContent() {
               </div>
             </div>
 
-            {/* Imagen completa (derecha en desktop) */}
-            <div className="relative w-full md:w-[35%] aspect-[4/5] md:aspect-auto md:min-h-[420px] shrink-0">
-              <Image
-                src="/images/Camaleon.png"
-                alt="Colección STENCIL2"
-                fill
-                priority
-                className="object-contain object-center"
-                sizes="(max-width: 768px) 100vw, 35vw"
+            {/* Video cinematográfico 3D (derecha en desktop) */}
+            <div className="relative w-full md:w-[48%] lg:w-[46%] aspect-video md:aspect-auto md:min-h-[420px] shrink-0 overflow-hidden flex items-center justify-center bg-[#050505]">
+              <video
+                src="/images/stencil2_hero_ae.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="auto"
+                className="w-full h-full object-cover object-center"
               />
+
+              {/* Sombra perimetral interna profunda para eliminar esquinas y bordes cuadrados */}
               <div
-                className="absolute inset-0"
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  boxShadow: 'inset 0 0 60px 25px #050505',
+                }}
+              />
+
+              {/* Degradado lateral izquierdo (Desktop): funde perfectamente el texto con el video sin cortes */}
+              <div
+                className="absolute inset-0 pointer-events-none hidden md:block"
                 style={{
                   background:
-                    'linear-gradient(to left, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0.35) 100%)',
+                    'linear-gradient(to right, #050505 0%, rgba(5,5,5,0.95) 10%, rgba(5,5,5,0.5) 28%, rgba(5,5,5,0.1) 48%, transparent 65%)',
+                }}
+              />
+
+              {/* Degradado superior e inferior para suavizar cortes horizontales */}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background:
+                    'linear-gradient(to bottom, rgba(5,5,5,0.65) 0%, transparent 20%, transparent 80%, rgba(5,5,5,0.75) 100%)',
+                }}
+              />
+
+              {/* Viñeta radial para concentrar la luz al centro y desvanecer las esquinas exteriores */}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background:
+                    'radial-gradient(ellipse 90% 80% at 55% 50%, transparent 40%, rgba(5,5,5,0.5) 75%, rgba(5,5,5,0.92) 100%)',
+                }}
+              />
+
+              {/* Degradado inferior para Mobile: transición suave hacia el bloque de texto */}
+              <div
+                className="absolute inset-0 pointer-events-none md:hidden"
+                style={{
+                  background:
+                    'linear-gradient(to bottom, transparent 40%, rgba(5,5,5,0.85) 80%, #050505 100%)',
                 }}
               />
             </div>
@@ -348,7 +386,7 @@ function TiendaContent() {
         {filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredProducts.map((p) => (
-              <div key={p.id} className="h-96 border border-white/[0.052] rounded-2xl overflow-hidden hover:border-white/15 transition-all">
+              <div key={p.id} className="h-96 border border-white/[0.052] rounded-2xl overflow-hidden hover:border-white/30 hover:scale-[1.08] hover:z-20 hover:shadow-[0_20px_50px_rgba(0,0,0,0.85)] transition-all duration-300 ease-out transform">
                 <ProductCard
                   code={p.code}
                   letter={p.letter}

@@ -134,7 +134,7 @@ export default function TiendaMujerPage() {
         {filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredProducts.map((p) => (
-              <div key={p.id} className="h-96 border border-white/[0.052] rounded-2xl overflow-hidden hover:border-white/15 transition-all">
+              <div key={p.id} className="h-96 border border-white/[0.052] rounded-2xl overflow-hidden hover:border-white/30 hover:scale-[1.08] hover:z-20 hover:shadow-[0_20px_50px_rgba(0,0,0,0.85)] transition-all duration-300 ease-out transform">
                 <ProductCard
                   code={p.code}
                   letter={p.letter}

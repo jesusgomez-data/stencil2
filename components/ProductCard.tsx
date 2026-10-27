@@ -98,6 +98,7 @@ export default function ProductCard({
   }
 
   const images = gallery && gallery.length > 0 ? gallery : image ? [image] : []
+  const secondaryImage = images.find((img, idx) => idx > 0 && !img.endsWith('.mp4')) || ''
 
   return (
     <Link href={`/producto/${slug}`} className="group relative flex flex-col h-full min-h-96 overflow-hidden" style={{ background: bg }}>
@@ -127,13 +128,26 @@ export default function ProductCard({
             }}
             className="absolute inset-0 overflow-hidden cursor-zoom-in"
           >
-            <Image
-              src={image}
-              alt={name}
-              fill
-              className="object-contain p-6 pt-20 transition-transform duration-700 group-hover:scale-105"
-              sizes="400px"
-            />
+            <div className="absolute inset-0 transition-transform duration-500 ease-out group-hover:scale-115">
+              <Image
+                src={image}
+                alt={name}
+                fill
+                className={`object-contain p-6 pt-20 transition-opacity duration-500 ease-in-out ${
+                  secondaryImage ? 'opacity-100 group-hover:opacity-0' : 'opacity-100'
+                }`}
+                sizes="400px"
+              />
+              {secondaryImage && (
+                <Image
+                  src={secondaryImage}
+                  alt={`${name} — vista alternativa`}
+                  fill
+                  className="object-contain p-6 pt-20 transition-opacity duration-500 ease-in-out opacity-0 group-hover:opacity-100"
+                  sizes="400px"
+                />
+              )}
+            </div>
           </div>
         ) : (
           <motion.div
