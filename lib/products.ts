@@ -6,7 +6,7 @@ import { getModelGallery, getModelMainImage } from '@/lib/imageCatalog'
  *
  * Cada producto se identifica por una LETRA (modelo de gafa). Las imágenes se
  * asignan AUTOMÁTICAMENTE desde el catálogo de imágenes (image-catalog.json):
- *   - A → FLERSY - SOIRES  (a01, a02, a03...)
+ *   - A → FLERSY - NAES SOIRES  (a01, a02, a03...)
  *   - B → IBZEN-SOIRES NAES    (b01, b02, b03...)
  *   - C → MAGMAFLOW  (c01, c02, c03...)
  *   - D → SMOKE GREY     (d01, d02, d03...)
@@ -80,14 +80,15 @@ const SEEDS: ProductSeed[] = [
     id: 'classic-blue',
     letter: 'A',
     code: 'GLT6652-C4',
-    name: 'FLERSY - SOIRES',
+    name: 'FLERSY - NAES SOIRES',
     subtitle: 'Edición limitada',
     price: 49.00,
+    compareAtPrice: 59.00,
     gender: 'unisex',
     model: 'wayfarer',
-    slug: 'flersy-soires',
-    aliases: ['kso-kc'],
-    description: 'La montura FLERSY - SOIRES combina nuestra icónica forma Wayfarer. Lentes polarizadas de alta resistencia con protección total UV400. Diseñadas para destacar en cualquier escenario urbano.',
+    slug: 'flersy-naes-soires',
+    aliases: ['flersy-soires', 'kso-kc'],
+    description: 'La montura FLERSY - NAES SOIRES combina nuestra icónica forma Wayfarer. Lentes polarizadas de alta resistencia con protección total UV400. Diseñadas para destacar en cualquier escenario urbano.',
     composition: '100% Acetato premium, bisagras de 5 dientes reforzadas',
     isFeatured: true,
     frameColor: '#1a1a1a',
@@ -111,6 +112,7 @@ const SEEDS: ProductSeed[] = [
     name: 'BLACKEYE - UTK',
     subtitle: 'Edición limitada',
     price: 39.00,
+    compareAtPrice: 47.00,
     gender: 'unisex',
     model: 'round',
     slug: 'blackeye-utk',
@@ -138,6 +140,7 @@ const SEEDS: ProductSeed[] = [
     name: 'RUBEN SMOKE TROPICAL',
     subtitle: 'Edición limitada',
     price: 39.00,
+    compareAtPrice: 47.00,
     gender: 'unisex',
     model: 'sport',
     slug: 'ruben-smoke-tropical',
@@ -164,7 +167,8 @@ const SEEDS: ProductSeed[] = [
     code: 'S2-005',
     name: 'AVIATOR GOLD',
     price: 35.00,
-    gender: 'men',
+    compareAtPrice: 42.00,
+    gender: 'unisex',
     model: 'aviator',
     slug: 'aviator-gold',
     description: 'Nuestra reinterpretación del estilo aviador tradicional. Montura de metal dorado súper fina con doble puente característico de STENCIL2. Lentes tintadas en color verde oscuro G-15 con filtro UV integral.',

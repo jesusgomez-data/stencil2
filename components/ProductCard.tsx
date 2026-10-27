@@ -217,9 +217,16 @@ export default function ProductCard({
             <p className="font-bebas text-2xl tracking-wide text-white leading-none">
               {price.includes('€') ? price : `${price} €`}
             </p>
-            <p className="font-code text-[11px] text-white/35 line-through leading-none h-[11px]">
-              {compareAtPrice ? `${compareAtPrice.toFixed(2)} €` : ''}
-            </p>
+            <div className="flex items-baseline gap-1.5 h-[11px]">
+              <span className="font-code text-[11px] text-white/35 line-through leading-none">
+                {compareAtPrice ? `${compareAtPrice.toFixed(2)} €` : ''}
+              </span>
+              {savings && (
+                <span className="font-code text-[9px] text-[#00E575] font-bold tracking-wider leading-none">
+                  -{savings}%
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">

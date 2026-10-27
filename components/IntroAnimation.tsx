@@ -148,7 +148,7 @@ export default function IntroAnimation({ onComplete }: IntroAnimationProps) {
               />
             </div>
             <span className="font-code text-[8px] tracking-[0.3em] text-white/20 uppercase">
-              EST. 2026
+              EST. 2007
             </span>
           </div>
         </motion.div>

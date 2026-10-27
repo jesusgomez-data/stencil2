@@ -150,6 +150,12 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
               <div className="flex items-baseline gap-2 mt-1">
                 <span className="font-bebas text-3xl tracking-wide text-white">{product.price.toFixed(2)}</span>
                 <span className="font-code text-[10px] tracking-widest text-white/40">EUR</span>
+                {product.compareAtPrice && (
+                  <>
+                    <span className="font-code text-sm text-white/35 line-through ml-2">{product.compareAtPrice.toFixed(2)} €</span>
+                    <span className="font-code text-[10px] text-[#00E575] font-bold tracking-wider ml-1">-17%</span>
+                  </>
+                )}
                 <span className="font-code text-[8px] tracking-wider text-white/20 ml-2 uppercase">IVA Incluido</span>
               </div>
             </div>

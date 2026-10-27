@@ -116,7 +116,7 @@ function TiendaContent() {
                   Diseñadas bajo los estándares de la cultura urbana y el streetwear premium. Lentes polarizadas de protección total UV400, monturas de acetato pulido a mano y polímeros flexibles.
                 </p>
                 <div className="hidden md:flex items-center gap-5 mt-8">
-                  <span className="font-code text-[8px] tracking-[0.3em] text-white/30 uppercase">EST. 2026</span>
+                  <span className="font-code text-[8px] tracking-[0.3em] text-white/30 uppercase">EST. 2007</span>
                   <span className="w-8 h-[1px] bg-white/20" />
                   <span className="font-code text-[8px] tracking-[0.3em] text-white/30 uppercase">STENCIL2</span>
                 </div>

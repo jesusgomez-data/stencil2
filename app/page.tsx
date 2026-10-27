@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-  ArrowRight, Truck, Shield, Award, Headphones,
+  ArrowRight, Shield, Award,
   ChevronLeft, ChevronRight, Plus, ChevronUp, ChevronDown,
   Home, Search, Compass, LayoutGrid, Play, AlignJustify, Grid3x3,
   Volume2, VolumeX, Pause, X, Maximize2, Check, ShoppingBag
@@ -36,10 +36,8 @@ const LEFT_NAV = [
 ]
 
 const TRUST_BADGES = [
-  { Icon: Truck,      title: 'ENVÍO GRATIS',  desc: 'En compras mayores a 50 EUR'   },
   { Icon: Shield,     title: 'PAGOS SEGUROS', desc: 'Tus datos siempre protegidos'  },
   { Icon: Award,      title: 'GARANTÍA',      desc: '30 días de garantía'           },
-  { Icon: Headphones, title: 'ATENCIÓN 24/7', desc: 'Estamos para ayudarte'         },
 ]
 
 interface CollectionProduct {
@@ -66,7 +64,7 @@ const COLLECTION_PRODUCTS: CollectionProduct[] = [
   },
   {
     id:              'classic-blue',
-    name:            'FLERSY - SOIRES',
+    name:            'FLERSY - NAES SOIRES',
     subtitle:        'Edición limitada',
     price:           '49.00',
     frameColor:      '#C4822A',
@@ -97,14 +95,14 @@ const COLLECTION_PRODUCTS: CollectionProduct[] = [
 ]
 
 const MODEL_ALIASES: Record<string, string[]> = {
-  'classic-blue': ['flersy', 'soires', 'flersy - soires', 'flersy soires', 'kso-kc', 'kso kc', 'kso', 'kc', 'wayfarer', 'glt6652', 'glt6652-c4', 'azul', 'negro', 'havana', 'verde', 'classic blue'],
+  'classic-blue': ['flersy', 'soires', 'naes', 'flersy - naes soires', 'flersy naes soires', 'flersy - soires', 'flersy soires', 'kso-kc', 'kso kc', 'kso', 'kc', 'wayfarer', 'glt6652', 'glt6652-c4', 'azul', 'negro', 'havana', 'verde', 'classic blue'],
   'onyx-black': ['ibsen', 'ibzen', 'soires', 'naes', 'ibsen soires naes', 'ibzen-soires naes', 'ibzen - soires naes', 'wayfarer', 'glt6642', 'glt6642-c1', 'carey', 'ambar', 'negro', 'onyx black', 'camaleon'],
   'olive-crystal': ['blackeye', 'utk', 'blackeye - utk', 'tropical', 'smoke', 'tropical smoke', 'magmaflow', 'magma', 'round', 'redonda', 'glt96153', 'glt96153s-c4', 'habana', 'verde', 'olive crystal'],
   'smoke-grey': ['ruben', 'rubel', 'ruben smoke tropical', 'rubel smoke tropical', 'spice', 'fler', 'spice fler', 'smoke grey', 'smoke', 'grey', 'gris', 'sport', 'deportiva', 'glt6630', 'glt6630-c3', 'tr90', 'negro', 'smoke tropical']
 }
 
 const POPULAR_SEARCH_MODELS = [
-  { label: 'FLERSY - SOIRES', query: 'FLERSY - SOIRES' },
+  { label: 'FLERSY - NAES SOIRES', query: 'FLERSY - NAES SOIRES' },
   { label: 'IBZEN - SOIRES NAES', query: 'IBZEN - SOIRES NAES' },
   { label: 'BLACKEYE - UTK', query: 'BLACKEYE - UTK' },
   { label: 'RUBEN SMOKE TROPICAL', query: 'RUBEN SMOKE TROPICAL' },
@@ -399,7 +397,7 @@ function HeroSection() {
                 <Search size={18} className="text-white/40 mr-3 flex-shrink-0" />
                 <input
                   type="text"
-                  placeholder="ESCRIBE PARA BUSCAR (EJ. FLERSY - SOIRES, TROPICAL, WAYFARER)..."
+                  placeholder="ESCRIBE PARA BUSCAR (EJ. FLERSY - NAES SOIRES, TROPICAL, WAYFARER)..."
                   autoFocus
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -834,9 +832,7 @@ function HeroSection() {
 /* ─── TRUST BADGES ────────────────────────────────────────────────── */
 
 const TRUST_BORDER = [
-  'border-r border-b border-white/[0.052] lg:border-b-0',
-  'border-b border-white/[0.052] lg:border-b-0 lg:border-r lg:border-white/[0.052]',
-  'border-r border-white/[0.052] lg:border-r',
+  'border-r border-white/[0.052]',
   '',
 ]
 
@@ -844,9 +840,9 @@ function TrustBadgesBar() {
   return (
     <div className="bg-[#0d0d0d] border-y border-white/[0.055]">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
-        <div className="flex flex-wrap">
+        <div className="flex">
           {TRUST_BADGES.map(({ Icon, title, desc }, i) => (
-            <div key={title} className={`flex items-center gap-4 py-5 px-4 lg:px-7 w-1/2 lg:w-1/4 ${TRUST_BORDER[i]}`}>
+            <div key={title} className={`flex items-center justify-center gap-3 sm:gap-4 py-5 px-4 lg:px-7 w-1/2 ${TRUST_BORDER[i]}`}>
               <Icon size={18} strokeWidth={1.4} className="text-white/28 flex-shrink-0" />
               <div>
                 <p className="font-code text-[10px] tracking-[0.13em] text-white uppercase leading-none mb-1">
@@ -1056,9 +1052,16 @@ function CollectionsSection() {
                       <p className="font-bebas text-2xl tracking-wide text-white leading-none">
                         {p.price.includes('€') ? p.price : `${p.price} €`}
                       </p>
-                      <p className="font-code text-[11px] text-white/35 line-through leading-none h-[11px]">
-                        {compareAtPrice ? `${compareAtPrice.toFixed(2)} €` : ''}
-                      </p>
+                      <div className="flex items-baseline gap-1.5 h-[11px]">
+                        <span className="font-code text-[11px] text-white/35 line-through leading-none">
+                          {compareAtPrice ? `${compareAtPrice.toFixed(2)} €` : ''}
+                        </span>
+                        {savings && (
+                          <span className="font-code text-[9px] text-[#00E575] font-bold tracking-wider leading-none">
+                            -{savings}%
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     <div className="flex items-center gap-2 flex-shrink-0">
