@@ -1,9 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 
 const SOCIAL_LINKS = [
   { label: 'Instagram', href: 'https://www.instagram.com/stencil2' },
@@ -24,6 +25,169 @@ const INFO_LINKS = [
   { label: 'Política de cookies',    href: '/cookies'      },
 ]
 
+function FooterTacticalLogo() {
+  const x = useMotionValue(0)
+  const y = useMotionValue(0)
+  const [isHovered, setIsHovered] = useState(false)
+  const [glitch, setGlitch] = useState(false)
+
+  const springX = useSpring(x, { stiffness: 220, damping: 18 })
+  const springY = useSpring(y, { stiffness: 220, damping: 18 })
+
+  const rotateX = useTransform(springY, [-0.5, 0.5], ['15deg', '-15deg'])
+  const rotateY = useTransform(springX, [-0.5, 0.5], ['-15deg', '15deg'])
+
+  const glareX = useTransform(springX, [-0.5, 0.5], ['100%', '-20%'])
+  const glareY = useTransform(springY, [-0.5, 0.5], ['100%', '-20%'])
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    x.set((e.clientX - rect.left) / rect.width - 0.5)
+    y.set((e.clientY - rect.top) / rect.height - 0.5)
+  }
+
+  const handleMouseEnter = () => {
+    setIsHovered(true)
+    setGlitch(true)
+    setTimeout(() => setGlitch(false), 220)
+  }
+
+  const handleMouseLeave = () => {
+    setIsHovered(false)
+    x.set(0)
+    y.set(0)
+  }
+
+  return (
+    <Link
+      href="/"
+      className="group relative flex flex-col items-center justify-center focus:outline-none select-none"
+      aria-label="STENCIL2 — Inicio"
+    >
+      <div
+        onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className="relative flex items-center justify-center p-3"
+        style={{ perspective: 700 }}
+      >
+        {/* Radar táctico / Ondas concéntricas que emanan de la anilla de la granada */}
+        <div className="absolute top-1 left-1/2 -translate-x-1/2 pointer-events-none flex items-center justify-center">
+          <motion.span
+            className="absolute rounded-full border border-white/20"
+            animate={{
+              width: ['0px', '120px'],
+              height: ['0px', '120px'],
+              opacity: [0.7, 0],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: 'easeOut',
+              repeatDelay: 1.5,
+            }}
+          />
+          <motion.span
+            className="absolute rounded-full border border-[#C4822A]/40"
+            animate={{
+              width: ['0px', '95px'],
+              height: ['0px', '95px'],
+              opacity: [0.8, 0],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: 'easeOut',
+              delay: 0.3,
+              repeatDelay: 1.5,
+            }}
+          />
+        </div>
+
+        {/* Halo de luz ambiental */}
+        <motion.div
+          className="absolute w-24 h-24 rounded-full pointer-events-none blur-2xl -z-10"
+          style={{
+            background: 'radial-gradient(circle, rgba(196,130,42,0.25) 0%, rgba(255,255,255,0.08) 40%, transparent 70%)',
+          }}
+          animate={{
+            scale: isHovered ? 1.3 : [0.85, 1.15, 0.85],
+            opacity: isHovered ? 0.75 : [0.25, 0.55, 0.25],
+          }}
+          transition={isHovered ? { duration: 0.3 } : { duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+        />
+
+        {/* Granada física 3D con respuesta interactiva al cursor */}
+        <motion.div
+          style={{
+            rotateX,
+            rotateY,
+            transformStyle: 'preserve-3d',
+          }}
+          animate={!isHovered ? {
+            y: [0, -4, 0],
+          } : { y: -6, scale: 1.12 }}
+          transition={!isHovered ? {
+            duration: 4.5,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          } : { duration: 0.25, ease: 'easeOut' }}
+          className="relative flex items-center justify-center"
+        >
+          {/* Micro-glitch cromático streetwear al entrar el cursor */}
+          <div
+            className={`relative transition-all duration-300 ${
+              glitch
+                ? '[filter:drop-shadow(-3px_0_0_rgba(0,229,255,0.8))_drop-shadow(3px_0_0_rgba(255,0,85,0.8))]'
+                : 'drop-shadow-[0_8px_20px_rgba(0,0,0,0.9)] group-hover:drop-shadow-[0_0_24px_rgba(255,255,255,0.5)]'
+            }`}
+          >
+            <Image
+              src="/images/logo-grenade-white.png"
+              alt="STENCIL2"
+              width={42}
+              height={68}
+              className="h-13 w-auto object-contain transition-transform duration-300 pointer-events-none"
+            />
+          </div>
+
+          {/* Reflejo especular holográfico según la posición del cursor */}
+          <motion.div
+            className="absolute inset-0 pointer-events-none rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"
+            style={{
+              background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.35) 0%, rgba(196,130,42,0.2) 40%, transparent 70%)',
+              left: glareX,
+              top: glareY,
+              width: '110px',
+              height: '110px',
+              transform: 'translate(-50%, -50%)',
+            }}
+          />
+        </motion.div>
+      </div>
+
+      {/* Sello de frecuencia streetwear táctica */}
+      <div className="flex items-center gap-1.5 my-1.5 opacity-30 group-hover:opacity-90 transition-opacity duration-300">
+        <motion.span
+          className="w-1 h-1 rounded-full bg-white/40 group-hover:bg-[#C4822A]"
+          animate={{ scale: [1, 1.5, 1] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <span className="w-10 h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+        <motion.span
+          className="w-1 h-1 rounded-full bg-white/40 group-hover:bg-[#C4822A]"
+          animate={{ scale: [1, 1.5, 1] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+        />
+      </div>
+
+      <p className="font-code text-[10px] tracking-[0.22em] group-hover:tracking-[0.3em] text-slate-400/70 group-hover:text-white transition-all duration-300 uppercase">
+        JOINING CULTURE
+      </p>
+    </Link>
+  )
+}
+
 export default function Footer() {
   const handleOpenCookies = () => {
     if (typeof window !== 'undefined') {
@@ -39,65 +203,7 @@ export default function Footer() {
 
           {/* Brand */}
           <div className="flex flex-col items-center text-center space-y-4">
-            <Link
-              href="/"
-              className="group relative flex flex-col items-center justify-center focus:outline-none"
-              aria-label="STENCIL2 — Inicio"
-            >
-              {/* Resplandor ambiental que respira suavemente */}
-              <motion.div
-                className="absolute w-28 h-28 rounded-full pointer-events-none blur-2xl -z-10"
-                style={{
-                  background: 'radial-gradient(circle, rgba(196,130,42,0.25) 0%, rgba(255,255,255,0.1) 40%, transparent 70%)',
-                }}
-                animate={{
-                  scale: [0.85, 1.25, 0.85],
-                  opacity: [0.25, 0.65, 0.25],
-                }}
-                transition={{
-                  duration: 4.5,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-              />
-
-              {/* Granada con levitación fluida y micro-interacción al interactuar */}
-              <motion.div
-                className="relative flex items-center justify-center p-2"
-                animate={{
-                  y: [0, -5, 0],
-                  rotate: [0, 0.8, -0.8, 0],
-                }}
-                transition={{
-                  duration: 4.8,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-                whileHover={{
-                  scale: 1.12,
-                  rotate: [0, -3, 3, 0],
-                  transition: { duration: 0.35, ease: 'easeOut' },
-                }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Image
-                  src="/images/logo-grenade-white.png"
-                  alt="STENCIL2"
-                  width={42}
-                  height={68}
-                  className="h-13 w-auto object-contain transition-all duration-300 drop-shadow-[0_4px_10px_rgba(0,0,0,0.9)] group-hover:drop-shadow-[0_0_22px_rgba(255,255,255,0.55)] group-hover:brightness-110"
-                />
-
-                {/* Destello de luz metálico (sheen) en hover */}
-                <span className="absolute inset-0 overflow-hidden rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12" />
-                </span>
-              </motion.div>
-
-              <p className="font-code text-[10px] tracking-[0.2em] group-hover:tracking-[0.28em] text-slate-400/70 group-hover:text-white transition-all duration-300 uppercase mt-2">
-                JOINING CULTURE
-              </p>
-            </Link>
+            <FooterTacticalLogo />
             <div className="flex items-center gap-4">
               {SOCIAL_LINKS.map(({ label, href }) => (
                 <a
