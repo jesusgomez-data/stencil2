@@ -81,3 +81,123 @@ body::after {
   animation: editorialProgress 4000ms linear forwards;
 }
 
+@keyframes cinematicSweep {
+  0%   { transform: translateX(-120%); opacity: 0; }
+  8%   { opacity: 1; }
+  30%  { transform: translateX(380%); opacity: 1; }
+  34%  { opacity: 0; }
+  100% { transform: translateX(380%); opacity: 0; }
+}
+
+.animate-cinematic-sweep {
+  animation: cinematicSweep 7s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+  animation-delay: 2s;
+}
+
+/* Zoom lento tipo cámara de cine */
+@keyframes kenBurns {
+  0%, 100% { transform: scale(1) translate3d(0, 0, 0); }
+  50%      { transform: scale(1.06) translate3d(0, -1%, 0); }
+}
+
+.animate-ken-burns {
+  animation: kenBurns 24s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Partículas de luz que ascienden */
+@keyframes floatParticle {
+  0%   { transform: translate3d(0, 0, 0) scale(0.6); opacity: 0; }
+  12%  { opacity: 0.9; }
+  50%  { transform: translate3d(18px, -55vh, 0) scale(1); }
+  85%  { opacity: 0.6; }
+  100% { transform: translate3d(-12px, -105vh, 0) scale(0.4); opacity: 0; }
+}
+
+.animate-float-particle {
+  animation-name: floatParticle;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
+  filter: blur(0.5px);
+}
+
+/* Grano de película animado */
+@keyframes grainShift {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(-3%, 2%); }
+  40%  { transform: translate(2%, -3%); }
+  60%  { transform: translate(-2%, -1%); }
+  80%  { transform: translate(3%, 3%); }
+  100% { transform: translate(0, 0); }
+}
+
+.film-grain {
+  overflow: hidden;
+}
+
+.film-grain::before {
+  content: '';
+  position: absolute;
+  inset: -10%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  animation: grainShift 0.8s steps(4) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ken-burns,
+  .animate-float-particle,
+  .animate-cinematic-sweep,
+  .film-grain::before { animation: none; }
+}
+
+@keyframes ambientPulse {
+  0%, 100% {
+    opacity: 0.22;
+    transform: scale(0.97);
+  }
+  50% {
+    opacity: 0.38;
+    transform: scale(1.02);
+  }
+}
+
+.animate-ambient-pulse {
+  animation: ambientPulse 6s ease-in-out infinite;
+}
+
+/* Focos de estudio laterales que se balancean lentamente */
+@keyframes spotLeft {
+  0%, 100% { transform: translateY(0) scale(1);    opacity: 0.75; }
+  50%      { transform: translateY(18%) scale(1.1); opacity: 1; }
+}
+@keyframes spotRight {
+  0%, 100% { transform: translateY(0) scale(1);     opacity: 0.75; }
+  50%      { transform: translateY(-18%) scale(1.1); opacity: 1; }
+}
+.animate-spot-left  { animation: spotLeft 9s ease-in-out infinite; }
+.animate-spot-right { animation: spotRight 9s ease-in-out infinite; animation-delay: -4.5s; }
+
+/* Texto editorial vertical en desplazamiento infinito */
+@keyframes verticalMarquee {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
+}
+.vertical-marquee {
+  display: flex;
+  flex-direction: row;
+  writing-mode: vertical-rl;
+  animation: verticalMarquee 40s linear infinite;
+}
+.vertical-marquee-reverse {
+  animation-direction: reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-spot-left,
+  .animate-spot-right,
+  .vertical-marquee { animation: none; }
+}
+

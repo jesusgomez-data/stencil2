@@ -117,6 +117,21 @@ const POPULAR_SEARCH_STYLES = [
 
 /* ─── HERO ────────────────────────────────────────────────────────── */
 
+const HERO_PARTICLES = [
+  { x: 8,  size: 3, dur: 14, delay: 0,   warm: true  },
+  { x: 16, size: 2, dur: 18, delay: 4,   warm: false },
+  { x: 24, size: 4, dur: 16, delay: 8,   warm: true  },
+  { x: 33, size: 2, dur: 20, delay: 2,   warm: true  },
+  { x: 41, size: 3, dur: 15, delay: 11,  warm: false },
+  { x: 52, size: 2, dur: 19, delay: 6,   warm: true  },
+  { x: 60, size: 4, dur: 17, delay: 1,   warm: true  },
+  { x: 68, size: 2, dur: 21, delay: 9,   warm: false },
+  { x: 76, size: 3, dur: 14, delay: 5,   warm: true  },
+  { x: 84, size: 2, dur: 18, delay: 12,  warm: true  },
+  { x: 91, size: 3, dur: 16, delay: 3,   warm: false },
+  { x: 47, size: 5, dur: 22, delay: 14,  warm: true  },
+]
+
 function HeroSection() {
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -132,7 +147,7 @@ function HeroSection() {
 
   useEffect(() => {
     if (videoRef.current) {
-      videoRef.current.playbackRate = 0.5
+      videoRef.current.playbackRate = 0.78
     }
     const handleOpenSearch = () => {
       setActiveTab('buscar')
@@ -203,7 +218,7 @@ function HeroSection() {
   }
 
   return (
-    <section className="w-full h-[52vh] md:h-[65vh] lg:h-[calc(100vh-74px)] min-[1100px]:h-[calc(100vh-65px)] lg:min-h-[520px] bg-black flex overflow-hidden relative">
+    <section className="w-full bg-black flex overflow-hidden relative flex-1 min-h-0">
 
       {/* ── LEFT SIDEBAR — columna sólida negra ── */}
       <div
@@ -242,48 +257,128 @@ function HeroSection() {
       </div>
 
       {/* ── VIDEO/INTERACTIVE CENTER ── */}
-      <div className="flex-1 relative overflow-hidden">
+      <div className="flex-1 min-h-0 relative overflow-hidden bg-black flex flex-col">
         {/* Render base ambient video (needed for home and video mode) */}
         {(activeTab === 'inicio' || activeTab === 'video') && (
-          <>
-            <video
-              ref={videoRef}
-              autoPlay
-              loop
-              playsInline
-              muted={isMuted}
-              className="absolute inset-0 w-full h-full object-contain object-center select-none"
-              style={{ transform: 'scale(0.92)', transformOrigin: 'center center' }}
-            >
-              <source src="/videos/hero-video.mp4" type="video/mp4" />
-            </video>
+          <div className="absolute inset-0 overflow-hidden bg-black pt-20 flex flex-col items-center justify-center">
+            {/* ── PANELES LATERALES: focos de estudio, partículas y texto vertical ── */}
+            {(['left', 'right'] as const).map((side) => (
+              <div
+                key={side}
+                className={`absolute inset-y-0 ${side === 'left' ? 'left-0' : 'right-0'} overflow-hidden pointer-events-none`}
+                style={{ width: 'max(40px, calc((100% - (100vh - 150px) * 16 / 9) / 2 + 35px))' }}
+              >
+                {/* Foco de luz ámbar que se balancea */}
+                <div
+                  className={side === 'left' ? 'absolute inset-0 animate-spot-left' : 'absolute inset-0 animate-spot-right'}
+                  style={{
+                    background: side === 'left'
+                      ? 'radial-gradient(ellipse 120% 70% at 0% 15%, rgba(232,170,90,0.28), transparent 65%)'
+                      : 'radial-gradient(ellipse 120% 70% at 100% 85%, rgba(232,170,90,0.24), transparent 65%)',
+                  }}
+                />
+                {/* Contraluz azul frío */}
+                <div
+                  className="absolute inset-0 animate-ambient-pulse"
+                  style={{
+                    background: side === 'left'
+                      ? 'radial-gradient(ellipse 100% 50% at 0% 90%, rgba(90,150,230,0.16), transparent 70%)'
+                      : 'radial-gradient(ellipse 100% 50% at 100% 10%, rgba(90,150,230,0.16), transparent 70%)',
+                  }}
+                />
+                {/* Partículas doradas ascendiendo */}
+                {HERO_PARTICLES.slice(side === 'left' ? 0 : 6, side === 'left' ? 6 : 12).map((p, i) => (
+                  <span
+                    key={i}
+                    className="absolute rounded-full animate-float-particle"
+                    style={{
+                      left: `${15 + ((i * 37) % 70)}%`,
+                      bottom: '-10px',
+                      width: `${p.size}px`,
+                      height: `${p.size}px`,
+                      background: p.warm ? 'rgba(232,170,90,0.95)' : 'rgba(170,205,255,0.9)',
+                      boxShadow: p.warm ? '0 0 10px 2px rgba(232,170,90,0.6)' : '0 0 10px 2px rgba(140,190,255,0.5)',
+                      animationDuration: `${p.dur}s`,
+                      animationDelay: `${p.delay}s`,
+                    }}
+                  />
+                ))}
+                {/* Texto editorial vertical en movimiento */}
+                <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 overflow-hidden hidden lg:block">
+                  <div className={`vertical-marquee ${side === 'right' ? 'vertical-marquee-reverse' : ''}`}>
+                    {[0, 1].map((k) => (
+                      <span key={k} className="font-code text-[9px] tracking-[0.6em] text-white/[0.14] uppercase whitespace-nowrap">
+                        STENCIL2 · JOINING CULTURE · EST. 2007 · EDICIÓN LIMITADA ·&nbsp;
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
 
-            {/* Top vignette */}
+            {/* ── VIDEO PRINCIPAL: completo, sin recortes ni zoom ── */}
+            <motion.div
+              className="relative mx-auto h-full max-w-full aspect-video z-[2] flex items-center justify-center"
+              initial={{ opacity: 0, scale: 1.03, filter: 'blur(12px)' }}
+              animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+              transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
+              style={{
+                // Solo los laterales se funden suavemente con los paneles; arriba y abajo intactos
+                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, #000 5%, #000 95%, transparent 100%)',
+                maskImage: 'linear-gradient(to right, transparent 0%, #000 5%, #000 95%, transparent 100%)',
+              }}
+            >
+              <video
+                ref={videoRef}
+                autoPlay
+                loop
+                playsInline
+                muted={isMuted}
+                onLoadedMetadata={(e) => {
+                  e.currentTarget.playbackRate = 0.78
+                }}
+                onPlay={(e) => {
+                  e.currentTarget.playbackRate = 0.78
+                }}
+                className="w-full h-full object-contain select-none block"
+                style={{ filter: 'contrast(1.04) saturate(1.06)' }}
+              >
+                <source src="/videos/hero-video.mp4" type="video/mp4" />
+              </video>
+
+              {/* Barrido de luz cinemático */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                <div
+                  className="absolute inset-y-0 left-0 w-1/3 animate-cinematic-sweep"
+                  style={{
+                    background: 'linear-gradient(100deg, transparent 0%, rgba(255,220,170,0.16) 50%, transparent 100%)',
+                    mixBlendMode: 'screen',
+                  }}
+                />
+              </div>
+            </motion.div>
+
+            {/* Fundido inferior muy ligero hacia la barra de Pagos/Garantía */}
             <div
-              className="absolute inset-x-0 top-0 h-36 pointer-events-none z-[6]"
-              style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.60) 0%, transparent 100%)' }}
+              className="absolute inset-x-0 bottom-0 h-14 pointer-events-none z-[3]"
+              style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6), transparent)' }}
             />
-            {/* Bottom fade */}
-            <div
-              className="absolute inset-x-0 bottom-0 h-28 pointer-events-none z-[6]"
-              style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.82) 0%, transparent 100%)' }}
-            />
+
 
             {/* Desktop CTA */}
             {activeTab === 'inicio' && (
               <motion.div
-                className="absolute bottom-8 z-10 hidden lg:flex flex-col gap-2"
-                style={{ left: '28px' }}
+                className="absolute bottom-6 left-6 md:bottom-8 md:left-8 z-10 hidden lg:flex flex-col gap-2"
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.5 }}
               >
-                <span className="font-code text-[8px] tracking-[0.38em] text-white/30 uppercase">
+                <span className="font-code text-[8px] tracking-[0.38em] text-white/50 uppercase">
                   JOINING CULTURE
                 </span>
                 <Link
                   href="/tienda"
-                  className="inline-flex items-center gap-2 font-code text-[10px] tracking-[0.22em] text-white/55 hover:text-white transition-colors uppercase group"
+                  className="inline-flex items-center gap-2 font-code text-[10px] tracking-[0.22em] text-white/70 hover:text-white transition-colors uppercase group"
                 >
                   VER COLECCIÓN
                   <ArrowRight size={10} strokeWidth={2} className="group-hover:translate-x-0.5 transition-transform" />
@@ -293,13 +388,13 @@ function HeroSection() {
 
             {/* Mobile CTA */}
             {activeTab === 'inicio' && (
-              <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-2 z-10 lg:hidden">
-                <span className="font-code text-[8px] tracking-[0.35em] text-white/30 uppercase">
+              <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center gap-1.5 z-10 lg:hidden">
+                <span className="font-code text-[8px] tracking-[0.35em] text-white/40 uppercase">
                   JOINING CULTURE
                 </span>
                 <Link
                   href="/tienda"
-                  className="inline-flex items-center gap-2 font-code text-[10px] tracking-[0.22em] text-white/65 border border-white/20 px-7 py-3 uppercase hover:text-white hover:border-white/50 transition-colors group"
+                  className="inline-flex items-center gap-2 font-code text-[10px] tracking-[0.22em] text-white/80 border border-white/20 bg-black/40 backdrop-blur-sm px-6 py-2 uppercase hover:text-white hover:border-white/50 transition-colors group rounded-sm"
                 >
                   VER COLECCIÓN
                   <ArrowRight size={10} strokeWidth={2} className="group-hover:translate-x-0.5 transition-transform" />
@@ -312,7 +407,7 @@ function HeroSection() {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="absolute inset-0 bg-black/40 z-10 flex flex-col justify-between p-6 md:p-8 animate-fade-in"
+                className="absolute inset-0 bg-black/50 backdrop-blur-[2px] z-10 flex flex-col justify-between p-6 md:p-8 animate-fade-in"
               >
                 {/* Top Status */}
                 <div className="flex items-center justify-between pointer-events-auto">
@@ -364,7 +459,7 @@ function HeroSection() {
                 </div>
               </motion.div>
             )}
-          </>
+          </div>
         )}
 
         {/* ── SEARCH OVERLAY ── */}
@@ -838,17 +933,22 @@ const TRUST_BORDER = [
 
 function TrustBadgesBar() {
   return (
-    <div className="bg-[#0d0d0d] border-y border-white/[0.055]">
+    <div className="bg-[#0b0b0b] border-t border-b border-white/[0.08] flex-shrink-0 z-20 shadow-[0_-10px_25px_rgba(0,0,0,0.6)]">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
         <div className="flex">
           {TRUST_BADGES.map(({ Icon, title, desc }, i) => (
-            <div key={title} className={`flex items-center justify-center gap-3 sm:gap-4 py-5 px-4 lg:px-7 w-1/2 ${TRUST_BORDER[i]}`}>
-              <Icon size={18} strokeWidth={1.4} className="text-white/28 flex-shrink-0" />
+            <div
+              key={title}
+              className={`flex items-center justify-center gap-3.5 sm:gap-5 py-5 sm:py-5.5 px-4 lg:px-8 w-1/2 ${TRUST_BORDER[i]}`}
+            >
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/[0.03] border border-white/[0.08] flex items-center justify-center flex-shrink-0 text-[#C4822A]">
+                <Icon size={20} strokeWidth={1.5} />
+              </div>
               <div>
-                <p className="font-code text-[10px] tracking-[0.13em] text-white uppercase leading-none mb-1">
+                <p className="font-code text-[11px] sm:text-[12px] tracking-[0.16em] text-white uppercase font-medium leading-tight mb-1">
                   {title}
                 </p>
-                <p className="font-code text-[9px] text-white/28 leading-none">{desc}</p>
+                <p className="font-code text-[9.5px] sm:text-[10.5px] text-white/45 tracking-wide leading-tight">{desc}</p>
               </div>
             </div>
           ))}
@@ -1120,8 +1220,11 @@ export default function HomePage() {
     <div className="bg-black min-h-screen">
       <IntroAnimation />
       <Navbar />
-      <HeroSection />
-      <TrustBadgesBar />
+      {/* Primera sección: Hero + Cintillo ocupan exactamente la pantalla completa (100vh / 100dvh) */}
+      <div className="flex flex-col w-full h-screen h-[100dvh] min-h-[600px] overflow-hidden justify-between">
+        <HeroSection />
+        <TrustBadgesBar />
+      </div>
       <CollectionsSection />
       <Footer />
     </div>
