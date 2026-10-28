@@ -252,8 +252,8 @@ function HeroSection() {
               loop
               playsInline
               muted={isMuted}
-              className="absolute inset-0 w-full h-full object-cover object-center select-none"
-              style={{ transform: 'scale(1.32)', transformOrigin: 'center center' }}
+              className="absolute inset-0 w-full h-full object-contain object-center select-none"
+              style={{ transform: 'scale(0.92)', transformOrigin: 'center center' }}
             >
               <source src="/videos/hero-video.mp4" type="video/mp4" />
             </video>
