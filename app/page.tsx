@@ -218,7 +218,7 @@ function HeroSection() {
   }
 
   return (
-    <section className="w-full bg-black flex overflow-hidden relative flex-1 min-h-0">
+    <section className="w-full bg-black flex relative lg:overflow-hidden lg:flex-1 lg:min-h-0">
 
       {/* ── LEFT SIDEBAR — columna sólida negra ── */}
       <div
@@ -257,10 +257,10 @@ function HeroSection() {
       </div>
 
       {/* ── VIDEO/INTERACTIVE CENTER ── */}
-      <div className="flex-1 min-h-0 relative overflow-hidden bg-black flex flex-col">
+      <div className="w-full lg:flex-1 lg:min-h-0 relative overflow-hidden bg-black flex flex-col">
         {/* Render base ambient video (needed for home and video mode) */}
         {(activeTab === 'inicio' || activeTab === 'video') && (
-          <div className="absolute inset-0 overflow-hidden bg-black pt-20 flex flex-col items-center justify-center">
+          <div className="relative w-full overflow-hidden bg-black pt-20 pb-6 lg:pb-0 lg:absolute lg:inset-0 flex flex-col items-center justify-start lg:justify-center">
             {/* ── PANELES LATERALES: focos de estudio, partículas y texto vertical ── */}
             {(['left', 'right'] as const).map((side) => (
               <div
@@ -318,7 +318,7 @@ function HeroSection() {
 
             {/* ── VIDEO PRINCIPAL: completo, sin recortes ni zoom ── */}
             <motion.div
-              className="relative mx-auto h-full max-w-full aspect-video z-[2] flex items-center justify-center"
+              className="relative mx-auto w-full max-w-full aspect-video lg:h-full lg:w-auto z-[2] flex items-center justify-center flex-shrink-0"
               initial={{ opacity: 0, scale: 1.03, filter: 'blur(12px)' }}
               animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
               transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
@@ -388,7 +388,7 @@ function HeroSection() {
 
             {/* Mobile CTA */}
             {activeTab === 'inicio' && (
-              <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center gap-1.5 z-10 lg:hidden">
+              <div className="mt-4 sm:mt-6 flex flex-col items-center gap-2 z-10 lg:hidden flex-shrink-0">
                 <span className="font-code text-[8px] tracking-[0.35em] text-white/40 uppercase">
                   JOINING CULTURE
                 </span>
@@ -1220,8 +1220,8 @@ export default function HomePage() {
     <div className="bg-black min-h-screen">
       <IntroAnimation />
       <Navbar />
-      {/* Primera sección: Hero + Cintillo ocupan exactamente la pantalla completa (100vh / 100dvh) */}
-      <div className="flex flex-col w-full h-screen h-[100dvh] min-h-[600px] overflow-hidden justify-between">
+      {/* En desktop ocupa exactamente 100vh; en móvil altura natural compacta sin vacíos */}
+      <div className="flex flex-col w-full lg:h-screen lg:h-[100dvh] lg:min-h-[600px] lg:overflow-hidden lg:justify-between">
         <HeroSection />
         <TrustBadgesBar />
       </div>
