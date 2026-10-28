@@ -220,11 +220,11 @@ export default function Footer() {
           </div>
 
           {/* Newsletter */}
-          <div className="space-y-3">
+          <div className="space-y-3 text-center sm:text-left">
             <p className="font-code text-[11px] tracking-widest text-white uppercase">
               SUSCRÍBETE Y OBTÉN 10% OFF
             </p>
-            <div className="flex gap-2 max-w-sm">
+            <div className="flex gap-2 max-w-sm mx-auto sm:mx-0">
               <input
                 type="email"
                 placeholder="Tu correo electrónico"
@@ -234,13 +234,13 @@ export default function Footer() {
                 <ArrowRight size={14} />
               </button>
             </div>
-            <p className="font-code text-[8px] text-white/30 leading-tight uppercase">
+            <p className="font-code text-[8px] text-white/30 leading-tight uppercase max-w-sm mx-auto sm:mx-0">
               Al suscribirte aceptas nuestra <Link href="/privacidad" className="underline hover:text-white/60">Política de Privacidad</Link> y el envío de comunicaciones comerciales.
             </p>
           </div>
 
           {/* Ayuda */}
-          <div className="space-y-3">
+          <div className="space-y-3 text-center sm:text-left">
             <p className="font-code text-[10px] tracking-widest text-white/30 uppercase">AYUDA</p>
             <nav className="space-y-2">
               {HELP_LINKS.map(({ label, href }) => (
@@ -254,7 +254,7 @@ export default function Footer() {
           </div>
 
           {/* Información */}
-          <div className="space-y-3">
+          <div className="space-y-3 text-center sm:text-left">
             <p className="font-code text-[10px] tracking-widest text-white/30 uppercase">INFORMACIÓN</p>
             <nav className="space-y-2">
               {INFO_LINKS.map(({ label, href }) => (
@@ -268,7 +268,7 @@ export default function Footer() {
                 <button
                   type="button"
                   onClick={handleOpenCookies}
-                  className="font-code text-[10px] text-white/40 hover:text-[#C4822A] transition-colors uppercase text-left"
+                  className="font-code text-[10px] text-white/40 hover:text-[#C4822A] transition-colors uppercase text-center sm:text-left"
                 >
                   Configurar cookies
                 </button>
@@ -280,7 +280,7 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-white/[0.06] px-6 lg:px-8 py-4">
-        <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
           <p className="font-code text-[10px] tracking-widest text-white/20 uppercase">
             © STENCIL2 2026 — TODOS LOS DERECHOS RESERVADOS
           </p>
