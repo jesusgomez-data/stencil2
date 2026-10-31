@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 
 const FEATURED_MODELS = [
@@ -29,26 +29,6 @@ const FEATURED_MODELS = [
 ]
 
 export default function ModelsHeroSection() {
-  const cardRef = useRef<HTMLDivElement>(null)
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-  const [isHovered, setIsHovered] = useState(false)
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return
-    const rect = cardRef.current.getBoundingClientRect()
-    // Normalizado de -1 a 1 desde el centro
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2
-    setMousePos({ x, y })
-  }
-
-  const handleMouseEnter = () => setIsHovered(true)
-
-  const handleMouseLeave = () => {
-    setIsHovered(false)
-    setMousePos({ x: 0, y: 0 })
-  }
-
   return (
     <section id="models-hero-section" className="bg-black py-8 md:py-12 relative overflow-hidden">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
@@ -66,24 +46,21 @@ export default function ModelsHeroSection() {
           </Link>
         </div>
 
-        {/* Banner Hero con efectos especiales y paralaje 3D interactivo */}
-        <div
-          ref={cardRef}
-          onMouseMove={handleMouseMove}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          className="relative w-full h-[350px] sm:h-[400px] md:h-[450px] lg:h-[480px] rounded-2xl overflow-hidden border border-white/[0.08] hover:border-white/25 transition-colors duration-500 group bg-[#050505] select-none"
-        >
-          {/* Contenedor de imagen con paralaje dinámico al mover el cursor */}
-          <div
+        {/* Banner Hero Cinematográfico con Animación Autónoma */}
+        <div className="relative w-full h-[360px] sm:h-[410px] md:h-[460px] lg:h-[490px] rounded-2xl overflow-hidden border border-white/[0.08] bg-[#050505] select-none shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
+
+          {/* 1. Animación continua de cámara lenta (Ken Burns effect en bucle infinito) */}
+          <motion.div
             className="absolute inset-0 z-0 will-change-transform"
-            style={{
-              transform: isHovered
-                ? `scale(1.045) translate3d(${mousePos.x * -12}px, ${mousePos.y * -8}px, 0)`
-                : 'scale(1.0) translate3d(0px, 0px, 0)',
-              transition: isHovered
-                ? 'transform 0.12s ease-out'
-                : 'transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1)',
+            animate={{
+              scale: [1.0, 1.07, 1.03, 1.06, 1.0],
+              x: ['0%', '-1.2%', '1%', '-0.5%', '0%'],
+              y: ['0%', '-1%', '0.5%', '-0.8%', '0%'],
+            }}
+            transition={{
+              duration: 22,
+              repeat: Infinity,
+              ease: 'easeInOut',
             }}
           >
             <Image
@@ -95,42 +72,62 @@ export default function ModelsHeroSection() {
               sizes="(max-width: 1400px) 100vw, 1400px"
               className="object-cover object-[center_18%] sm:object-[center_20%]"
             />
-          </div>
+          </motion.div>
 
-          {/* Destello de luz interactivo tipo "lente solar" que sigue suavemente al cursor */}
-          <div
-            className="absolute inset-0 z-10 pointer-events-none transition-opacity duration-500 ease-out will-change-[opacity]"
-            style={{
-              opacity: isHovered ? 1 : 0,
-              background: `radial-gradient(circle 380px at ${(mousePos.x / 2 + 0.5) * 100}% ${(mousePos.y / 2 + 0.5) * 100}%, rgba(255, 235, 200, 0.13) 0%, rgba(255, 255, 255, 0.04) 35%, transparent 75%)`,
-            }}
-          />
-
-          {/* Barrido de luz anamórfico tipo cine al entrar con el cursor */}
+          {/* 2. Destello solar / rayo anamórfico automático que barre las gafas cada 6 segundos */}
           <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
-            <div className="absolute -inset-full w-[250%] h-[200%] bg-gradient-to-r from-transparent via-white/[0.08] to-transparent -rotate-45 translate-x-[-120%] group-hover:translate-x-[120%] transition-transform duration-1000 ease-in-out" />
+            <motion.div
+              className="absolute -top-[50%] -bottom-[50%] w-[160px] md:w-[240px] bg-gradient-to-r from-transparent via-white/[0.18] to-transparent -rotate-[22deg] blur-md will-change-transform"
+              animate={{
+                left: ['-30%', '130%'],
+                opacity: [0, 0.9, 0.9, 0],
+              }}
+              transition={{
+                duration: 2.8,
+                repeat: Infinity,
+                repeatDelay: 5.2,
+                ease: [0.25, 0.1, 0.25, 1],
+              }}
+            />
           </div>
 
-          {/* Viñeta sutil en esquinas para profundidad de cine */}
-          <div
-            className="absolute inset-0 z-10 pointer-events-none"
+          {/* 3. Resplandor solar ambiental que respira en la esquina superior derecha (coincide con la luz real de la foto) */}
+          <motion.div
+            className="absolute -top-10 -right-10 w-[380px] h-[380px] md:w-[500px] md:h-[500px] rounded-full pointer-events-none z-10 blur-[80px]"
             style={{
-              background:
-                'radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%)',
+              background: 'radial-gradient(circle, rgba(255,220,150,0.22) 0%, rgba(255,180,80,0.08) 50%, transparent 75%)',
+            }}
+            animate={{
+              opacity: [0.35, 0.8, 0.35],
+              scale: [0.95, 1.12, 0.95],
+            }}
+            transition={{
+              duration: 7,
+              repeat: Infinity,
+              ease: 'easeInOut',
             }}
           />
 
-          {/* Gradiente inferior para legibilidad del texto sin oscurecer los rostros */}
+          {/* 4. Viñeteado perimetral cinematográfico */}
           <div
             className="absolute inset-0 z-15 pointer-events-none"
+            style={{
+              background:
+                'radial-gradient(ellipse at center, rgba(0,0,0,0) 50%, rgba(0,0,0,0.6) 100%)',
+            }}
+          />
+
+          {/* 5. Gradiente inferior para legibilidad del texto sin oscurecer los rostros */}
+          <div
+            className="absolute inset-0 z-20 pointer-events-none"
             style={{
               background:
                 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.6) 78%, rgba(0,0,0,0.92) 100%)',
             }}
           />
 
-          {/* Contenido inferior interactivo */}
-          <div className="absolute bottom-0 left-0 right-0 z-20 p-5 sm:p-7 md:p-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          {/* Contenido inferior */}
+          <div className="absolute bottom-0 left-0 right-0 z-30 p-5 sm:p-7 md:p-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div className="max-w-md">
               <h4 className="font-bebas text-2xl sm:text-3xl md:text-4xl text-white tracking-wide leading-none drop-shadow-md">
                 EL ESTILO NO SE PIDE. SE IMPONE.
@@ -165,6 +162,7 @@ export default function ModelsHeroSection() {
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </section>
