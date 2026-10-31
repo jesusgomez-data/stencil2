@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
@@ -28,10 +29,30 @@ const FEATURED_MODELS = [
 ]
 
 export default function ModelsHeroSection() {
+  const cardRef = useRef<HTMLDivElement>(null)
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+  const [isHovered, setIsHovered] = useState(false)
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return
+    const rect = cardRef.current.getBoundingClientRect()
+    // Normalizado de -1 a 1 desde el centro
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2
+    setMousePos({ x, y })
+  }
+
+  const handleMouseEnter = () => setIsHovered(true)
+
+  const handleMouseLeave = () => {
+    setIsHovered(false)
+    setMousePos({ x: 0, y: 0 })
+  }
+
   return (
     <section id="models-hero-section" className="bg-black py-8 md:py-12 relative overflow-hidden">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
-        {/* Header minimalista alineado con el resto del sitio */}
+        {/* Header minimalista */}
         <div className="flex items-center justify-between pb-3 mb-2">
           <h3 className="font-code text-[10px] tracking-[0.28em] text-white/42 uppercase">
             STREET EDITORIAL // MODELOS
@@ -45,10 +66,26 @@ export default function ModelsHeroSection() {
           </Link>
         </div>
 
-        {/* Banner Hero compacto y cinematográfico */}
-        <div className="relative w-full h-[350px] sm:h-[400px] md:h-[450px] lg:h-[480px] rounded-2xl overflow-hidden border border-white/[0.08] hover:border-white/20 transition-all duration-500 group bg-[#050505]">
-          {/* Imagen de los modelos: encuadre alto para que las caras y gafas queden despejadas */}
-          <div className="absolute inset-0 z-0">
+        {/* Banner Hero con efectos especiales y paralaje 3D interactivo */}
+        <div
+          ref={cardRef}
+          onMouseMove={handleMouseMove}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          className="relative w-full h-[350px] sm:h-[400px] md:h-[450px] lg:h-[480px] rounded-2xl overflow-hidden border border-white/[0.08] hover:border-white/25 transition-colors duration-500 group bg-[#050505] select-none"
+        >
+          {/* Contenedor de imagen con paralaje dinámico al mover el cursor */}
+          <div
+            className="absolute inset-0 z-0 will-change-transform"
+            style={{
+              transform: isHovered
+                ? `scale(1.045) translate3d(${mousePos.x * -12}px, ${mousePos.y * -8}px, 0)`
+                : 'scale(1.0) translate3d(0px, 0px, 0)',
+              transition: isHovered
+                ? 'transform 0.12s ease-out'
+                : 'transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1)',
+            }}
+          >
             <Image
               src="/images/ejemploModels.png"
               alt="Modelos Stencil2"
@@ -56,20 +93,43 @@ export default function ModelsHeroSection() {
               priority
               quality={95}
               sizes="(max-width: 1400px) 100vw, 1400px"
-              className="object-cover object-[center_18%] sm:object-[center_20%] transition-transform duration-700 ease-out group-hover:scale-[1.02]"
+              className="object-cover object-[center_18%] sm:object-[center_20%]"
             />
           </div>
 
-          {/* Gradiente suave solo en el tercio inferior para que los rostros queden 100% nítidos */}
+          {/* Destello de luz interactivo tipo "lente solar" que sigue suavemente al cursor */}
+          <div
+            className="absolute inset-0 z-10 pointer-events-none transition-opacity duration-500 ease-out will-change-[opacity]"
+            style={{
+              opacity: isHovered ? 1 : 0,
+              background: `radial-gradient(circle 380px at ${(mousePos.x / 2 + 0.5) * 100}% ${(mousePos.y / 2 + 0.5) * 100}%, rgba(255, 235, 200, 0.13) 0%, rgba(255, 255, 255, 0.04) 35%, transparent 75%)`,
+            }}
+          />
+
+          {/* Barrido de luz anamórfico tipo cine al entrar con el cursor */}
+          <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
+            <div className="absolute -inset-full w-[250%] h-[200%] bg-gradient-to-r from-transparent via-white/[0.08] to-transparent -rotate-45 translate-x-[-120%] group-hover:translate-x-[120%] transition-transform duration-1000 ease-in-out" />
+          </div>
+
+          {/* Viñeta sutil en esquinas para profundidad de cine */}
           <div
             className="absolute inset-0 z-10 pointer-events-none"
+            style={{
+              background:
+                'radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%)',
+            }}
+          />
+
+          {/* Gradiente inferior para legibilidad del texto sin oscurecer los rostros */}
+          <div
+            className="absolute inset-0 z-15 pointer-events-none"
             style={{
               background:
                 'linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.6) 78%, rgba(0,0,0,0.92) 100%)',
             }}
           />
 
-          {/* Contenido inferior: tipografía reducida y sin tapar las caras de los modelos */}
+          {/* Contenido inferior interactivo */}
           <div className="absolute bottom-0 left-0 right-0 z-20 p-5 sm:p-7 md:p-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div className="max-w-md">
               <h4 className="font-bebas text-2xl sm:text-3xl md:text-4xl text-white tracking-wide leading-none drop-shadow-md">
@@ -80,7 +140,7 @@ export default function ModelsHeroSection() {
               </p>
             </div>
 
-            {/* Acciones y accesos rápidos a los modelos de la foto */}
+            {/* Acciones y accesos rápidos a los modelos */}
             <div className="flex flex-col sm:items-end gap-2.5 flex-shrink-0">
               <Link
                 href="/tienda"
@@ -90,7 +150,7 @@ export default function ModelsHeroSection() {
                 <ArrowRight size={11} strokeWidth={2.2} />
               </Link>
 
-              {/* Píldoras discretas de los modelos */}
+              {/* Píldoras de los modelos */}
               <div className="flex flex-wrap items-center gap-1.5">
                 {FEATURED_MODELS.map((m) => (
                   <Link
