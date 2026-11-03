@@ -2,7 +2,8 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 
 const FEATURED_MODELS = [
@@ -28,7 +29,16 @@ const FEATURED_MODELS = [
   },
 ]
 
+const HERO_IMAGES = ['/images/ejemploModels.png', '/images/ejemploModels2.png']
+const SLIDE_MS = 5000
+
 export default function ModelsHeroSection() {
+  const [current, setCurrent] = useState(0)
+  useEffect(() => {
+    const id = setInterval(() => setCurrent((i) => (i + 1) % HERO_IMAGES.length), SLIDE_MS)
+    return () => clearInterval(id)
+  }, [])
+
   return (
     <section id="models-hero-section" className="bg-black py-8 md:py-12 relative overflow-hidden">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-10">
@@ -65,15 +75,26 @@ export default function ModelsHeroSection() {
                 ease: 'easeInOut',
               }}
             >
-              <Image
-                src="/images/ejemploModels.png"
-                alt="Modelos Stencil2"
-                fill
-                priority
-                quality={95}
-                sizes="(max-width: 768px) 100vw, 1400px"
-                className="object-cover object-center"
-              />
+              <AnimatePresence initial={false}>
+                <motion.div
+                  key={current}
+                  className="absolute inset-0"
+                  initial={{ opacity: 0, scale: 1.04 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 1.4, ease: 'easeInOut' }}
+                >
+                  <Image
+                    src={HERO_IMAGES[current]}
+                    alt="Modelos Stencil2"
+                    fill
+                    priority={current === 0}
+                    quality={95}
+                    sizes="(max-width: 768px) 100vw, 1400px"
+                    className="object-cover object-center"
+                  />
+                </motion.div>
+              </AnimatePresence>
             </motion.div>
 
             {/* 2. Destello solar automático que barre las gafas periódicamente */}

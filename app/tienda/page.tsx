@@ -42,6 +42,11 @@ function TiendaContent() {
   // Active product for the photoshoot session
   const activeProduct = selectedProductId !== 'all' ? PRODUCTS.find((p) => p.id === selectedProductId) : null
 
+  const [shotIndex, setShotIndex] = useState(0)
+  useEffect(() => {
+    setShotIndex(0)
+  }, [selectedProductId])
+
   // Sync state if URL query param changes
   useEffect(() => {
     if (genderParam === 'men') {
@@ -275,108 +280,109 @@ function TiendaContent() {
               transition={{ duration: 0.3, ease: 'easeOut' }}
               className="overflow-hidden mb-10"
             >
-              <div className="p-5 md:p-6 rounded-2xl border border-white/[0.08] bg-[#070707] shadow-[0_12px_40px_rgba(0,0,0,0.7)]">
-                {/* Header de la Sesión */}
-                <div className="flex items-center justify-between pb-4 mb-5 border-b border-white/[0.06]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-[#C4822A]/15 border border-[#C4822A]/30 flex items-center justify-center text-[#C4822A] flex-shrink-0">
-                      <Camera size={15} />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-code text-[8px] tracking-[0.25em] text-[#C4822A] uppercase font-bold">
-                          SESIÓN FOTOGRÁFICA OFICIAL
-                        </span>
-                        <span className="font-code text-[8px] tracking-wider text-white/40 uppercase">
-                          · CÓDIGO {activeProduct.code}
-                        </span>
-                      </div>
-                      <h3 className="font-bebas text-2xl md:text-3xl text-white tracking-wide uppercase">
-                        {activeProduct.name}
-                      </h3>
-                    </div>
+              <div className="rounded-2xl border border-white/[0.08] bg-[#080808] overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.7)]">
+                {/* Cabecera editorial */}
+                <div className="flex items-end justify-between gap-4 px-5 md:px-7 pt-5 md:pt-6 pb-4">
+                  <div>
+                    <p className="font-code text-[9px] tracking-[0.3em] text-white/40 uppercase mb-1.5">
+                      Sesión oficial <span className="text-white/20 mx-1">/</span> {activeProduct.code}
+                    </p>
+                    <h3 className="font-bebas text-3xl md:text-4xl text-white tracking-wide uppercase leading-none">
+                      {activeProduct.name}
+                    </h3>
                   </div>
-
                   <button
                     onClick={() => setSelectedProductId('all')}
-                    className="font-code text-[9px] tracking-widest text-white/40 hover:text-white flex items-center gap-1.5 border border-white/10 hover:border-white/30 px-3.5 py-1.5 rounded-full transition-all uppercase"
+                    className="font-code text-[9px] tracking-[0.2em] text-white/50 hover:text-white flex items-center gap-2 transition-colors uppercase"
                     title="Cerrar sesión"
                   >
-                    <span>CERRAR</span>
-                    <X size={12} />
+                    Cerrar
+                    <span className="w-6 h-6 rounded-full border border-white/15 flex items-center justify-center">
+                      <X size={11} />
+                    </span>
                   </button>
                 </div>
 
-                {/* Tomas exclusivamente de ESTA gafa seleccionada */}
-                <div className="flex flex-col gap-2.5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#C4822A]" />
-                      <span className="font-code text-[10px] font-bold tracking-[0.18em] text-white uppercase">
-                        {activeProduct.name}
-                      </span>
-                      <span className="font-code text-[9px] tracking-wider text-white/40">
-                        ({activeProduct.gallery.length} tomas de la sesión)
-                      </span>
-                    </div>
-                    <span className="font-code text-[8px] tracking-widest text-white/30 uppercase hidden sm:inline">
-                      HAZ CLIC EN CUALQUIER FOTO PARA AMPLIAR EN ALTA DEFINICIÓN
-                    </span>
-                  </div>
+                {(() => {
+                  const gallery = activeProduct.gallery
+                  const idx = Math.min(shotIndex, gallery.length - 1)
+                  const current = gallery[idx]
+                  const currentIsVideo = current.endsWith('.mp4')
+                  const openLightbox = (i: number) =>
+                    setGalleryState({
+                      images: gallery,
+                      name: activeProduct.name,
+                      code: activeProduct.code,
+                      letter: activeProduct.letter,
+                      initialIndex: i,
+                    })
+                  return (
+                    <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-px bg-white/[0.06] border-t border-white/[0.06]">
+                      {/* Visor principal */}
+                      <button
+                        type="button"
+                        onClick={() => openLightbox(idx)}
+                        className="relative bg-[#050505] aspect-[16/10] md:aspect-auto md:min-h-[360px] overflow-hidden group cursor-zoom-in"
+                      >
+                        <AnimatePresence mode="wait" initial={false}>
+                          <motion.div
+                            key={current}
+                            className="absolute inset-0"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.35, ease: 'easeOut' }}
+                          >
+                            {currentIsVideo ? (
+                              <video src={current} muted playsInline autoPlay loop className="w-full h-full object-cover" />
+                            ) : (
+                              <Image
+                                src={current}
+                                alt={`${activeProduct.name} — toma ${idx + 1}`}
+                                fill
+                                className="object-contain p-6 md:p-10 group-hover:scale-[1.03] transition-transform duration-700"
+                                sizes="(max-width: 768px) 100vw, 800px"
+                              />
+                            )}
+                          </motion.div>
+                        </AnimatePresence>
+                        <span className="absolute left-4 bottom-4 font-code text-[9px] tracking-[0.25em] text-white/60 uppercase">
+                          {String(idx + 1).padStart(2, '0')} <span className="text-white/25">/ {String(gallery.length).padStart(2, '0')}</span>
+                        </span>
+                        <span className="absolute right-4 bottom-4 w-8 h-8 rounded-full border border-white/15 bg-black/50 backdrop-blur flex items-center justify-center text-white/70 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Maximize2 size={12} />
+                        </span>
+                      </button>
 
-                  {/* Tira deslizable de fotos */}
-                  <div className="flex gap-3 overflow-x-auto pb-2.5 pt-1 scrollbar-thin">
-                    {activeProduct.gallery.map((imgUrl, imgIdx) => {
-                      const isVideo = imgUrl.endsWith('.mp4')
-                      return (
-                        <div
-                          key={imgUrl}
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => {
-                            setGalleryState({
-                              images: activeProduct.gallery,
-                              name: activeProduct.name,
-                              code: activeProduct.code,
-                              letter: activeProduct.letter,
-                              initialIndex: imgIdx,
-                            })
-                          }}
-                          className="relative flex-shrink-0 w-28 sm:w-36 aspect-[3/4] rounded-xl overflow-hidden border border-white/[0.08] hover:border-white/50 bg-[#0c0c0c] transition-all duration-300 hover:scale-[1.03] cursor-zoom-in group shadow-md"
-                        >
-                          {isVideo ? (
-                            <div className="w-full h-full flex items-center justify-center bg-black/80 relative">
-                              <video src={imgUrl} muted playsInline preload="none" className="w-full h-full object-cover opacity-80" />
-                              <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                                <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white group-hover:scale-110 transition-transform">
+                      {/* Miniaturas */}
+                      <div className="bg-[#080808] p-3 md:p-4 flex md:flex-col gap-2 overflow-x-auto md:overflow-y-auto md:max-h-[420px] scrollbar-thin">
+                        {gallery.map((imgUrl, i) => {
+                          const isVideo = imgUrl.endsWith('.mp4')
+                          const active = i === idx
+                          return (
+                            <button
+                              key={imgUrl}
+                              type="button"
+                              onClick={() => setShotIndex(i)}
+                              aria-label={`Ver toma ${i + 1}`}
+                              className={`relative flex-shrink-0 w-20 h-14 md:w-24 md:h-16 overflow-hidden rounded-md bg-[#0c0c0c] border transition-all duration-300 ${
+                                active ? 'border-white/70' : 'border-white/[0.08] opacity-50 hover:opacity-100'
+                              }`}
+                            >
+                              {isVideo ? (
+                                <div className="w-full h-full flex items-center justify-center text-white/80">
                                   <Play size={12} fill="currentColor" />
                                 </div>
-                              </div>
-                            </div>
-                          ) : (
-                            <Image
-                              src={imgUrl}
-                              alt={`${activeProduct.name} — toma ${imgIdx + 1}`}
-                              fill
-                              className="object-contain p-2.5 group-hover:scale-105 transition-transform duration-500"
-                              sizes="180px"
-                            />
-                          )}
-
-                          {/* Badge inferior con el número de toma */}
-                          <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between pointer-events-none">
-                            <span className="font-code text-[7.5px] font-bold tracking-[0.14em] text-white/80 bg-black/80 backdrop-blur-md px-1.5 py-0.5 rounded-[2px] uppercase">
-                              {isVideo ? 'VIDEO' : `TOMA 0${imgIdx + 1}`}
-                            </span>
-                            <div className="w-5 h-5 rounded-full bg-black/70 text-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Maximize2 size={9} />
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
+                              ) : (
+                                <Image src={imgUrl} alt="" fill className="object-cover" sizes="100px" />
+                              )}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })()}
               </div>
             </motion.div>
           )}
