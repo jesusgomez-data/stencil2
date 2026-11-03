@@ -57,7 +57,7 @@ interface CollectionProduct {
 const COLLECTION_PRODUCTS: CollectionProduct[] = [
   {
     id:              'onyx-black',
-    name:            'IBZEN - SOIRES NAES',
+    name:            'IBZEN -SOIRESNAES',
     subtitle:        'Edición limitada',
     price:           '49.00',
     frameColor:      '#111111',
@@ -87,7 +87,7 @@ const COLLECTION_PRODUCTS: CollectionProduct[] = [
   },
   {
     id:              'smoke-grey',
-    name:            'RUBEN SMOKE TROPICAL',
+    name:            'RUBEN (RUBEN - SMOKE TROPICAL)',
     subtitle:        'Edición limitada',
     price:           '39.00',
     frameColor:      '#555555',
@@ -1188,9 +1188,14 @@ function CollectionsSection() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-0.5">
-                    <p className="font-code text-[9px] tracking-wider text-white/50 leading-snug">IVA incluido</p>
-                    <p className="font-code text-[9px] tracking-wider text-[#00E575] font-bold leading-snug">Envío gratis</p>
+                  <div className="flex items-end justify-between gap-2">
+                    <div className="flex flex-col gap-0.5">
+                      <p className="font-code text-[9px] tracking-wider text-white/50 leading-snug">IVA incluido</p>
+                      <p className="font-code text-[9px] tracking-wider text-[#00E575] font-bold leading-snug">Envío gratis</p>
+                    </div>
+                    <span className="font-code text-[8px] tracking-[0.22em] text-white/45 uppercase border border-white/15 rounded-full px-2.5 py-1 leading-none">
+                      Unisex
+                    </span>
                   </div>
                 </div>
               </Link>

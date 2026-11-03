@@ -247,9 +247,14 @@ export default function ProductCard({
           </div>
         </div>
 
-        <div className="flex flex-col gap-0.5">
-          <p className="font-code text-[9px] tracking-wider text-white/50 leading-snug">IVA incluido</p>
-          <p className="font-code text-[9px] tracking-wider text-[#00E575] font-bold leading-snug">Envío gratis</p>
+        <div className="flex items-end justify-between gap-2">
+          <div className="flex flex-col gap-0.5">
+            <p className="font-code text-[9px] tracking-wider text-white/50 leading-snug">IVA incluido</p>
+            <p className="font-code text-[9px] tracking-wider text-[#00E575] font-bold leading-snug">Envío gratis</p>
+          </div>
+          <span className="font-code text-[8px] tracking-[0.22em] text-white/45 uppercase border border-white/15 rounded-full px-2.5 py-1 leading-none">
+            Unisex
+          </span>
         </div>
       </div>
 
