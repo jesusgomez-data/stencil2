@@ -10,12 +10,12 @@ export default function EditorialHeroBanner() {
       {/* Foto única de la campaña */}
       <div className="absolute inset-0 overflow-hidden z-0">
         <Image
-          src="/images/a07.png"
+          src="/images/JOINING.jpg"
           alt="JOINING CULTURE — Nueva colección"
           fill
           priority
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover object-center opacity-[0.68] group-hover:opacity-80 group-hover:scale-[1.03] transition-[opacity,transform] duration-700"
+          className="object-cover object-center opacity-[0.85] group-hover:opacity-100 group-hover:scale-[1.03] transition-[opacity,transform] duration-700"
         />
       </div>
 

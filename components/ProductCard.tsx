@@ -252,7 +252,7 @@ export default function ProductCard({
             <p className="font-code text-[9px] tracking-wider text-white/50 leading-snug">IVA incluido</p>
             <p className="font-code text-[9px] tracking-wider text-[#00E575] font-bold leading-snug">Envío gratis</p>
           </div>
-          <span className="font-code text-[8px] tracking-[0.22em] text-white/45 uppercase border border-white/15 rounded-full px-2.5 py-1 leading-none">
+          <span className="font-code text-[8px] font-medium tracking-[0.2em] text-white uppercase border border-white/30 bg-white/[0.06] rounded-full px-2.5 py-1 leading-none shadow-sm">
             Unisex
           </span>
         </div>
