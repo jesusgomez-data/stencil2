@@ -23,7 +23,6 @@ import { useCart } from '@/context/CartContext'
 import IntroAnimation from '@/components/IntroAnimation'
 import EditorialHeroBanner from '@/components/EditorialHeroBanner'
 import ModelsHeroSection from '@/components/ModelsHeroSection'
-import MarqueeStrip from '@/components/MarqueeStrip'
 import CraftsmanshipSection from '@/components/CraftsmanshipSection'
 
 /* ─── Data ────────────────────────────────────────────────────────── */
@@ -1234,7 +1233,6 @@ export default function HomePage() {
         <TrustBadgesBar />
       </div>
       <CollectionsSection />
-      <MarqueeStrip />
       <ModelsHeroSection />
       <CraftsmanshipSection />
       <Footer />
