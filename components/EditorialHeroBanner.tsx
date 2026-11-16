@@ -1,21 +1,22 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 
 export default function EditorialHeroBanner() {
   return (
     <div className="relative overflow-hidden rounded-2xl sm:col-span-2 xl:col-span-1 xl:row-span-2 xl:h-auto h-[390px] aspect-[3/4] sm:aspect-auto border border-white/[0.055] hover:border-white/20 group flex flex-col justify-end p-6 md:p-8 z-10 select-none transition-colors duration-500 bg-black">
-      {/* Foto única de la campaña */}
+      {/* Video de la campaña */}
       <div className="absolute inset-0 overflow-hidden z-0">
-        <Image
-          src="/images/JOINING.jpg"
-          alt="JOINING CULTURE — Nueva colección"
-          fill
-          priority
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover object-center opacity-[0.85] group-hover:opacity-100 group-hover:scale-[1.03] transition-[opacity,transform] duration-700"
+        <video
+          src="/images/VideoJoing.mp4"
+          poster="/images/JOINING.jpg"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          className="w-full h-full object-cover object-center opacity-[0.85] group-hover:opacity-100 group-hover:scale-[1.03] transition-[opacity,transform] duration-700"
         />
       </div>
 

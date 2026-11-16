@@ -150,10 +150,35 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setOrders((prevOrders) => [newOrder, ...prevOrders])
     setLoyaltyPoints((prevPoints) => prevPoints + pointsEarned)
 
-    if (typeof window !== 'undefined' && shippingAddress) {
-      if (shippingAddress.name) localStorage.setItem('stencil2_profile_name', shippingAddress.name)
-      if (shippingAddress.email) localStorage.setItem('stencil2_profile_email', shippingAddress.email)
-      if (shippingAddress.phone) localStorage.setItem('stencil2_profile_phone', shippingAddress.phone)
+    if (typeof window !== 'undefined') {
+      if (shippingAddress) {
+        if (shippingAddress.name) localStorage.setItem('stencil2_profile_name', shippingAddress.name)
+        if (shippingAddress.email) localStorage.setItem('stencil2_profile_email', shippingAddress.email)
+        if (shippingAddress.phone) localStorage.setItem('stencil2_profile_phone', shippingAddress.phone)
+      }
+
+      // Persistir el pedido en segundo plano en Supabase sin bloquear el flujo de checkout
+      fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderNumber: newOrder.id,
+          items: newOrder.items,
+          subtotal: newOrder.subtotal,
+          discount: newOrder.discount,
+          taxableBase,
+          tax: newOrder.tax,
+          shipping: newOrder.shipping,
+          total: newOrder.total,
+          promoCode,
+          pointsEarned: newOrder.pointsEarned,
+          stripeId: newOrder.stripeId,
+          shippingAddress: newOrder.shippingAddress,
+          status: 'paid',
+        }),
+      }).catch((err) => {
+        console.warn('[CartContext] No se pudo sincronizar el pedido en Supabase:', err)
+      })
     }
 
     clearCart()

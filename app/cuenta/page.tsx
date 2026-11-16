@@ -36,17 +36,34 @@ export default function CuentaPage() {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [isSaved, setIsSaved] = useState(false)
+  const [isSavingProfile, setIsSavingProfile] = useState(false)
+
+  // Synced DB states (pedidos y puntos desde Supabase cuando hay email)
+  const [dbOrders, setDbOrders] = useState<Order[]>([])
+  const [syncedPoints, setSyncedPoints] = useState<number | null>(null)
 
   // Points Redemption State
   const [claimedCode, setClaimedCode] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
 
-  // Load profile from localStorage or most recent order
+  const effectivePoints = syncedPoints !== null ? syncedPoints : loyaltyPoints
+
+  const mergedOrders: Order[] = [...orders]
+  for (const dbOrder of dbOrders) {
+    if (!mergedOrders.some((o) => o.id === dbOrder.id)) {
+      mergedOrders.push(dbOrder)
+    }
+  }
+
+  // Load profile from localStorage or most recent order, then sync with Supabase
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedName = localStorage.getItem('stencil2_profile_name')
       const storedEmail = localStorage.getItem('stencil2_profile_email')
       const storedPhone = localStorage.getItem('stencil2_profile_phone')
+
+      const resolvedEmail =
+        storedEmail || (orders.length > 0 ? orders[0].shippingAddress?.email || '' : '')
 
       if (storedName) {
         setName(storedName)
@@ -54,10 +71,8 @@ export default function CuentaPage() {
         setName(orders[0].shippingAddress.name)
       }
 
-      if (storedEmail) {
-        setEmail(storedEmail)
-      } else if (orders.length > 0 && orders[0].shippingAddress?.email) {
-        setEmail(orders[0].shippingAddress.email)
+      if (resolvedEmail) {
+        setEmail(resolvedEmail)
       }
 
       if (storedPhone) {
@@ -65,30 +80,92 @@ export default function CuentaPage() {
       } else if (orders.length > 0 && orders[0].shippingAddress?.phone) {
         setPhone(orders[0].shippingAddress.phone)
       }
+
+      if (resolvedEmail && resolvedEmail.includes('@')) {
+        fetch(`/api/cuenta?email=${encodeURIComponent(resolvedEmail)}`)
+          .then((res) => (res.ok ? res.json() : null))
+          .then((data) => {
+            if (!data) return
+            if (data.profile) {
+              if (!storedName && data.profile.full_name) setName(data.profile.full_name)
+              if (!storedPhone && data.profile.phone) setPhone(data.profile.phone)
+            }
+            if (typeof data.loyaltyPoints === 'number') {
+              const localPts = parseInt(localStorage.getItem('stencil2_points') || '0', 10)
+              const bestPoints = Math.max(localPts, data.loyaltyPoints)
+              setSyncedPoints(bestPoints)
+            }
+            if (Array.isArray(data.orders) && data.orders.length > 0) {
+              setDbOrders(data.orders)
+            }
+          })
+          .catch(() => {
+            // Fallback silencioso a localStorage si no hay red o Supabase
+          })
+      }
     }
   }, [orders])
 
-  const handleProfileSave = (e: React.FormEvent) => {
+  const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsSavingProfile(true)
     localStorage.setItem('stencil2_profile_name', name)
     localStorage.setItem('stencil2_profile_email', email)
     localStorage.setItem('stencil2_profile_phone', phone)
-    setIsSaved(true)
-    setTimeout(() => setIsSaved(false), 2000)
+
+    try {
+      await fetch('/api/cuenta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_profile',
+          email,
+          name,
+          phone,
+        }),
+      })
+    } catch {
+      // Mantiene guardado local aunque falle la red
+    } finally {
+      setIsSavingProfile(false)
+      setIsSaved(true)
+      setTimeout(() => setIsSaved(false), 2000)
+    }
   }
 
-  const handleClaimReward = (pointsNeeded: number, code: string) => {
-    if (loyaltyPoints >= pointsNeeded) {
-      // Deduct points (this would normally be handled in the Context or DB, let's mock it)
-      const currentPoints = parseInt(localStorage.getItem('stencil2_points') || '0', 10)
+  const handleClaimReward = async (pointsNeeded: number, code: string) => {
+    if (effectivePoints >= pointsNeeded) {
+      const currentPoints = syncedPoints !== null
+        ? syncedPoints
+        : parseInt(localStorage.getItem('stencil2_points') || '0', 10)
       const newPoints = Math.max(0, currentPoints - pointsNeeded)
       localStorage.setItem('stencil2_points', newPoints.toString())
-      
-      // Force page reload/state sync for points (since it's a simple localState in CartContext)
-      // For this mock, we can set the claimed code
+      setSyncedPoints(newPoints)
       setClaimedCode(code)
-      // Just reload the page or trigger state update
-      window.location.reload()
+
+      if (email && email.includes('@')) {
+        try {
+          const res = await fetch('/api/cuenta', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'redeem_points',
+              email,
+              pointsNeeded,
+              code,
+            }),
+          })
+          if (res.ok) {
+            const data = await res.json()
+            if (typeof data.loyaltyPoints === 'number') {
+              localStorage.setItem('stencil2_points', data.loyaltyPoints.toString())
+              setSyncedPoints(data.loyaltyPoints)
+            }
+          }
+        } catch {
+          // Mantiene canje local
+        }
+      }
     }
   }
 
@@ -134,7 +211,7 @@ export default function CuentaPage() {
               }`}
             >
               <Package size={13} />
-              PEDIDOS ({orders.length})
+              PEDIDOS ({mergedOrders.length})
             </button>
             <button
               onClick={() => setActiveTab('lealtad')}
@@ -203,9 +280,10 @@ export default function CuentaPage() {
                     <div className="pt-4 flex items-center gap-4">
                       <button
                         type="submit"
-                        className="bg-white text-black hover:bg-white/80 font-code text-[10px] tracking-[0.2em] px-8 py-3.5 rounded-sm font-bold uppercase transition-colors"
+                        disabled={isSavingProfile}
+                        className="bg-white text-black hover:bg-white/80 disabled:opacity-50 font-code text-[10px] tracking-[0.2em] px-8 py-3.5 rounded-sm font-bold uppercase transition-colors"
                       >
-                        GUARDAR CAMBIOS
+                        {isSavingProfile ? 'GUARDANDO...' : 'GUARDAR CAMBIOS'}
                       </button>
                       {isSaved && (
                         <span className="font-code text-[9px] text-[#4caf50] uppercase font-bold flex items-center gap-1.5">
@@ -228,7 +306,7 @@ export default function CuentaPage() {
                   transition={{ duration: 0.2 }}
                   className="space-y-4 text-left"
                 >
-                  {orders.length === 0 ? (
+                  {mergedOrders.length === 0 ? (
                     <div className="text-center py-20 border border-white/[0.06] bg-[#0c0c0c] rounded-xl">
                       <Package size={20} className="text-white/20 mx-auto mb-4" />
                       <p className="font-code text-[10px] tracking-widest text-white/30 uppercase">
@@ -236,7 +314,7 @@ export default function CuentaPage() {
                       </p>
                     </div>
                   ) : (
-                    orders.map((order) => {
+                    mergedOrders.map((order) => {
                       const isOpen = openOrderIndex === order.id
                       return (
                         <div
@@ -372,7 +450,7 @@ export default function CuentaPage() {
                     <div className="border border-white/10 bg-black/60 rounded-xl px-8 py-5 text-center flex-shrink-0 relative z-10 shadow-lg">
                       <Sparkles size={16} className="text-[#C4822A] mx-auto mb-1 animate-pulse" />
                       <span className="font-bebas text-5xl text-white block leading-none">
-                        {loyaltyPoints}
+                        {effectivePoints}
                       </span>
                       <span className="font-code text-[9px] tracking-widest text-white/40 block mt-1 uppercase">
                         PUNTOS S2
@@ -395,9 +473,9 @@ export default function CuentaPage() {
                         </div>
                         <button
                           onClick={() => handleClaimReward(100, 'S2-10OFF')}
-                          disabled={loyaltyPoints < 100}
+                          disabled={effectivePoints < 100}
                           className={`font-code text-[8px] tracking-widest px-4 py-2.5 rounded-sm font-bold uppercase transition-colors ${
-                            loyaltyPoints >= 100
+                            effectivePoints >= 100
                               ? 'bg-white text-black hover:bg-white/80'
                               : 'border border-white/10 text-white/20 cursor-not-allowed'
                           }`}
@@ -414,9 +492,9 @@ export default function CuentaPage() {
                         </div>
                         <button
                           onClick={() => handleClaimReward(150, 'S2-FREE')}
-                          disabled={loyaltyPoints < 150}
+                          disabled={effectivePoints < 150}
                           className={`font-code text-[8px] tracking-widest px-4 py-2.5 rounded-sm font-bold uppercase transition-colors ${
-                            loyaltyPoints >= 150
+                            effectivePoints >= 150
                               ? 'bg-white text-black hover:bg-white/80'
                               : 'border border-white/10 text-white/20 cursor-not-allowed'
                           }`}
@@ -433,9 +511,9 @@ export default function CuentaPage() {
                         </div>
                         <button
                           onClick={() => handleClaimReward(250, 'S2-WELCOME10')}
-                          disabled={loyaltyPoints < 250}
+                          disabled={effectivePoints < 250}
                           className={`font-code text-[8px] tracking-widest px-4 py-2.5 rounded-sm font-bold uppercase transition-colors ${
-                            loyaltyPoints >= 250
+                            effectivePoints >= 250
                               ? 'bg-white text-black hover:bg-white/80'
                               : 'border border-white/10 text-white/20 cursor-not-allowed'
                           }`}

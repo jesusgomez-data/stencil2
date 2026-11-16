@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
+import { markOrderPaidInDb } from '@/lib/db'
 import { supabaseServer } from '@/lib/supabaseClient'
 import Stripe from 'stripe'
 
@@ -31,28 +32,38 @@ export async function POST(req: Request) {
     case 'payment_intent.succeeded': {
       const paymentIntent = event.data.object as Stripe.PaymentIntent
       const orderId = paymentIntent.metadata?.orderId
+      const customerEmail = paymentIntent.metadata?.customerEmail || paymentIntent.receipt_email || undefined
+      const customerName = paymentIntent.metadata?.customerName || undefined
+      const promoCode =
+        paymentIntent.metadata?.promoCode && paymentIntent.metadata.promoCode !== 'NONE'
+          ? paymentIntent.metadata.promoCode
+          : null
+
       console.log(`[Stripe Webhook] Pago confirmado para el pedido ${orderId} (${paymentIntent.id})`)
 
-      // Registrar pedido en Supabase si está disponible
-      if (supabaseServer && orderId) {
-        try {
-          const { error } = await supabaseServer.from('orders').upsert({
-            stripe_id: paymentIntent.id,
-            status: 'paid',
-            total: (paymentIntent.amount / 100).toFixed(2),
-            promo_code: paymentIntent.metadata?.promoCode !== 'NONE' ? paymentIntent.metadata?.promoCode : null,
-            subtotal: paymentIntent.metadata?.subtotal,
-            shipping: paymentIntent.metadata?.shipping,
-            updated_at: new Date().toISOString(),
-          }, { onConflict: 'stripe_id' })
+      // Registrar/confirmar pedido en Supabase y acreditar puntos de lealtad
+      if (supabaseServer) {
+        const totalNum = Number((paymentIntent.amount / 100).toFixed(2))
+        const result = await markOrderPaidInDb(paymentIntent.id, {
+          orderNumber: orderId,
+          customerEmail,
+          customerName,
+          promoCode,
+          subtotal: paymentIntent.metadata?.subtotal ? Number(paymentIntent.metadata.subtotal) : totalNum,
+          discount: paymentIntent.metadata?.discount ? Number(paymentIntent.metadata.discount) : 0,
+          taxableBase: paymentIntent.metadata?.taxableBase ? Number(paymentIntent.metadata.taxableBase) : undefined,
+          tax: paymentIntent.metadata?.tax ? Number(paymentIntent.metadata.tax) : undefined,
+          shipping: paymentIntent.metadata?.shipping ? Number(paymentIntent.metadata.shipping) : 0,
+          total: totalNum,
+          pointsEarned: paymentIntent.metadata?.pointsEarned
+            ? Number(paymentIntent.metadata.pointsEarned)
+            : Math.round(totalNum),
+        })
 
-          if (error) {
-            console.error('[Stripe Webhook] Error guardando en Supabase:', error)
-          } else {
-            console.log(`[Stripe Webhook] Pedido ${orderId} guardado exitosamente en Supabase`)
-          }
-        } catch (dbError) {
-          console.error('[Stripe Webhook] Excepción al interactuar con base de datos:', dbError)
+        if (!result.persisted) {
+          console.error('[Stripe Webhook] Error guardando en Supabase:', result.error)
+        } else {
+          console.log(`[Stripe Webhook] Pedido ${orderId || paymentIntent.id} guardado exitosamente en Supabase`)
         }
       }
       break
@@ -61,11 +72,20 @@ export async function POST(req: Request) {
     case 'payment_intent.payment_failed': {
       const paymentIntent = event.data.object as Stripe.PaymentIntent
       console.warn(`[Stripe Webhook] Fallo en el pago: ${paymentIntent.id}. Causa: ${paymentIntent.last_payment_error?.message}`)
+      if (supabaseServer) {
+        try {
+          await supabaseServer
+            .from('orders')
+            .update({ status: 'cancelled', notes: paymentIntent.last_payment_error?.message || 'Pago fallido' })
+            .eq('stripe_id', paymentIntent.id)
+        } catch {
+          // Ignorar fallo secundario
+        }
+      }
       break
     }
 
     default:
-      // Evento no manejado específicamente
       break
   }
 

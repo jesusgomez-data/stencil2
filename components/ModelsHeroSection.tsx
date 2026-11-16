@@ -153,8 +153,8 @@ export default function ModelsHeroSection() {
           {/* Contenido: en móvil se coloca limpiamente DEBAJO de la foto (cero interferencia visual con los rostros); en desktop queda sobre el tercio inferior */}
           <div className="relative z-30 p-5 sm:p-6 md:absolute md:bottom-0 md:left-0 md:right-0 md:p-8 flex flex-col md:flex-row md:items-end justify-between gap-4 bg-[#050505] md:bg-transparent border-t border-white/[0.06] md:border-t-0">
             <div className="max-w-md">
-              <h4 className="font-bebas text-2xl sm:text-3xl md:text-4xl text-white tracking-wide leading-none drop-shadow-md">
-                EL ESTILO NO SE PIDE. SE IMPONE.
+              <h4 className="font-bebas text-2xl sm:text-3xl md:text-4xl text-white tracking-wide leading-none uppercase drop-shadow-md">
+                Nueva colección stencil2
               </h4>
               <p className="font-code text-[10.5px] sm:text-[11px] text-white/60 mt-1 leading-snug drop-shadow-sm">
                 Diseñadas para el asfalto. Acetato pulido a mano y protección UV400.

@@ -19,35 +19,80 @@ export default function ContactoPage() {
   const [distributorPrivacyAccepted, setDistributorPrivacyAccepted] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [distributorErrorMessage, setDistributorErrorMessage] = useState('')
+  const [isSending, setIsSending] = useState(false)
+  const [isDistributorSending, setIsDistributorSending] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!privacyAccepted) {
       setErrorMessage('Debes aceptar la Política de Privacidad')
       return
     }
-    if (email && message) {
+    if (email && message && !isSending) {
+      setIsSending(true)
       setErrorMessage('')
-      setFormSent(true)
-      setEmail('')
-      setMessage('')
-      setPrivacyAccepted(false)
-      setTimeout(() => setFormSent(false), 3000)
+      try {
+        const res = await fetch('/api/contacto', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'support',
+            email,
+            message,
+            privacyAccepted,
+          }),
+        })
+        const data = await res.json()
+        if (!res.ok) {
+          setErrorMessage(data.error || 'No se pudo enviar el mensaje')
+          return
+        }
+        setFormSent(true)
+        setEmail('')
+        setMessage('')
+        setPrivacyAccepted(false)
+        setTimeout(() => setFormSent(false), 3000)
+      } catch {
+        setErrorMessage('Error de conexión. Inténtalo de nuevo.')
+      } finally {
+        setIsSending(false)
+      }
     }
   }
 
-  const handleDistributorSubmit = (e: React.FormEvent) => {
+  const handleDistributorSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!distributorPrivacyAccepted) {
       setDistributorErrorMessage('Debes aceptar la Política de Privacidad')
       return
     }
-    if (distributorEmail) {
+    if (distributorEmail && !isDistributorSending) {
+      setIsDistributorSending(true)
       setDistributorErrorMessage('')
-      setDistributorSent(true)
-      setDistributorEmail('')
-      setDistributorPrivacyAccepted(false)
-      setTimeout(() => setDistributorSent(false), 3000)
+      try {
+        const res = await fetch('/api/contacto', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'distributor',
+            email: distributorEmail,
+            privacyAccepted: distributorPrivacyAccepted,
+          }),
+        })
+        const data = await res.json()
+        if (!res.ok) {
+          setDistributorErrorMessage(data.error || 'No se pudo enviar la solicitud')
+          return
+        }
+        setDistributorSent(true)
+        setDistributorEmail('')
+        setDistributorPrivacyAccepted(false)
+        setTimeout(() => setDistributorSent(false), 3000)
+      } catch {
+        setDistributorErrorMessage('Error de conexión. Inténtalo de nuevo.')
+      } finally {
+        setIsDistributorSending(false)
+      }
     }
   }
 
@@ -144,13 +189,16 @@ export default function ContactoPage() {
 
               <button
                 type="submit"
-                className="w-full bg-white text-black hover:bg-white/80 font-code text-[10px] tracking-[0.2em] py-3.5 rounded-sm font-bold uppercase transition-all flex items-center justify-center gap-2"
+                disabled={isSending}
+                className="w-full bg-white text-black hover:bg-white/80 disabled:opacity-60 font-code text-[10px] tracking-[0.2em] py-3.5 rounded-sm font-bold uppercase transition-all flex items-center justify-center gap-2"
               >
                 {formSent ? (
                   <>
                     <Check size={12} strokeWidth={2.5} className="text-[#1C3B1C]" />
                     ¡MENSAJE ENVIADO!
                   </>
+                ) : isSending ? (
+                  'ENVIANDO...'
                 ) : (
                   'ENVIAR MENSAJE'
                 )}
@@ -231,13 +279,16 @@ export default function ContactoPage() {
 
                 <button
                   type="submit"
-                  className="w-full bg-[#C4822A] hover:bg-[#d8943f] text-black font-code text-[10px] tracking-[0.2em] py-3.5 rounded-sm font-bold uppercase transition-all flex items-center justify-center gap-2 group"
+                  disabled={isDistributorSending}
+                  className="w-full bg-[#C4822A] hover:bg-[#d8943f] disabled:opacity-60 text-black font-code text-[10px] tracking-[0.2em] py-3.5 rounded-sm font-bold uppercase transition-all flex items-center justify-center gap-2 group"
                 >
                   {distributorSent ? (
                     <>
                       <Check size={12} strokeWidth={2.5} />
                       ¡RECIBIDO! TE CONTACTAREMOS
                     </>
+                  ) : isDistributorSending ? (
+                    'ENVIANDO...'
                   ) : (
                     <>
                       SOLICITAR INFORMACIÓN

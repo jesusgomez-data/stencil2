@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Check } from 'lucide-react'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 
 const SOCIAL_LINKS = [
@@ -189,9 +189,40 @@ function FooterTacticalLogo() {
 }
 
 export default function Footer() {
+  const [newsletterEmail, setNewsletterEmail] = useState('')
+  const [newsletterLoading, setNewsletterLoading] = useState(false)
+  const [newsletterCode, setNewsletterCode] = useState<string | null>(null)
+  const [newsletterError, setNewsletterError] = useState<string | null>(null)
+
   const handleOpenCookies = () => {
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('stencil2_open_cookie_settings'))
+    }
+  }
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newsletterEmail.trim() || newsletterLoading) return
+
+    setNewsletterLoading(true)
+    setNewsletterError(null)
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newsletterEmail.trim(), source: 'footer' }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setNewsletterError(data.error || 'No se pudo completar la suscripción')
+      } else {
+        setNewsletterCode(data.promoCode || 'S2-WELCOME10')
+        setNewsletterEmail('')
+      }
+    } catch {
+      setNewsletterError('Error de conexión. Inténtalo de nuevo.')
+    } finally {
+      setNewsletterLoading(false)
     }
   }
   return (
@@ -224,16 +255,34 @@ export default function Footer() {
             <p className="font-code text-[11px] tracking-widest text-white uppercase">
               SUSCRÍBETE Y OBTÉN 10% OFF
             </p>
-            <div className="flex gap-2 max-w-sm mx-auto sm:mx-0">
+            <form onSubmit={handleNewsletterSubmit} className="flex gap-2 max-w-sm mx-auto sm:mx-0">
               <input
                 type="email"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
                 placeholder="Tu correo electrónico"
+                required
                 className="flex-1 bg-white/[0.04] border border-white/15 text-white font-code text-[11px] px-4 py-2.5 placeholder:text-white/20 focus:outline-none focus:border-white/30 transition-colors min-w-0"
               />
-              <button className="bg-white/10 border border-white/20 text-white px-3 py-2.5 hover:bg-white hover:text-black transition-colors flex-shrink-0" aria-label="Suscribirme">
-                <ArrowRight size={14} />
+              <button
+                type="submit"
+                disabled={newsletterLoading}
+                className="bg-white/10 border border-white/20 text-white px-3 py-2.5 hover:bg-white hover:text-black transition-colors flex-shrink-0 disabled:opacity-50"
+                aria-label="Suscribirme"
+              >
+                {newsletterCode ? <Check size={14} /> : <ArrowRight size={14} />}
               </button>
-            </div>
+            </form>
+            {newsletterCode && (
+              <p className="font-code text-[10px] tracking-wider text-[#00E575] uppercase max-w-sm mx-auto sm:mx-0">
+                ¡Suscrito! Usa el código <span className="font-bold underline">{newsletterCode}</span> en tu primer pedido.
+              </p>
+            )}
+            {newsletterError && (
+              <p className="font-code text-[10px] tracking-wider text-[#CC0000] uppercase max-w-sm mx-auto sm:mx-0">
+                {newsletterError}
+              </p>
+            )}
             <p className="font-code text-[8px] text-white/30 leading-tight uppercase max-w-sm mx-auto sm:mx-0">
               Al suscribirte aceptas nuestra <Link href="/privacidad" className="underline hover:text-white/60">Política de Privacidad</Link> y el envío de comunicaciones comerciales.
             </p>
