@@ -1,30 +1,16 @@
 import { NextResponse } from 'next/server'
-import { createOrderInDb, getOrdersByEmailFromDb } from '@/lib/db'
+import { createOrderInDb, orderExistsInDb } from '@/lib/db'
 import { calculateCartTotals } from '@/lib/pricing'
 import { getProductById, getProductBySlug } from '@/lib/products'
 import type { OrderItemJson } from '@/types/database'
 
-export async function GET(req: Request) {
-  try {
-    const { searchParams } = new URL(req.url)
-    const email = searchParams.get('email')
-
-    if (!email || !email.includes('@')) {
-      return NextResponse.json(
-        { error: 'Se requiere un correo electrónico válido' },
-        { status: 400 }
-      )
-    }
-
-    const { orders, source } = await getOrdersByEmailFromDb(email)
-    return NextResponse.json({ orders, source })
-  } catch (error: any) {
-    console.error('[API /orders GET] Error:', error)
-    return NextResponse.json(
-      { error: error?.message || 'Error al obtener pedidos' },
-      { status: 500 }
-    )
-  }
+// Seguridad (RGPD): listar pedidos por email sin login expone datos personales
+// de terceros. Desactivado hasta implementar Supabase Auth.
+export async function GET() {
+  return NextResponse.json(
+    { error: 'Requiere iniciar sesión (próximamente)' },
+    { status: 403 }
+  )
 }
 
 export async function POST(req: Request) {
@@ -37,10 +23,16 @@ export async function POST(req: Request) {
       shippingAddress,
       promoCode,
       stripeId,
-      status,
     } = body
 
     const resolvedOrderNumber = String(orderNumber || id || `S2-ORD-${Math.floor(100000 + Math.random() * 900000)}`)
+
+    // Seguridad: este endpoint es público. Si el pedido ya existe (lo pre-registra
+    // create-payment-intent), no se modifica. El estado 'paid' y los puntos solo
+    // los asigna el webhook firmado de Stripe.
+    if (await orderExistsInDb(resolvedOrderNumber)) {
+      return NextResponse.json({ ok: true, orderNumber: resolvedOrderNumber, persisted: true })
+    }
     const customerEmail = shippingAddress?.email || body.customerEmail
 
     if (!customerEmail || typeof customerEmail !== 'string' || !customerEmail.includes('@')) {
@@ -91,7 +83,7 @@ export async function POST(req: Request) {
       customerName: shippingAddress?.name || body.customerName || null,
       customerPhone: shippingAddress?.phone || body.customerPhone || null,
       stripeId: stripeId || null,
-      status: status || 'paid',
+      status: 'pending',
       items: normalizedItems,
       subtotal: breakdown.subtotal,
       discount: breakdown.discount,
@@ -108,7 +100,6 @@ export async function POST(req: Request) {
       ok: true,
       orderNumber: resolvedOrderNumber,
       persisted: result.persisted,
-      order: result.order,
     })
   } catch (error: any) {
     console.error('[API /orders POST] Error:', error)

@@ -16,11 +16,18 @@ export async function POST(req: Request) {
   let event: Stripe.Event
 
   try {
-    if (webhookSecret && sig) {
+    if (webhookSecret) {
+      // Siempre exigir firma válida de Stripe cuando hay secreto configurado
+      if (!sig) {
+        return NextResponse.json({ error: 'Falta la firma de Stripe' }, { status: 400 })
+      }
       event = stripe.webhooks.constructEvent(body, sig, webhookSecret)
-    } else {
-      // En desarrollo sin webhook secret configurado
+    } else if (process.env.NODE_ENV !== 'production') {
+      // Solo en desarrollo local sin secreto configurado
       event = JSON.parse(body) as Stripe.Event
+    } else {
+      console.error('[Stripe Webhook] STRIPE_WEBHOOK_SECRET no configurado en producción')
+      return NextResponse.json({ error: 'Webhook no configurado' }, { status: 500 })
     }
   } catch (err: any) {
     console.error(`Error en verificación de webhook de Stripe: ${err.message}`)

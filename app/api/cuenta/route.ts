@@ -1,10 +1,5 @@
 import { NextResponse } from 'next/server'
-import {
-  getProfileByEmailFromDb,
-  upsertProfileInDb,
-  getOrdersByEmailFromDb,
-  redeemLoyaltyPointsInDb,
-} from '@/lib/db'
+import { getProfileByEmailFromDb } from '@/lib/db'
 
 export async function GET(req: Request) {
   try {
@@ -18,16 +13,16 @@ export async function GET(req: Request) {
       )
     }
 
-    const [profile, ordersResult] = await Promise.all([
-      getProfileByEmailFromDb(email),
-      getOrdersByEmailFromDb(email),
-    ])
+    // Seguridad (RGPD): sin login no se puede verificar que el email pertenece a
+    // quien hace la petición, así que no se devuelven datos personales ni pedidos.
+    // Solo el saldo de puntos. Cuando exista login (Supabase Auth) se ampliará.
+    const profile = await getProfileByEmailFromDb(email)
 
     return NextResponse.json({
-      profile,
+      profile: null,
       loyaltyPoints: profile?.loyalty_points ?? null,
-      orders: ordersResult.orders,
-      source: profile || ordersResult.source === 'supabase' ? 'supabase' : 'fallback',
+      orders: [],
+      source: profile ? 'supabase' : 'fallback',
     })
   } catch (error: any) {
     console.error('[API /cuenta GET] Error:', error)
@@ -50,47 +45,14 @@ export async function POST(req: Request) {
       )
     }
 
-    if (action === 'update_profile') {
-      const { fullName, name, phone, defaultShippingAddress } = body
-      const result = await upsertProfileInDb({
-        email,
-        fullName: fullName ?? name ?? null,
-        phone: phone ?? null,
-        defaultShippingAddress,
-      })
-
-      return NextResponse.json({
-        ok: true,
-        profile: result.profile,
-        persisted: result.persisted,
-      })
-    }
-
-    if (action === 'redeem_points') {
-      const pointsNeeded = Number(body.pointsNeeded)
-      const rewardCode = String(body.code || body.rewardCode || '').trim().toUpperCase()
-
-      if (!Number.isFinite(pointsNeeded) || pointsNeeded <= 0 || !rewardCode) {
-        return NextResponse.json(
-          { error: 'Datos de canje inválidos' },
-          { status: 400 }
-        )
-      }
-
-      const result = await redeemLoyaltyPointsInDb(email, pointsNeeded, rewardCode)
-      if (!result.ok && result.persisted) {
-        return NextResponse.json(
-          { error: result.error || 'Puntos insuficientes' },
-          { status: 400 }
-        )
-      }
-
-      return NextResponse.json({
-        ok: true,
-        loyaltyPoints: result.loyaltyPoints,
-        code: rewardCode,
-        persisted: result.persisted,
-      })
+    // Seguridad: sin login, cualquiera podría modificar el perfil o gastar los
+    // puntos de otra persona conociendo solo su email. Desactivado en servidor
+    // hasta implementar Supabase Auth; la página mantiene el guardado local.
+    if (action === 'update_profile' || action === 'redeem_points') {
+      return NextResponse.json(
+        { error: 'Requiere iniciar sesión (próximamente)' },
+        { status: 403 }
+      )
     }
 
     return NextResponse.json(

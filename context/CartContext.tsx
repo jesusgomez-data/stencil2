@@ -174,7 +174,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           pointsEarned: newOrder.pointsEarned,
           stripeId: newOrder.stripeId,
           shippingAddress: newOrder.shippingAddress,
-          status: 'paid',
         }),
       }).catch((err) => {
         console.warn('[CartContext] No se pudo sincronizar el pedido en Supabase:', err)

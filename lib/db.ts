@@ -480,6 +480,16 @@ export async function createOrderInDb(payload: CreateOrderPayload): Promise<{
   }
 }
 
+export async function orderExistsInDb(orderNumber: string): Promise<boolean> {
+  if (!supabaseServer || !orderNumber) return false
+  const { data } = await supabaseServer
+    .from('orders')
+    .select('id')
+    .eq('order_number', orderNumber)
+    .maybeSingle()
+  return Boolean(data)
+}
+
 export async function markOrderPaidInDb(
   stripeId: string,
   payload: {
