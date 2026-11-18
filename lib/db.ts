@@ -146,6 +146,11 @@ export async function getProductBySlugFromDb(slug: string): Promise<{
   product: Product | undefined
   source: 'supabase' | 'fallback'
 }> {
+  // Solo letras, números y guiones: evita inyectar filtros en la consulta .or()
+  if (!/^[a-z0-9-]{1,100}$/i.test(slug)) {
+    return { product: undefined, source: 'fallback' }
+  }
+
   if (!supabaseServer) {
     return { product: getProductBySlug(slug), source: 'fallback' }
   }

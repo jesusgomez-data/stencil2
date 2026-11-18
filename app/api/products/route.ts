@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { getProductsFromDb, getProductBySlugFromDb } from '@/lib/db'
 
+// Depende de los parámetros de la URL: siempre se renderiza bajo demanda
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url)
