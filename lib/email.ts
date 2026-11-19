@@ -159,6 +159,12 @@ async function dispatchEmail(params: {
   }
 }
 
+// Los logos se sirven desde /public. Se fuerza el host con "www" para evitar la
+// redirección del apex (algunos clientes de correo no siguen redirecciones en imágenes).
+function getAssetBaseUrl(): string {
+  return getAppUrl().replace(/^https:\/\/stencil2\.com/i, 'https://www.stencil2.com')
+}
+
 function renderEmailShell(options: {
   preheader: string
   eyebrow: string
@@ -167,72 +173,90 @@ function renderEmailShell(options: {
   footerExtraHtml?: string
 }): string {
   const appUrl = escapeHtml(getAppUrl())
+  const assetUrl = escapeHtml(getAssetBaseUrl())
   const preheader = escapeHtml(options.preheader)
   const eyebrow = escapeHtml(options.eyebrow)
   const title = escapeHtml(options.title)
+  const mono = "'Courier New',Courier,monospace"
+  const navLink = `style="color:#B8B2A6;text-decoration:none;font-family:${mono};font-size:11px;letter-spacing:1.5px;text-transform:uppercase;"`
 
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="color-scheme" content="dark light" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="supported-color-schemes" content="dark" />
   <title>${title}</title>
 </head>
-<body style="margin:0;padding:0;background-color:#080808;color:#F5F2EB;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
+<body style="margin:0;padding:0;background-color:#050505;color:#F5F2EB;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
   <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">
     ${preheader}
   </div>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#080808;width:100%;margin:0;padding:28px 12px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#050505" style="background-color:#050505;width:100%;margin:0;padding:32px 12px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background-color:#111111;border:1px solid #262420;">
-          <!-- Cabecera de marca -->
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#0E0E0E" style="width:100%;max-width:600px;background-color:#0E0E0E;border:1px solid #232120;">
+          <!-- Franja de marca -->
           <tr>
-            <td style="padding:28px 32px 20px 32px;border-bottom:1px solid #22201C;background-color:#0B0B0B;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td align="left">
-                    <a href="${appUrl}" style="text-decoration:none;color:#F5F2EB;font-size:22px;font-weight:800;letter-spacing:4px;font-family:'Courier New',Courier,monospace;">
-                      STENCIL2
-                    </a>
-                  </td>
-                  <td align="right" style="font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:2.5px;color:#C4822A;text-transform:uppercase;">
-                    JOINING CULTURE
-                  </td>
-                </tr>
-              </table>
+            <td height="4" style="height:4px;line-height:4px;font-size:0;background-color:#CC0000;">&nbsp;</td>
+          </tr>
+
+          <!-- Cabecera con logo oficial -->
+          <tr>
+            <td align="center" bgcolor="#080808" style="padding:36px 32px 28px 32px;background-color:#080808;border-bottom:1px solid #232120;">
+              <a href="${appUrl}" style="text-decoration:none;">
+                <img src="${assetUrl}/images/logo-script-white.png" alt="STENCIL2" width="190" height="96" style="display:block;border:0;outline:none;width:190px;height:auto;max-width:100%;color:#F5F2EB;font-family:${mono};font-size:24px;letter-spacing:4px;" />
+              </a>
+              <p style="margin:14px 0 0 0;font-family:${mono};font-size:10px;letter-spacing:4px;color:#C8B89A;text-transform:uppercase;">
+                JOINING CULTURE
+              </p>
             </td>
           </tr>
 
           <!-- Título principal -->
           <tr>
-            <td style="padding:32px 32px 12px 32px;">
-              <p style="margin:0 0 8px 0;font-family:'Courier New',Courier,monospace;font-size:11px;letter-spacing:3px;color:#C4822A;text-transform:uppercase;">
+            <td style="padding:36px 36px 8px 36px;">
+              <p style="margin:0 0 10px 0;font-family:${mono};font-size:11px;letter-spacing:3px;color:#C8B89A;text-transform:uppercase;">
                 ${eyebrow}
               </p>
-              <h1 style="margin:0;font-size:24px;line-height:1.25;font-weight:700;color:#F5F2EB;letter-spacing:0.5px;">
+              <h1 style="margin:0;font-size:26px;line-height:1.25;font-weight:700;color:#F5F2EB;letter-spacing:0.3px;">
                 ${title}
               </h1>
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;">
+                <tr><td width="48" height="2" style="width:48px;height:2px;line-height:2px;font-size:0;background-color:#CC0000;">&nbsp;</td></tr>
+              </table>
             </td>
           </tr>
 
           <!-- Cuerpo -->
           <tr>
-            <td style="padding:12px 32px 32px 32px;color:#EAE5D9;font-size:14px;line-height:1.6;">
+            <td style="padding:20px 36px 36px 36px;color:#EAE5D9;font-size:14px;line-height:1.65;">
               ${options.bodyHtml}
             </td>
           </tr>
 
           <!-- Pie -->
           <tr>
-            <td style="padding:24px 32px;background-color:#0B0B0B;border-top:1px solid #22201C;color:#8E8A80;font-size:12px;line-height:1.5;">
-              ${options.footerExtraHtml || ''}
-              <p style="margin:0 0 6px 0;font-family:'Courier New',Courier,monospace;font-size:11px;letter-spacing:1.5px;color:#B8B2A6;">
-                STENCIL2 · ESPAÑA · <a href="${appUrl}" style="color:#F5F2EB;text-decoration:underline;">www.stencil2.com</a>
+            <td align="center" bgcolor="#080808" style="padding:32px 32px 28px 32px;background-color:#080808;border-top:1px solid #232120;color:#8E8A80;font-size:12px;line-height:1.6;">
+              <a href="${appUrl}" style="text-decoration:none;">
+                <img src="${assetUrl}/images/logo-grenade-white.png" alt="S2" width="34" height="55" style="display:block;margin:0 auto 18px auto;border:0;width:34px;height:auto;opacity:0.9;" />
+              </a>
+              <p style="margin:0 0 18px 0;">
+                <a href="${appUrl}/tienda" ${navLink}>Tienda</a>
+                <span style="color:#3A3733;">&nbsp;&nbsp;·&nbsp;&nbsp;</span>
+                <a href="${appUrl}/envio" ${navLink}>Envíos</a>
+                <span style="color:#3A3733;">&nbsp;&nbsp;·&nbsp;&nbsp;</span>
+                <a href="${appUrl}/faq" ${navLink}>FAQ</a>
+                <span style="color:#3A3733;">&nbsp;&nbsp;·&nbsp;&nbsp;</span>
+                <a href="${appUrl}/contacto" ${navLink}>Contacto</a>
               </p>
-              <p style="margin:0;color:#757168;font-size:11px;">
-                Si necesitas ayuda, responde directamente a este correo o escríbenos a <a href="mailto:pedidos@stencil2.com" style="color:#C4822A;text-decoration:none;">pedidos@stencil2.com</a>.
+              ${options.footerExtraHtml || ''}
+              <p style="margin:0 0 8px 0;color:#757168;font-size:11px;">
+                ¿Necesitas ayuda? Responde a este correo o escríbenos a <a href="mailto:pedidos@stencil2.com" style="color:#C8B89A;text-decoration:none;">pedidos@stencil2.com</a>.
+              </p>
+              <p style="margin:0;font-family:${mono};font-size:10px;letter-spacing:1.5px;color:#5E5A52;text-transform:uppercase;">
+                STENCIL2 · España · <a href="${appUrl}/privacidad" style="color:#757168;text-decoration:underline;">Privacidad</a>
               </p>
             </td>
           </tr>
@@ -342,8 +366,8 @@ function buildOrderTotalsHtml(order: OrderEmailPayload): string {
   const discountRow =
     order.discount > 0
       ? `<tr>
-          <td style="padding:4px 0;color:#C4822A;font-size:13px;">Descuento${promoLabel}</td>
-          <td align="right" style="padding:4px 0;color:#C4822A;font-family:'Courier New',Courier,monospace;font-size:13px;">-${formatEur(order.discount)}</td>
+          <td style="padding:4px 0;color:#C8B89A;font-size:13px;">Descuento${promoLabel}</td>
+          <td align="right" style="padding:4px 0;color:#C8B89A;font-family:'Courier New',Courier,monospace;font-size:13px;">-${formatEur(order.discount)}</td>
         </tr>`
       : ''
 
@@ -385,7 +409,7 @@ function buildShippingAddressHtml(order: OrderEmailPayload): string {
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-top:20px;background-color:#0D0D0C;border:1px solid #262420;padding:16px;">
     <tr>
       <td>
-        <p style="margin:0 0 8px 0;font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:2px;color:#C4822A;text-transform:uppercase;">
+        <p style="margin:0 0 8px 0;font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:2px;color:#C8B89A;text-transform:uppercase;">
           DIRECCIÓN DE ENVÍO
         </p>
         <p style="margin:0;color:#F5F2EB;font-size:13px;line-height:1.5;">
@@ -474,7 +498,7 @@ export async function sendOrderConfirmation(
         <td style="font-family:'Courier New',Courier,monospace;font-size:11px;color:#8E8A80;letter-spacing:1.5px;text-transform:uppercase;">
           Nº DE PEDIDO
         </td>
-        <td align="right" style="font-family:'Courier New',Courier,monospace;font-size:14px;color:#C4822A;font-weight:700;letter-spacing:1px;">
+        <td align="right" style="font-family:'Courier New',Courier,monospace;font-size:14px;color:#C8B89A;font-weight:700;letter-spacing:1px;">
           #${orderNumber}
         </td>
       </tr>
@@ -487,7 +511,7 @@ export async function sendOrderConfirmation(
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin-top:20px;background-color:#161410;border:1px solid #3D3220;padding:14px 16px;">
       <tr>
         <td style="color:#EAE5D9;font-size:13px;">
-          <strong style="color:#C4822A;font-family:'Courier New',Courier,monospace;">+${escapeHtml(order.pointsEarned)} PUNTOS S2</strong> añadidos a tu cuenta de fidelidad con esta compra.
+          <strong style="color:#C8B89A;font-family:'Courier New',Courier,monospace;">+${escapeHtml(order.pointsEarned)} PUNTOS S2</strong> añadidos a tu cuenta de fidelidad con esta compra.
         </td>
       </tr>
     </table>
@@ -534,7 +558,7 @@ export async function sendNewOrderAlert(
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background-color:#0D0D0C;border:1px solid #2C2924;padding:14px 16px;margin-bottom:16px;">
       <tr>
         <td style="padding:4px 0;font-family:'Courier New',Courier,monospace;font-size:11px;color:#8E8A80;">PEDIDO:</td>
-        <td align="right" style="padding:4px 0;font-family:'Courier New',Courier,monospace;font-size:13px;color:#C4822A;font-weight:700;">#${orderNumber}</td>
+        <td align="right" style="padding:4px 0;font-family:'Courier New',Courier,monospace;font-size:13px;color:#C8B89A;font-weight:700;">#${orderNumber}</td>
       </tr>
       <tr>
         <td style="padding:4px 0;font-family:'Courier New',Courier,monospace;font-size:11px;color:#8E8A80;">CLIENTE:</td>
@@ -594,10 +618,10 @@ export async function sendContactAlert(
       </tr>
       <tr>
         <td style="padding:4px 0;color:#8E8A80;font-size:12px;">Email:</td>
-        <td style="padding:4px 0;color:#C4822A;font-size:13px;"><a href="mailto:${safeEmail}" style="color:#C4822A;text-decoration:underline;">${safeEmail}</a></td>
+        <td style="padding:4px 0;color:#C8B89A;font-size:13px;"><a href="mailto:${safeEmail}" style="color:#C8B89A;text-decoration:underline;">${safeEmail}</a></td>
       </tr>
     </table>
-    <div style="background-color:#161513;border-left:3px solid #C4822A;padding:16px;color:#F5F2EB;font-size:13px;line-height:1.6;">
+    <div style="background-color:#161513;border-left:3px solid #C8B89A;padding:16px;color:#F5F2EB;font-size:13px;line-height:1.6;">
       ${safeMessage}
     </div>
   `
@@ -643,7 +667,7 @@ export async function sendContactAutoreply(
     <p style="margin:0 0 8px 0;font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:2px;color:#8E8A80;text-transform:uppercase;">
       COPIA DE TU MENSAJE
     </p>
-    <div style="background-color:#161513;border-left:3px solid #C4822A;padding:16px;color:#EAE5D9;font-size:13px;line-height:1.6;">
+    <div style="background-color:#161513;border-left:3px solid #C8B89A;padding:16px;color:#EAE5D9;font-size:13px;line-height:1.6;">
       ${safeMessage}
     </div>
   `
@@ -702,7 +726,7 @@ export async function sendDistributorAlert(
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background-color:#0D0D0C;border:1px solid #262420;padding:16px;margin-bottom:16px;">
       <tr>
         <td style="padding:4px 0;color:#8E8A80;font-size:12px;">Email:</td>
-        <td style="padding:4px 0;color:#C4822A;font-size:13px;"><a href="mailto:${safeEmail}" style="color:#C4822A;text-decoration:underline;">${safeEmail}</a></td>
+        <td style="padding:4px 0;color:#C8B89A;font-size:13px;"><a href="mailto:${safeEmail}" style="color:#C8B89A;text-decoration:underline;">${safeEmail}</a></td>
       </tr>
       <tr>
         <td style="padding:4px 0;color:#8E8A80;font-size:12px;">Empresa / Óptica:</td>
@@ -713,7 +737,7 @@ export async function sendDistributorAlert(
         <td style="padding:4px 0;color:#F5F2EB;font-size:13px;">${safePhone}</td>
       </tr>
     </table>
-    <div style="background-color:#161513;border-left:3px solid #C4822A;padding:16px;color:#EAE5D9;font-size:13px;line-height:1.6;">
+    <div style="background-color:#161513;border-left:3px solid #C8B89A;padding:16px;color:#EAE5D9;font-size:13px;line-height:1.6;">
       ${safeNotes}
     </div>
   `
@@ -764,7 +788,7 @@ export async function sendNewsletterWelcome(
       Como regalo de bienvenida, aquí tienes tu código de <strong>10% de descuento</strong> para tu primer pedido:
     </p>
 
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:20px 0;background-color:#0B0B0A;border:1px dashed #C4822A;padding:20px;text-align:center;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:20px 0;background-color:#0B0B0A;border:1px dashed #C8B89A;padding:20px;text-align:center;">
       <tr>
         <td align="center">
           <span style="display:block;font-family:'Courier New',Courier,monospace;font-size:10px;letter-spacing:2.5px;color:#8E8A80;text-transform:uppercase;margin-bottom:6px;">
