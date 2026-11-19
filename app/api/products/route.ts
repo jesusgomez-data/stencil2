@@ -35,10 +35,10 @@ export async function GET(req: Request) {
       count: filtered.length,
       source,
     })
-  } catch (error: any) {
+  } catch (error) {
     console.error('[API /products] Error:', error)
     return NextResponse.json(
-      { error: error?.message || 'Error al obtener productos' },
+      { error: 'No se pudieron obtener los productos en este momento' },
       { status: 500 }
     )
   }

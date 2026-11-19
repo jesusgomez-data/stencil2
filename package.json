@@ -8,7 +8,8 @@
         "start": "next start",
         "lint": "next lint",
         "images:build": "node scripts/generate-image-catalog.js",
-        "db:seed": "node scripts/seed-supabase.mjs"
+        "db:seed": "node scripts/seed-supabase.mjs",
+        "email:test": "node scripts/test-emails.mjs"
     },
     "dependencies": {
         "@react-three/drei": "^9.115.0",
@@ -22,6 +23,7 @@
         "next": "14.2.35",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
+        "resend": "^6.39.0",
         "stripe": "^17.4.0",
         "three": "^0.170.0"
     },

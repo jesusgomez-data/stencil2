@@ -190,9 +190,11 @@ function FooterTacticalLogo() {
 
 export default function Footer() {
   const [newsletterEmail, setNewsletterEmail] = useState('')
+  const [newsletterHoneypot, setNewsletterHoneypot] = useState('')
   const [newsletterLoading, setNewsletterLoading] = useState(false)
   const [newsletterCode, setNewsletterCode] = useState<string | null>(null)
   const [newsletterError, setNewsletterError] = useState<string | null>(null)
+  const [needsReactivateConfirm, setNeedsReactivateConfirm] = useState(false)
 
   const handleOpenCookies = () => {
     if (typeof window !== 'undefined') {
@@ -200,8 +202,7 @@ export default function Footer() {
     }
   }
 
-  const handleNewsletterSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const submitNewsletter = async (confirmReactivate: boolean = false) => {
     if (!newsletterEmail.trim() || newsletterLoading) return
 
     setNewsletterLoading(true)
@@ -210,20 +211,32 @@ export default function Footer() {
       const res = await fetch('/api/newsletter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: newsletterEmail.trim(), source: 'footer' }),
+        body: JSON.stringify({
+          email: newsletterEmail.trim(),
+          source: 'footer',
+          website: newsletterHoneypot,
+          confirmReactivate,
+        }),
       })
       const data = await res.json()
       if (!res.ok) {
         setNewsletterError(data.error || 'No se pudo completar la suscripción')
+        setNeedsReactivateConfirm(Boolean(data.requiresConfirmation))
       } else {
         setNewsletterCode(data.promoCode || 'S2-WELCOME10')
         setNewsletterEmail('')
+        setNeedsReactivateConfirm(false)
       }
     } catch {
       setNewsletterError('Error de conexión. Inténtalo de nuevo.')
     } finally {
       setNewsletterLoading(false)
     }
+  }
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    await submitNewsletter(false)
   }
   return (
     <footer className="bg-black border-t border-white/[0.07]">
@@ -257,10 +270,24 @@ export default function Footer() {
             </p>
             <form onSubmit={handleNewsletterSubmit} className="flex gap-2 max-w-sm mx-auto sm:mx-0">
               <input
+                type="text"
+                name="website"
+                value={newsletterHoneypot}
+                onChange={(e) => setNewsletterHoneypot(e.target.value)}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                className="hidden"
+              />
+              <input
                 type="email"
                 value={newsletterEmail}
-                onChange={(e) => setNewsletterEmail(e.target.value)}
+                onChange={(e) => {
+                  setNewsletterEmail(e.target.value)
+                  if (needsReactivateConfirm) setNeedsReactivateConfirm(false)
+                }}
                 placeholder="Tu correo electrónico"
+                maxLength={254}
                 required
                 className="flex-1 bg-white/[0.04] border border-white/15 text-white font-code text-[11px] px-4 py-2.5 placeholder:text-white/20 focus:outline-none focus:border-white/30 transition-colors min-w-0"
               />
@@ -279,9 +306,21 @@ export default function Footer() {
               </p>
             )}
             {newsletterError && (
-              <p className="font-code text-[10px] tracking-wider text-[#CC0000] uppercase max-w-sm mx-auto sm:mx-0">
-                {newsletterError}
-              </p>
+              <div className="max-w-sm mx-auto sm:mx-0 space-y-1.5">
+                <p className="font-code text-[10px] tracking-wider text-[#CC0000] uppercase">
+                  {newsletterError}
+                </p>
+                {needsReactivateConfirm && (
+                  <button
+                    type="button"
+                    disabled={newsletterLoading}
+                    onClick={() => submitNewsletter(true)}
+                    className="font-code text-[9px] tracking-widest text-white underline hover:text-[#C4822A] uppercase"
+                  >
+                    CONFIRMAR REACTIVACIÓN DE SUSCRIPCIÓN →
+                  </button>
+                )}
+              </div>
             )}
             <p className="font-code text-[8px] text-white/30 leading-tight uppercase max-w-sm mx-auto sm:mx-0">
               Al suscribirte aceptas nuestra <Link href="/privacidad" className="underline hover:text-white/60">Política de Privacidad</Link> y el envío de comunicaciones comerciales.

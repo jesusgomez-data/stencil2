@@ -3,25 +3,55 @@ import { stripe, isStripeConfigured } from '@/lib/stripe'
 import { getProductById, getProductBySlug } from '@/lib/products'
 import { calculateCartTotals } from '@/lib/pricing'
 import { createOrderInDb } from '@/lib/db'
+import { FIELD_LIMITS, isValidEmail, normalizeEmail } from '@/lib/security'
 import type { OrderItemJson } from '@/types/database'
 
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { items, shippingAddress, promoCode } = body
+    const { items, shippingAddress, promoCode } = body || {}
 
-    if (!items || !Array.isArray(items) || items.length === 0) {
+    if (!items || !Array.isArray(items) || items.length === 0 || items.length > 50) {
       return NextResponse.json(
         { error: 'El carrito no contiene artículos válidos' },
         { status: 400 }
       )
     }
 
-    if (!shippingAddress || !shippingAddress.email) {
+    if (!shippingAddress || !isValidEmail(shippingAddress.email)) {
       return NextResponse.json(
-        { error: 'Se requiere información de envío y correo electrónico' },
+        { error: 'Se requiere información de envío y un correo electrónico válido' },
         { status: 400 }
       )
+    }
+
+    const normalizedEmail = normalizeEmail(shippingAddress.email)
+    const cleanName = String(shippingAddress.name || '').trim()
+    const cleanPhone = String(shippingAddress.phone || '').trim()
+    const cleanAddress = String(shippingAddress.address || '').trim()
+    const cleanCity = String(shippingAddress.city || '').trim()
+    const cleanPostal = String(shippingAddress.postalCode || '').trim()
+
+    if (
+      cleanName.length > FIELD_LIMITS.name ||
+      cleanPhone.length > FIELD_LIMITS.phone ||
+      cleanAddress.length > FIELD_LIMITS.address ||
+      cleanCity.length > FIELD_LIMITS.city ||
+      cleanPostal.length > FIELD_LIMITS.postalCode
+    ) {
+      return NextResponse.json(
+        { error: 'Uno o más campos de la dirección de envío superan la longitud máxima' },
+        { status: 400 }
+      )
+    }
+
+    const safeShippingAddress = {
+      name: cleanName,
+      address: cleanAddress,
+      city: cleanCity,
+      postalCode: cleanPostal,
+      email: normalizedEmail,
+      phone: cleanPhone,
     }
 
     // 1. Verificación de precios contra el catálogo del servidor
@@ -35,15 +65,15 @@ export async function POST(req: Request) {
       const quantity = Math.max(1, Math.min(10, Number(clientItem.quantity) || 1))
 
       orderItemsPayload.push({
-        id: String(clientItem.id || product?.id || ''),
-        code: String(clientItem.code || product?.code || ''),
-        name: String(clientItem.name || product?.name || 'Gafas STENCIL2'),
-        slug: String(clientItem.slug || product?.slug || clientItem.id || ''),
+        id: String(clientItem.id || product?.id || '').slice(0, 80),
+        code: String(clientItem.code || product?.code || '').slice(0, 40),
+        name: String(clientItem.name || product?.name || 'Gafas STENCIL2').slice(0, 120),
+        slug: String(clientItem.slug || product?.slug || clientItem.id || '').slice(0, 100),
         price: unitPrice,
-        image: String(clientItem.image || product?.image || ''),
-        model: String(clientItem.model || product?.model || 'wayfarer'),
-        color: String(clientItem.color || product?.frameColor || '#1a1a1a'),
-        colorLabel: String(clientItem.colorLabel || product?.colors?.[0]?.label || 'Estándar'),
+        image: String(clientItem.image || product?.image || '').slice(0, 250),
+        model: String(clientItem.model || product?.model || 'wayfarer').slice(0, 40),
+        color: String(clientItem.color || product?.frameColor || '#1a1a1a').slice(0, 40),
+        colorLabel: String(clientItem.colorLabel || product?.colors?.[0]?.label || 'Estándar').slice(0, 60),
         quantity,
       })
 
@@ -55,19 +85,23 @@ export async function POST(req: Request) {
     })
 
     // 2. Cálculo matemático de totales y desgloses
-    const breakdown = calculateCartTotals(verifiedItems, promoCode)
+    const normalizedPromo =
+      typeof promoCode === 'string' && promoCode.trim().length <= FIELD_LIMITS.promoCode
+        ? promoCode.trim().toUpperCase() || null
+        : null
+
+    const breakdown = calculateCartTotals(verifiedItems, normalizedPromo || undefined)
     const amountInCents = Math.round(breakdown.total * 100)
     const orderId = `S2-ORD-${Math.floor(100000 + Math.random() * 900000)}`
-    const normalizedPromo = promoCode ? String(promoCode).trim().toUpperCase() : null
 
     // 3. Comprobación de configuración de Stripe
     if (!isStripeConfigured() || !stripe) {
       const mockPi = `s2_mock_pi_${Date.now()}`
       await createOrderInDb({
         orderNumber: orderId,
-        customerEmail: shippingAddress.email,
-        customerName: shippingAddress.name || null,
-        customerPhone: shippingAddress.phone || null,
+        customerEmail: normalizedEmail,
+        customerName: cleanName || null,
+        customerPhone: cleanPhone || null,
         stripeId: mockPi,
         status: 'pending',
         items: orderItemsPayload,
@@ -79,7 +113,7 @@ export async function POST(req: Request) {
         total: breakdown.total,
         promoCode: normalizedPromo,
         pointsEarned: breakdown.pointsEarned,
-        shippingAddress,
+        shippingAddress: safeShippingAddress,
       })
 
       return NextResponse.json({
@@ -99,12 +133,12 @@ export async function POST(req: Request) {
       automatic_payment_methods: {
         enabled: true,
       },
-      receipt_email: shippingAddress.email,
+      receipt_email: normalizedEmail,
       description: `Pedido STENCIL2 #${orderId}`,
       metadata: {
         orderId,
-        customerName: shippingAddress.name || '',
-        customerEmail: shippingAddress.email || '',
+        customerName: cleanName,
+        customerEmail: normalizedEmail,
         promoCode: normalizedPromo || 'NONE',
         subtotal: breakdown.subtotal.toFixed(2),
         discount: breakdown.discount.toFixed(2),
@@ -120,9 +154,9 @@ export async function POST(req: Request) {
     // 5. Pre-registro del pedido en estado 'pending' en Supabase
     await createOrderInDb({
       orderNumber: orderId,
-      customerEmail: shippingAddress.email,
-      customerName: shippingAddress.name || null,
-      customerPhone: shippingAddress.phone || null,
+      customerEmail: normalizedEmail,
+      customerName: cleanName || null,
+      customerPhone: cleanPhone || null,
       stripeId: paymentIntent.id,
       status: 'pending',
       items: orderItemsPayload,
@@ -134,7 +168,7 @@ export async function POST(req: Request) {
       total: breakdown.total,
       promoCode: normalizedPromo,
       pointsEarned: breakdown.pointsEarned,
-      shippingAddress,
+      shippingAddress: safeShippingAddress,
     })
 
     return NextResponse.json({
@@ -144,10 +178,10 @@ export async function POST(req: Request) {
       breakdown,
       demoMode: false,
     })
-  } catch (error: any) {
-    console.error('Error al crear PaymentIntent:', error)
+  } catch (error) {
+    console.error('[API /checkout/create-payment-intent] Error:', error)
     return NextResponse.json(
-      { error: error?.message || 'Error interno al procesar el pago' },
+      { error: 'No se pudo iniciar el proceso de pago en este momento. Inténtalo de nuevo.' },
       { status: 500 }
     )
   }

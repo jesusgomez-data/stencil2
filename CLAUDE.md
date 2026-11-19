@@ -78,18 +78,29 @@ Font 3 (UI/Interfaz): Minion Variable Concept — Medium
 - **IVA:** 21% incluido en precio mostrado
 
 ### Email
-- **Proveedor:** Resend (transaccional)
-- **Templates:** React Email
-- **Emails a implementar:**
-  1. Confirmación de pedido
-  2. Pedido enviado + tracking
-  3. Bienvenida al programa de lealtad
-  4. Recuperación de carrito abandonado
-  5. Newsletter de la comunidad STENCIL2
+- **Proveedor:** Resend (transaccional, dominio `stencil2.com` verificado en región EU)
+- **Módulo central:** `lib/email.ts` (HTML compatible basado en tablas + estilos inline negro/crema `#080808` / `#F5F2EB` / `#C4822A` + versión texto plano, escapado HTML estricto `escapeHtml` e `Idempotency-Key` en cada envío)
+- **Remitente:** `STENCIL2 <pedidos@stencil2.com>` (`EMAIL_FROM`)
+- **Avisos internos y Reply-To:** `pedidos@stencil2.com` (`EMAIL_ADMIN_TO`, reenviado por Cloudflare Email Routing)
+- **Emails implementados:**
+  1. Confirmación de pedido al cliente (`sendOrderConfirmation`) — disparado únicamente en transición `'pending' -> 'paid'` del webhook firmado de Stripe
+  2. Aviso interno de nuevo pedido (`sendNewOrderAlert`) — disparado en la misma transición `'pending' -> 'paid'`
+  3. Aviso interno de formulario de soporte (`sendContactAlert`) + autorrespuesta al cliente (`sendContactAutoreply`)
+  4. Aviso interno de solicitud B2B de distribuidor (`sendDistributorAlert`)
+  5. Bienvenida al newsletter STENCIL2 con cupón `S2-WELCOME10` y enlace de baja firmado HMAC-SHA256 (`sendNewsletterWelcome` + `GET /api/newsletter/baja`)
+- **Política de baja y valoración de doble opt-in:**
+  - Enlace de baja firmado con `UNSUBSCRIBE_SECRET` (`GET/POST /api/newsletter/baja`) y cabecera `List-Unsubscribe`.
+  - Si un email tiene `is_active = false`, no se reactiva automáticamente al enviar el formulario sin confirmación explícita (`confirmReactivate: true`).
+  - *Valoración doble opt-in:* Para e-commerce con incentivo inmediato (`S2-WELCOME10` en el checkout), el single opt-in protegido con honeypot, rate limiting por IP, validación estricta RFC, baja firmada con 1 clic y bloqueo de auto-reactivación maximiza la conversión del primer pedido manteniendo la higiene de la lista; si en el futuro se realizan campañas masivas de marketing, puede añadirse un estado intermedio `pending_confirmation` con token HMAC.
+
+### Seguridad y Endurecimiento (`lib/security.ts`)
+- Validación de email RFC (máx. 254 caracteres) y límites de longitud en todos los campos de entrada.
+- Honeypot oculto (`website`) y limitación de peticiones por IP en memoria (sliding window, sin dependencias externas como Upstash) en `/api/contacto` y `/api/newsletter`.
+- Respuestas HTTP 500 sanean los errores internos (detalle solo en logs de servidor).
 
 ### Deploy / Infraestructura
 - **Hosting:** Vercel (producción)
-- **Dominio:** [PENDIENTE — confirmar con cliente]
+- **Dominio:** `https://www.stencil2.com`
 - **CDN:** Vercel Edge Network (imágenes optimizadas con next/image)
 - **Variables de entorno:** Ver `.env.example`
 
@@ -284,9 +295,12 @@ STRIPE_WEBHOOK_SECRET=
 
 # Resend (email)
 RESEND_API_KEY=
+EMAIL_FROM="STENCIL2 <pedidos@stencil2.com>"
+EMAIL_ADMIN_TO=pedidos@stencil2.com
+UNSUBSCRIBE_SECRET=
 
 # App
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=https://www.stencil2.com
 NEXT_PUBLIC_SITE_NAME=STENCIL2
 ```
 

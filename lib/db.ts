@@ -2,6 +2,7 @@ import { supabaseServer } from '@/lib/supabaseClient'
 import { PRODUCTS, getProductBySlug } from '@/lib/products'
 import { VALID_PROMO_CODES } from '@/lib/pricing'
 import { getModelGallery, getModelMainImage } from '@/lib/imageCatalog'
+import { isValidEmail } from '@/lib/security'
 import type { CartItem, Order, Product } from '@/types'
 import type {
   DbProduct,
@@ -495,6 +496,46 @@ export async function orderExistsInDb(orderNumber: string): Promise<boolean> {
   return Boolean(data)
 }
 
+async function loadOrderItemsFromDbIfEmpty(order: DbOrder): Promise<DbOrder> {
+  if (!supabaseServer) return order
+  if (Array.isArray(order.items) && order.items.length > 0) {
+    return order
+  }
+
+  try {
+    const { data: rows, error } = await supabaseServer
+      .from('order_items')
+      .select('*')
+      .eq('order_id', order.id)
+      .order('created_at', { ascending: true })
+
+    if (error || !rows || rows.length === 0) {
+      return order
+    }
+
+    const hydratedItems: OrderItemJson[] = rows.map((row) => ({
+      id: row.product_slug || row.product_id || row.id,
+      code: row.product_code || '',
+      name: row.product_name,
+      slug: row.product_slug,
+      price: Number(row.unit_price) || 0,
+      image: row.image || '',
+      model: row.model || 'wayfarer',
+      color: row.color_hex || '#1a1a1a',
+      colorLabel: row.color_label || 'Estándar',
+      quantity: Number(row.quantity) || 1,
+    }))
+
+    return {
+      ...order,
+      items: hydratedItems,
+    }
+  } catch (err) {
+    console.warn('[DB loadOrderItemsFromDbIfEmpty] No se pudieron cargar order_items:', err)
+    return order
+  }
+}
+
 export async function markOrderPaidInDb(
   stripeId: string,
   payload: {
@@ -510,36 +551,82 @@ export async function markOrderPaidInDb(
     total?: number
     pointsEarned?: number
   }
-): Promise<{ order: DbOrder | null; persisted: boolean; error?: string }> {
+): Promise<{
+  order: DbOrder | null
+  persisted: boolean
+  transitionedToPaid: boolean
+  error?: string
+}> {
   if (!supabaseServer) {
-    return { order: null, persisted: false, error: 'Supabase no configurado' }
+    return {
+      order: null,
+      persisted: false,
+      transitionedToPaid: false,
+      error: 'Supabase no configurado',
+    }
   }
 
   try {
     let existing: DbOrder | null = null
 
-    const { data: byStripe } = await supabaseServer
+    const { data: byStripe, error: byStripeErr } = await supabaseServer
       .from('orders')
       .select('*')
       .eq('stripe_id', stripeId)
       .maybeSingle()
 
+    if (byStripeErr) {
+      console.error('[DB markOrderPaidInDb] Error buscando por stripe_id:', byStripeErr.message)
+      return {
+        order: null,
+        persisted: false,
+        transitionedToPaid: false,
+        error: 'Error consultando el pedido en la base de datos',
+      }
+    }
+
     existing = byStripe
 
     if (!existing && payload.orderNumber) {
-      const { data: byOrderNum } = await supabaseServer
+      const { data: byOrderNum, error: byOrderErr } = await supabaseServer
         .from('orders')
         .select('*')
         .eq('order_number', payload.orderNumber)
         .maybeSingle()
+
+      if (byOrderErr) {
+        console.error('[DB markOrderPaidInDb] Error buscando por order_number:', byOrderErr.message)
+        return {
+          order: null,
+          persisted: false,
+          transitionedToPaid: false,
+          error: 'Error consultando el pedido en la base de datos',
+        }
+      }
       existing = byOrderNum
     }
 
-    const effectiveTotal = payload.total ?? existing?.total ?? 0
-    const effectivePoints = payload.pointsEarned ?? existing?.points_earned ?? Math.round(Number(effectiveTotal))
-    const effectiveEmail = (payload.customerEmail || existing?.customer_email || '').trim().toLowerCase()
+    const effectiveTotal = Number(payload.total ?? existing?.total ?? 0)
+    const effectivePoints =
+      payload.pointsEarned ?? existing?.points_earned ?? Math.round(Number(effectiveTotal))
+    const effectiveEmail = (payload.customerEmail || existing?.customer_email || '')
+      .trim()
+      .toLowerCase()
+    const defaultTaxableBase = Number((effectiveTotal / 1.21).toFixed(2))
+    const defaultTax = Number((effectiveTotal - defaultTaxableBase).toFixed(2))
 
     if (existing) {
+      // Idempotencia ante reintentos de Stripe: si ya estaba en 'paid', no transiciona de nuevo
+      if (existing.status === 'paid') {
+        const hydrated = await loadOrderItemsFromDbIfEmpty(existing)
+        return {
+          order: hydrated,
+          persisted: true,
+          transitionedToPaid: false,
+        }
+      }
+
+      // Actualización condicional atómica (.neq('status', 'paid')) para evitar carreras
       const { data, error } = await supabaseServer
         .from('orders')
         .update({
@@ -548,18 +635,43 @@ export async function markOrderPaidInDb(
           total: effectiveTotal,
           subtotal: payload.subtotal ?? existing.subtotal,
           discount: payload.discount ?? existing.discount,
-          taxable_base: payload.taxableBase ?? existing.taxable_base,
-          tax: payload.tax ?? existing.tax,
+          taxable_base:
+            payload.taxableBase ??
+            (Number(existing.taxable_base) > 0 ? existing.taxable_base : defaultTaxableBase),
+          tax: payload.tax ?? (Number(existing.tax) > 0 ? existing.tax : defaultTax),
           shipping: payload.shipping ?? existing.shipping,
           promo_code: payload.promoCode !== undefined ? payload.promoCode : existing.promo_code,
           points_earned: effectivePoints,
         })
         .eq('id', existing.id)
+        .neq('status', 'paid')
         .select('*')
-        .single()
+        .maybeSingle()
 
       if (error) {
-        return { order: null, persisted: false, error: error.message }
+        console.error('[DB markOrderPaidInDb] Update error:', error.message)
+        return {
+          order: null,
+          persisted: false,
+          transitionedToPaid: false,
+          error: 'Error actualizando el pedido en la base de datos',
+        }
+      }
+
+      if (!data) {
+        // Otra petición concurrente ya lo marcó como 'paid'
+        const { data: currentOrder } = await supabaseServer
+          .from('orders')
+          .select('*')
+          .eq('id', existing.id)
+          .maybeSingle()
+
+        const hydrated = currentOrder ? await loadOrderItemsFromDbIfEmpty(currentOrder) : existing
+        return {
+          order: hydrated,
+          persisted: true,
+          transitionedToPaid: false,
+        }
       }
 
       if (effectiveEmail) {
@@ -572,13 +684,18 @@ export async function markOrderPaidInDb(
         })
       }
 
-      return { order: data, persisted: true }
+      const hydrated = await loadOrderItemsFromDbIfEmpty(data)
+      return {
+        order: hydrated,
+        persisted: true,
+        transitionedToPaid: true,
+      }
     }
 
     const fallbackOrderNum = payload.orderNumber || `S2-ORD-${Date.now()}`
-    const fallbackEmail = effectiveEmail || 'cliente@stencil2.com'
+    const fallbackEmail = effectiveEmail || 'pedidos@stencil2.com'
 
-    return createOrderInDb({
+    const created = await createOrderInDb({
       orderNumber: fallbackOrderNum,
       customerEmail: fallbackEmail,
       customerName: payload.customerName ?? null,
@@ -587,16 +704,37 @@ export async function markOrderPaidInDb(
       items: [],
       subtotal: payload.subtotal ?? effectiveTotal,
       discount: payload.discount ?? 0,
-      taxableBase: payload.taxableBase ?? 0,
-      tax: payload.tax ?? 0,
+      taxableBase: payload.taxableBase ?? defaultTaxableBase,
+      tax: payload.tax ?? defaultTax,
       shipping: payload.shipping ?? 0,
       total: effectiveTotal,
       promoCode: payload.promoCode ?? null,
       pointsEarned: effectivePoints,
     })
+
+    if (!created.persisted || !created.order) {
+      return {
+        order: null,
+        persisted: false,
+        transitionedToPaid: false,
+        error: created.error || 'No se pudo registrar el pedido en la base de datos',
+      }
+    }
+
+    const hydrated = await loadOrderItemsFromDbIfEmpty(created.order)
+    return {
+      order: hydrated,
+      persisted: true,
+      transitionedToPaid: true,
+    }
   } catch (err: any) {
-    console.warn('[DB markOrderPaidInDb] Excepción:', err)
-    return { order: null, persisted: false, error: err?.message }
+    console.error('[DB markOrderPaidInDb] Excepción:', err)
+    return {
+      order: null,
+      persisted: false,
+      transitionedToPaid: false,
+      error: 'Excepción al registrar el pago en la base de datos',
+    }
   }
 }
 
@@ -731,31 +869,83 @@ export async function validatePromoCodeInDb(code: string): Promise<{
 
 export async function subscribeNewsletterInDb(
   email: string,
-  source: string = 'footer'
+  source: string = 'footer',
+  options?: { confirmReactivate?: boolean }
 ): Promise<{
   ok: boolean
   promoCode: string
   persisted: boolean
   alreadySubscribed?: boolean
+  unsubscribed?: boolean
+  requiresConfirmation?: boolean
+  status?: number
   error?: string
 }> {
-  const normalizedEmail = email.trim().toLowerCase()
   const promoCode = 'S2-WELCOME10'
 
-  if (!normalizedEmail || !normalizedEmail.includes('@')) {
-    return { ok: false, promoCode, persisted: false, error: 'Email inválido' }
+  if (!isValidEmail(email)) {
+    return {
+      ok: false,
+      promoCode,
+      persisted: false,
+      status: 400,
+      error: 'Introduce un correo electrónico válido',
+    }
   }
 
+  const normalizedEmail = email.trim().toLowerCase()
+
   if (!supabaseServer) {
-    return { ok: true, promoCode, persisted: false }
+    console.error('[DB subscribeNewsletterInDb] Supabase no está configurado en el servidor')
+    return {
+      ok: false,
+      promoCode,
+      persisted: false,
+      status: 500,
+      error: 'No se pudo registrar la suscripción en este momento',
+    }
   }
 
   try {
-    const { data: existing } = await supabaseServer
+    const { data: existing, error: selectErr } = await supabaseServer
       .from('newsletter_subscribers')
       .select('id, is_active')
       .eq('email', normalizedEmail)
       .maybeSingle()
+
+    if (selectErr) {
+      console.error('[DB subscribeNewsletterInDb] Error consultando suscriptor:', selectErr.message)
+      return {
+        ok: false,
+        promoCode,
+        persisted: false,
+        status: 500,
+        error: 'No se pudo procesar la suscripción en este momento',
+      }
+    }
+
+    // No reactivar automáticamente a quien se dio de baja sin nueva confirmación explícita
+    if (existing && existing.is_active === false && !options?.confirmReactivate) {
+      return {
+        ok: false,
+        promoCode,
+        persisted: false,
+        unsubscribed: true,
+        requiresConfirmation: true,
+        status: 409,
+        error:
+          'Este correo se dio de baja anteriormente. Confirma de nuevo si deseas reactivar tu suscripción.',
+      }
+    }
+
+    if (existing && existing.is_active === true) {
+      return {
+        ok: true,
+        promoCode,
+        persisted: true,
+        alreadySubscribed: true,
+      }
+    }
 
     const { error } = await supabaseServer.from('newsletter_subscribers').upsert(
       {
@@ -769,18 +959,93 @@ export async function subscribeNewsletterInDb(
     )
 
     if (error) {
-      console.warn('[DB subscribeNewsletterInDb]:', error.message)
-      return { ok: true, promoCode, persisted: false, error: error.message }
+      console.error('[DB subscribeNewsletterInDb] Upsert error:', error.message)
+      return {
+        ok: false,
+        promoCode,
+        persisted: false,
+        status: 500,
+        error: 'No se pudo guardar la suscripción en este momento',
+      }
     }
 
     return {
       ok: true,
       promoCode,
       persisted: true,
-      alreadySubscribed: Boolean(existing?.is_active),
+      alreadySubscribed: false,
     }
   } catch (err: any) {
-    return { ok: true, promoCode, persisted: false, error: err?.message }
+    console.error('[DB subscribeNewsletterInDb] Excepción:', err)
+    return {
+      ok: false,
+      promoCode,
+      persisted: false,
+      status: 500,
+      error: 'No se pudo completar la suscripción en este momento',
+    }
+  }
+}
+
+export async function unsubscribeNewsletterInDb(email: string): Promise<{
+  ok: boolean
+  persisted: boolean
+  error?: string
+}> {
+  if (!isValidEmail(email)) {
+    return { ok: false, persisted: false, error: 'Correo electrónico inválido' }
+  }
+
+  const normalizedEmail = email.trim().toLowerCase()
+
+  if (!supabaseServer) {
+    console.error('[DB unsubscribeNewsletterInDb] Supabase no configurado')
+    return { ok: false, persisted: false, error: 'Servicio no disponible temporalmente' }
+  }
+
+  try {
+    const { data: existing, error: selectErr } = await supabaseServer
+      .from('newsletter_subscribers')
+      .select('id')
+      .eq('email', normalizedEmail)
+      .maybeSingle()
+
+    if (selectErr) {
+      console.error('[DB unsubscribeNewsletterInDb] Select error:', selectErr.message)
+      return { ok: false, persisted: false, error: 'No se pudo procesar la baja' }
+    }
+
+    if (existing) {
+      const { error: updateErr } = await supabaseServer
+        .from('newsletter_subscribers')
+        .update({ is_active: false })
+        .eq('id', existing.id)
+
+      if (updateErr) {
+        console.error('[DB unsubscribeNewsletterInDb] Update error:', updateErr.message)
+        return { ok: false, persisted: false, error: 'No se pudo registrar la baja' }
+      }
+    } else {
+      const { error: insertErr } = await supabaseServer
+        .from('newsletter_subscribers')
+        .insert({
+          email: normalizedEmail,
+          promo_code_sent: 'S2-WELCOME10',
+          privacy_accepted: false,
+          is_active: false,
+          source: 'unsubscribe',
+        })
+
+      if (insertErr) {
+        console.error('[DB unsubscribeNewsletterInDb] Insert error:', insertErr.message)
+        return { ok: false, persisted: false, error: 'No se pudo registrar la baja' }
+      }
+    }
+
+    return { ok: true, persisted: true }
+  } catch (err) {
+    console.error('[DB unsubscribeNewsletterInDb] Excepción:', err)
+    return { ok: false, persisted: false, error: 'Error al procesar la baja' }
   }
 }
 
@@ -789,17 +1054,34 @@ export async function createContactMessageInDb(input: {
   name?: string
   message: string
   privacyAccepted: boolean
-}): Promise<{ ok: boolean; persisted: boolean; id?: string; error?: string }> {
-  const normalizedEmail = input.email.trim().toLowerCase()
-  if (!normalizedEmail || !input.message.trim()) {
-    return { ok: false, persisted: false, error: 'Email y mensaje son obligatorios' }
+}): Promise<{ ok: boolean; persisted: boolean; id?: string; status?: number; error?: string }> {
+  if (!isValidEmail(input.email) || !input.message?.trim()) {
+    return {
+      ok: false,
+      persisted: false,
+      status: 400,
+      error: 'Email válido y mensaje son obligatorios',
+    }
   }
   if (!input.privacyAccepted) {
-    return { ok: false, persisted: false, error: 'Debes aceptar la Política de Privacidad' }
+    return {
+      ok: false,
+      persisted: false,
+      status: 400,
+      error: 'Debes aceptar la Política de Privacidad',
+    }
   }
 
+  const normalizedEmail = input.email.trim().toLowerCase()
+
   if (!supabaseServer) {
-    return { ok: true, persisted: false }
+    console.error('[DB createContactMessageInDb] Supabase no está configurado en el servidor')
+    return {
+      ok: false,
+      persisted: false,
+      status: 500,
+      error: 'No se pudo guardar tu mensaje en este momento',
+    }
   }
 
   try {
@@ -815,14 +1097,25 @@ export async function createContactMessageInDb(input: {
       .select('id')
       .single()
 
-    if (error) {
-      console.warn('[DB createContactMessageInDb]:', error.message)
-      return { ok: true, persisted: false, error: error.message }
+    if (error || !data) {
+      console.error('[DB createContactMessageInDb] Insert error:', error?.message)
+      return {
+        ok: false,
+        persisted: false,
+        status: 500,
+        error: 'No se pudo guardar tu mensaje en este momento',
+      }
     }
 
     return { ok: true, persisted: true, id: data.id }
   } catch (err: any) {
-    return { ok: true, persisted: false, error: err?.message }
+    console.error('[DB createContactMessageInDb] Excepción:', err)
+    return {
+      ok: false,
+      persisted: false,
+      status: 500,
+      error: 'No se pudo guardar tu mensaje en este momento',
+    }
   }
 }
 
@@ -832,17 +1125,34 @@ export async function createDistributorLeadInDb(input: {
   phone?: string
   notes?: string
   privacyAccepted: boolean
-}): Promise<{ ok: boolean; persisted: boolean; id?: string; error?: string }> {
-  const normalizedEmail = input.email.trim().toLowerCase()
-  if (!normalizedEmail) {
-    return { ok: false, persisted: false, error: 'Email obligatorio' }
+}): Promise<{ ok: boolean; persisted: boolean; id?: string; status?: number; error?: string }> {
+  if (!isValidEmail(input.email)) {
+    return {
+      ok: false,
+      persisted: false,
+      status: 400,
+      error: 'Introduce un correo electrónico válido',
+    }
   }
   if (!input.privacyAccepted) {
-    return { ok: false, persisted: false, error: 'Debes aceptar la Política de Privacidad' }
+    return {
+      ok: false,
+      persisted: false,
+      status: 400,
+      error: 'Debes aceptar la Política de Privacidad',
+    }
   }
 
+  const normalizedEmail = input.email.trim().toLowerCase()
+
   if (!supabaseServer) {
-    return { ok: true, persisted: false }
+    console.error('[DB createDistributorLeadInDb] Supabase no está configurado en el servidor')
+    return {
+      ok: false,
+      persisted: false,
+      status: 500,
+      error: 'No se pudo registrar tu solicitud en este momento',
+    }
   }
 
   try {
@@ -859,13 +1169,24 @@ export async function createDistributorLeadInDb(input: {
       .select('id')
       .single()
 
-    if (error) {
-      console.warn('[DB createDistributorLeadInDb]:', error.message)
-      return { ok: true, persisted: false, error: error.message }
+    if (error || !data) {
+      console.error('[DB createDistributorLeadInDb] Insert error:', error?.message)
+      return {
+        ok: false,
+        persisted: false,
+        status: 500,
+        error: 'No se pudo registrar tu solicitud en este momento',
+      }
     }
 
     return { ok: true, persisted: true, id: data.id }
   } catch (err: any) {
-    return { ok: true, persisted: false, error: err?.message }
+    console.error('[DB createDistributorLeadInDb] Excepción:', err)
+    return {
+      ok: false,
+      persisted: false,
+      status: 500,
+      error: 'No se pudo registrar tu solicitud en este momento',
+    }
   }
 }

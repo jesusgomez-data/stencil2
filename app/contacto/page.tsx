@@ -10,9 +10,11 @@ export default function ContactoPage() {
   const [formSent, setFormSent] = useState(false)
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
+  const [contactHoneypot, setContactHoneypot] = useState('')
 
   // Distribuidor oficial B2B
   const [distributorEmail, setDistributorEmail] = useState('')
+  const [distributorHoneypot, setDistributorHoneypot] = useState('')
   const [distributorSent, setDistributorSent] = useState(false)
 
   const [privacyAccepted, setPrivacyAccepted] = useState(false)
@@ -40,6 +42,7 @@ export default function ContactoPage() {
             email,
             message,
             privacyAccepted,
+            website: contactHoneypot,
           }),
         })
         const data = await res.json()
@@ -77,6 +80,7 @@ export default function ContactoPage() {
             type: 'distributor',
             email: distributorEmail,
             privacyAccepted: distributorPrivacyAccepted,
+            website: distributorHoneypot,
           }),
         })
         const data = await res.json()
@@ -147,12 +151,23 @@ export default function ContactoPage() {
               ENVÍANOS UN MENSAJE
             </h3>
             <form onSubmit={handleSubmit} className="space-y-4">
+              <input
+                type="text"
+                name="website"
+                value={contactHoneypot}
+                onChange={(e) => setContactHoneypot(e.target.value)}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                className="hidden"
+              />
               <div>
                 <label className="font-code text-[9px] tracking-widest text-white/40 uppercase block mb-2">EMAIL</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  maxLength={254}
                   className="w-full bg-black border border-white/15 text-white font-code text-[10px] tracking-widest px-4 py-3 focus:outline-none focus:border-white/30 transition-colors rounded-sm"
                   required
                 />
@@ -164,6 +179,7 @@ export default function ContactoPage() {
                   rows={4}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
+                  maxLength={4000}
                   className="w-full bg-black border border-white/15 text-white font-code text-[10px] tracking-widest px-4 py-3 focus:outline-none focus:border-white/30 transition-colors rounded-sm resize-none"
                   required
                 />
@@ -245,6 +261,16 @@ export default function ContactoPage() {
                 ESCRÍBENOS
               </p>
               <form onSubmit={handleDistributorSubmit} className="space-y-4">
+                <input
+                  type="text"
+                  name="website"
+                  value={distributorHoneypot}
+                  onChange={(e) => setDistributorHoneypot(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="hidden"
+                />
                 <div>
                   <label className="font-code text-[9px] tracking-widest text-white/40 uppercase block mb-2">
                     TU CORREO ELECTRÓNICO
@@ -254,6 +280,7 @@ export default function ContactoPage() {
                     value={distributorEmail}
                     onChange={(e) => setDistributorEmail(e.target.value)}
                     placeholder="TU@EMPRESA.COM"
+                    maxLength={254}
                     className="w-full bg-black border border-white/15 text-white font-code text-[10px] tracking-widest px-4 py-3.5 focus:outline-none focus:border-[#C4822A]/50 transition-colors rounded-sm placeholder:text-white/20"
                     required
                   />
