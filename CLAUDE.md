@@ -348,4 +348,4 @@ npm run start
 5. Precios **siempre** con formato `29.00` (dos decimales, sin símbolo € al lado izquierdo).
 6. **IVA siempre incluido** en precio mostrado — nunca mostrar precio sin IVA al usuario final.
 7. El visor 3D es la pieza estrella del proyecto — debe funcionar perfectamente en mobile.
-8. Categorías de navegación: solo HOME, MEN, WOMEN — en mayúsculas siempre.
+8. Categorías de navegación: solo HOME, MEN, WOMEN — en mayúsculas siempre. . .
