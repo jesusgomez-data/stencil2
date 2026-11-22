@@ -58,7 +58,7 @@ const COLLECTION_PRODUCTS: CollectionProduct[] = [
     id:              'onyx-black',
     name:            'IBZEN -SOIRESNAES',
     subtitle:        'Edición limitada',
-    price:           '49.00',
+    price:           '44.90',
     frameColor:      '#111111',
     bgColor:         '#030303',
     isNew:           false,
@@ -68,7 +68,7 @@ const COLLECTION_PRODUCTS: CollectionProduct[] = [
     id:              'classic-blue',
     name:            'FLERSY - SOIRES NAES',
     subtitle:        'Edición limitada',
-    price:           '49.00',
+    price:           '44.90',
     frameColor:      '#C4822A',
     bgColor:         '#040404',
     isNew:           false,
@@ -78,7 +78,7 @@ const COLLECTION_PRODUCTS: CollectionProduct[] = [
     id:              'olive-crystal',
     name:            'BLACKEYE - UTK',
     subtitle:        'Edición limitada',
-    price:           '39.00',
+    price:           '44.90',
     frameColor:      '#3A5A28',
     bgColor:         '#050505',
     isNew:           false,
@@ -86,9 +86,9 @@ const COLLECTION_PRODUCTS: CollectionProduct[] = [
   },
   {
     id:              'smoke-grey',
-    name:            'RUBEN (RUBEN - SMOKE TROPICAL)',
+    name:            'Ruben - Smoke Tropical',
     subtitle:        'Edición limitada',
-    price:           '39.00',
+    price:           '44.90',
     frameColor:      '#555555',
     bgColor:         '#080808',
     isNew:           false,
@@ -317,6 +317,28 @@ function HeroSection() {
                 </div>
               </div>
             ))}
+
+            {/* ── CINTILLO DE DESCUENTO -30% (Animación: aparece, 5s visible, 3s oculto, loop) ── */}
+            <motion.div
+              className="relative lg:absolute lg:top-20 lg:inset-x-0 z-20 w-full bg-white text-black py-1.5 px-3 flex items-center justify-center gap-2 shadow-sm pointer-events-auto"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{
+                opacity: [0, 1, 1, 0, 0],
+                y: [-8, 0, 0, -8, -8],
+              }}
+              transition={{
+                duration: 8.8,
+                times: [0, 0.045, 0.614, 0.659, 1],
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+            >
+              <span className="text-sm leading-none select-none" aria-hidden="true">💣</span>
+              <span className="font-sans text-[11px] sm:text-xs font-semibold tracking-wide uppercase text-center leading-tight">
+                APROVECHA EL -30% DEL 23 AL 30 DE NOVIEMBRE
+              </span>
+              <span className="text-sm leading-none select-none" aria-hidden="true">💣</span>
+            </motion.div>
 
             {/* ── VIDEO PRINCIPAL: completo, sin recortes ni zoom ── */}
             <motion.div
@@ -985,7 +1007,7 @@ function CollectionsSection() {
     e.preventDefault()
     e.stopPropagation()
     const product = PRODUCTS.find((pr) => pr.id === p.id)
-    const numericPrice = parseFloat(p.price.replace(/[^0-9.]/g, '')) || 29.00
+    const numericPrice = parseFloat(p.price.replace(/[^0-9.]/g, '')) || 44.90
     addToCart({
       id: p.id,
       code: product?.code ?? '',
@@ -1150,12 +1172,14 @@ function CollectionsSection() {
                   className="relative z-10 flex flex-col gap-2.5 w-full px-4 pb-4 pt-3 border-t border-white/[0.04]"
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <div className="min-w-0 flex flex-col gap-1.5">
+                    <div className="min-w-0 flex items-baseline flex-wrap gap-x-2 gap-y-0.5">
+                      {compareAtPrice && (
+                        <span className="font-code text-xs text-white/50 line-through decoration-[#CC0000] decoration-[1.5px] whitespace-nowrap">
+                          {compareAtPrice.toFixed(2).replace('.', ',')}€
+                        </span>
+                      )}
                       <p className="font-bebas text-2xl tracking-wide text-white leading-none">
-                        {p.price.includes('€') ? p.price : `${p.price} €`}
-                      </p>
-                      <p className="font-code text-[11px] text-white/35 line-through leading-none h-[11px] whitespace-nowrap">
-                        {compareAtPrice ? `${compareAtPrice.toFixed(2)} €` : ''}
+                        {p.price.includes('€') ? p.price : `${p.price}€`}
                       </p>
                     </div>
 

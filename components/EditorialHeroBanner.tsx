@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 export default function EditorialHeroBanner() {
   return (
@@ -29,14 +30,34 @@ export default function EditorialHeroBanner() {
         }}
       />
 
-      {/* Texto superior y título */}
-      <div className="relative z-10 text-left mb-6">
+      {/* Texto superior y cuadro de descuento -30% con animación y transparencia */}
+      <div className="relative z-10 text-left mb-5">
         <p className="font-code text-[8px] tracking-[0.35em] text-white/50 uppercase mb-3">
           NUEVA COLECCIÓN
         </p>
-        <h2 className="font-bebas text-[38px] leading-[0.88] text-white tracking-wide drop-shadow-sm">
-          JOINING<br />CULTURE
-        </h2>
+        <motion.div
+          className="inline-block bg-black/60 backdrop-blur-md border border-white/15 px-3.5 py-2.5 shadow-xl select-none"
+          initial={{ opacity: 0, scale: 0.96, y: 6 }}
+          animate={{
+            opacity: [0, 1, 1, 0, 0],
+            scale: [0.96, 1, 1, 0.96, 0.96],
+            y: [6, 0, 0, 6, 6],
+          }}
+          transition={{
+            duration: 8.8,
+            times: [0, 0.045, 0.614, 0.659, 1],
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        >
+          <p className="font-sans text-[15px] sm:text-[16px] font-extrabold leading-[1.15] text-white uppercase tracking-tight drop-shadow-sm">
+            -30%
+            <br />
+            DEL 23 AL 30
+            <br />
+            DE NOVIEMBRE
+          </p>
+        </motion.div>
       </div>
 
       {/* CTA */}

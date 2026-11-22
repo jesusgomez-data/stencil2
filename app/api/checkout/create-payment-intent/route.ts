@@ -56,12 +56,29 @@ export async function POST(req: Request) {
 
     // 1. Verificación de precios contra el catálogo del servidor
     const orderItemsPayload: OrderItemJson[] = []
+
+    // Seguridad: con dinero real, jamás se acepta un precio enviado por el cliente.
+    // Todo artículo debe existir en el catálogo del servidor.
+    const hasUnknownProduct = items.some(
+      (clientItem: any) =>
+        !(
+          getProductById(clientItem?.id) ||
+          getProductBySlug(clientItem?.id) ||
+          getProductBySlug(clientItem?.slug)
+        )
+    )
+    if (hasUnknownProduct) {
+      return NextResponse.json(
+        { error: 'Uno de los productos del carrito ya no está disponible. Actualiza el carrito.' },
+        { status: 400 }
+      )
+    }
+
     const verifiedItems = items.map((clientItem: any) => {
-      const product =
-        getProductById(clientItem.id) ||
+      const product = (getProductById(clientItem.id) ||
         getProductBySlug(clientItem.id) ||
-        getProductBySlug(clientItem.slug)
-      const unitPrice = product ? product.price : (Number(clientItem.price) || 29.00)
+        getProductBySlug(clientItem.slug))!
+      const unitPrice = product.price
       const quantity = Math.max(1, Math.min(10, Number(clientItem.quantity) || 1))
 
       orderItemsPayload.push({

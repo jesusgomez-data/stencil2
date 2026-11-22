@@ -75,7 +75,7 @@ export default function ProductCard({
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    const numericPrice = parseFloat(price.replace(/[^0-9.]/g, '')) || 29.00
+    const numericPrice = parseFloat(price.replace(/[^0-9.]/g, '')) || 44.90
     addToCart({
       id: slug,
       code,
@@ -213,12 +213,14 @@ export default function ProductCard({
       {/* ── 4. PIE: Precio con IVA y botones en la misma fila; envío a todo el ancho ── */}
       <div className="relative z-10 flex flex-col gap-2.5 w-full px-4 pb-4 pt-3 border-t border-white/[0.06] bg-black/80">
         <div className="flex items-center justify-between gap-2">
-          <div className="min-w-0 flex flex-col gap-1.5">
+          <div className="min-w-0 flex items-baseline flex-wrap gap-x-2 gap-y-0.5">
+            {compareAtPrice && (
+              <span className="font-code text-xs text-white/50 line-through decoration-[#CC0000] decoration-[1.5px] whitespace-nowrap">
+                {compareAtPrice.toFixed(2).replace('.', ',')}€
+              </span>
+            )}
             <p className="font-bebas text-2xl tracking-wide text-white leading-none">
-              {price.includes('€') ? price : `${price} €`}
-            </p>
-            <p className="font-code text-[11px] text-white/35 line-through leading-none h-[11px] whitespace-nowrap">
-              {compareAtPrice ? `${compareAtPrice.toFixed(2)} €` : ''}
+              {price.includes('€') ? price : `${price}€`}
             </p>
           </div>
 

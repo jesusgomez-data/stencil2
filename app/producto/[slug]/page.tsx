@@ -147,14 +147,15 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                   {product.subtitle}
                 </p>
               )}
-              <div className="flex items-baseline gap-2 mt-1">
-                <span className="font-bebas text-3xl tracking-wide text-white">{product.price.toFixed(2)}</span>
-                <span className="font-code text-[10px] tracking-widest text-white/40">EUR</span>
+              <div className="flex items-baseline flex-wrap gap-2 mt-1">
                 {product.compareAtPrice && (
-                  <>
-                    <span className="font-code text-sm text-white/35 line-through ml-2">{product.compareAtPrice.toFixed(2)} €</span>
-                    <span className="font-code text-[10px] text-[#00E575] font-bold tracking-wider ml-1">-17%</span>
-                  </>
+                  <span className="font-code text-sm text-white/50 line-through decoration-[#CC0000] decoration-[1.5px]">
+                    {product.compareAtPrice.toFixed(2).replace('.', ',')}€
+                  </span>
+                )}
+                <span className="font-bebas text-3xl tracking-wide text-white">{product.price.toFixed(2)}€</span>
+                {product.compareAtPrice && (
+                  <span className="font-code text-[10px] text-[#00E575] font-bold tracking-wider ml-1">-30%</span>
                 )}
                 <span className="font-code text-[8px] tracking-wider text-white/20 ml-2 uppercase">IVA Incluido</span>
               </div>

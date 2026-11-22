@@ -3,6 +3,9 @@ import { getProductsFromDb, getProductBySlugFromDb } from '@/lib/db'
 
 // Depende de los parámetros de la URL: siempre se renderiza bajo demanda
 export const dynamic = 'force-dynamic'
+// Sin caché de datos: los cambios de precio en Supabase deben verse al instante
+export const fetchCache = 'force-no-store'
+export const revalidate = 0
 
 export async function GET(req: Request) {
   try {

@@ -58,8 +58,8 @@ const PRODUCTS = [
     subtitle: 'Edición limitada',
     slug: 'ibzen-soires-naes',
     aliases: ['ibsen-soires-naes'],
-    price: 49.0,
-    compare_at_price: 59.0,
+    price: 44.9,
+    compare_at_price: 58.37,
     gender: 'unisex',
     model: 'wayfarer',
     description:
@@ -99,8 +99,8 @@ const PRODUCTS = [
     subtitle: 'Edición limitada',
     slug: 'flersy-soires-naes',
     aliases: ['flersy-naes-soires', 'flersy-soires', 'kso-kc'],
-    price: 49.0,
-    compare_at_price: 59.0,
+    price: 44.9,
+    compare_at_price: 58.37,
     gender: 'unisex',
     model: 'wayfarer',
     description:
@@ -140,8 +140,8 @@ const PRODUCTS = [
     subtitle: 'Edición limitada',
     slug: 'blackeye-utk',
     aliases: ['tropical-smoke'],
-    price: 39.0,
-    compare_at_price: 47.0,
+    price: 44.9,
+    compare_at_price: 58.37,
     gender: 'unisex',
     model: 'round',
     description:
@@ -176,12 +176,12 @@ const PRODUCTS = [
     product_key: 'smoke-grey',
     letter: 'D',
     code: 'GLT6630-C3',
-    name: 'RUBEN (RUBEN - SMOKE TROPICAL)',
+    name: 'Ruben - Smoke Tropical',
     subtitle: 'Edición limitada',
     slug: 'ruben-smoke-tropical',
     aliases: ['rubel-smoke-tropical', 'rubel', 'ruben', 'spice-fler', 'smoke-tropical'],
-    price: 39.0,
-    compare_at_price: 47.0,
+    price: 44.9,
+    compare_at_price: 58.37,
     gender: 'unisex',
     model: 'sport',
     description:
@@ -213,8 +213,8 @@ const PRODUCTS = [
     subtitle: null,
     slug: 'aviator-gold',
     aliases: [],
-    price: 35.0,
-    compare_at_price: 42.0,
+    price: 44.9,
+    compare_at_price: 58.37,
     gender: 'unisex',
     model: 'aviator',
     description:
@@ -304,6 +304,11 @@ const PROMO_CODES = [
   },
 ]
 
+// PRUEBA1 (pedido a 1 €) solo se siembra si se pide explícitamente (nunca en producción).
+const PROMO_CODES_TO_SEED = PROMO_CODES.filter(
+  (promo) => promo.code !== 'PRUEBA1' || process.env.SEED_TEST_PROMO === 'true'
+)
+
 function failWithGuidance(step, error) {
   const msg = error?.message || String(error)
   const code = error?.code || ''
@@ -365,7 +370,7 @@ async function runSeed() {
 
   const { data: upsertedPromos, error: promoError } = await supabase
     .from('promo_codes')
-    .upsert(PROMO_CODES, { onConflict: 'code' })
+    .upsert(PROMO_CODES_TO_SEED, { onConflict: 'code' })
     .select('code')
 
   if (promoError) {

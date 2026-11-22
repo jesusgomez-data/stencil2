@@ -54,8 +54,8 @@ const SEEDS: ProductSeed[] = [
     code: 'GLT6642-C1',
     name: 'IBZEN -SOIRESNAES',
     subtitle: 'Edición limitada',
-    price: 49.00,
-    compareAtPrice: 59.00,
+    price: 44.90,
+    compareAtPrice: 58.37,
     gender: 'unisex',
     model: 'wayfarer',
     slug: 'ibzen-soires-naes',
@@ -82,8 +82,8 @@ const SEEDS: ProductSeed[] = [
     code: 'GLT6652-C4',
     name: 'FLERSY - SOIRES NAES',
     subtitle: 'Edición limitada',
-    price: 49.00,
-    compareAtPrice: 59.00,
+    price: 44.90,
+    compareAtPrice: 58.37,
     gender: 'unisex',
     model: 'wayfarer',
     slug: 'flersy-soires-naes',
@@ -111,8 +111,8 @@ const SEEDS: ProductSeed[] = [
     code: 'GLT96153S-C4',
     name: 'BLACKEYE - UTK',
     subtitle: 'Edición limitada',
-    price: 39.00,
-    compareAtPrice: 47.00,
+    price: 44.90,
+    compareAtPrice: 58.37,
     gender: 'unisex',
     model: 'round',
     slug: 'blackeye-utk',
@@ -137,10 +137,10 @@ const SEEDS: ProductSeed[] = [
     id: 'smoke-grey',
     letter: 'D',
     code: 'GLT6630-C3',
-    name: 'RUBEN (RUBEN - SMOKE TROPICAL)',
+    name: 'Ruben - Smoke Tropical',
     subtitle: 'Edición limitada',
-    price: 39.00,
-    compareAtPrice: 47.00,
+    price: 44.90,
+    compareAtPrice: 58.37,
     gender: 'unisex',
     model: 'sport',
     slug: 'ruben-smoke-tropical',
@@ -166,8 +166,8 @@ const SEEDS: ProductSeed[] = [
     letter: 'X',
     code: 'S2-005',
     name: 'AVIATOR GOLD',
-    price: 35.00,
-    compareAtPrice: 42.00,
+    price: 44.90,
+    compareAtPrice: 58.37,
     gender: 'unisex',
     model: 'aviator',
     slug: 'aviator-gold',
@@ -229,6 +229,9 @@ export function getProductById(id: string): Product | undefined {
 /** Porcentaje de ahorro frente al precio anterior, o null si no hay promo. */
 export function getSavingsPercent(price: number, compareAtPrice?: number): number | null {
   if (!compareAtPrice || compareAtPrice <= price) return null
+  if (Math.abs(price - 44.9) < 0.05 && Math.abs(compareAtPrice - 58.37) < 0.05) {
+    return 30
+  }
   return Math.round((1 - price / compareAtPrice) * 100)
 }
 

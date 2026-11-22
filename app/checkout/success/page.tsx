@@ -69,7 +69,7 @@ function SuccessContent() {
   }, [clientSecret, clearCart])
 
   const displayOrderId = orderIdParam || (orders.length > 0 ? orders[0].id : `S2-ORD-${Math.floor(100000 + Math.random() * 900000)}`)
-  const displayAmount = orderAmount ?? (orders.length > 0 ? orders[0].total : 29.00)
+  const displayAmount = orderAmount ?? (orders.length > 0 ? orders[0].total : 44.90)
 
   if (status === 'loading') {
     return (

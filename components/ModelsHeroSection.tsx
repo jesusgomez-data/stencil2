@@ -10,22 +10,26 @@ const FEATURED_MODELS = [
   {
     name: 'FLERSY',
     slug: 'flersy-soires-naes',
-    price: '49€',
+    price: '44.90€',
+    compareAtPrice: '58,37€',
   },
   {
     name: 'IBZEN',
     slug: 'ibzen-soires-naes',
-    price: '49€',
+    price: '44.90€',
+    compareAtPrice: '58,37€',
   },
   {
     name: 'BLACKEYE',
     slug: 'blackeye-utk',
-    price: '39€',
+    price: '44.90€',
+    compareAtPrice: '58,37€',
   },
   {
     name: 'RUBEN SMOKE',
     slug: 'ruben-smoke-tropical',
-    price: '39€',
+    price: '44.90€',
+    compareAtPrice: '58,37€',
   },
 ]
 
@@ -180,7 +184,8 @@ export default function ModelsHeroSection() {
                     className="inline-flex items-center justify-between sm:justify-start gap-1.5 px-2.5 py-1.5 rounded-sm bg-white/[0.04] md:bg-black/60 hover:bg-white hover:text-black text-white/80 border border-white/10 hover:border-white font-code text-[9px] tracking-wider transition-all duration-200"
                   >
                     <span>{m.name}</span>
-                    <span className="text-white/40 font-normal">{m.price}</span>
+                    <span className="line-through decoration-[#CC0000] decoration-[1.5px] text-white/40">{m.compareAtPrice}</span>
+                    <span className="text-white group-hover:text-black font-medium">{m.price}</span>
                   </Link>
                 ))}
               </div>

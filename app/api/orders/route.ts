@@ -80,7 +80,7 @@ export async function POST(req: Request) {
         code: String(item.code || product?.code || '').slice(0, 40),
         name: String(item.name || product?.name || 'Gafas STENCIL2').slice(0, 120),
         slug: String(item.slug || product?.slug || item.id || '').slice(0, 100),
-        price: product ? product.price : (Number(item.price) || 29.0),
+        price: product ? product.price : (Number(item.price) || 44.90),
         image: String(item.image || product?.image || '').slice(0, 250),
         model: String(item.model || product?.model || 'wayfarer').slice(0, 40),
         color: String(item.color || product?.frameColor || '#1a1a1a').slice(0, 40),
